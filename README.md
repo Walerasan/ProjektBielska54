@@ -1,2 +1,2 @@
 # ProjektBielska54
-Szkola Prywatna
+Szkola Prywatna Oferta
