@@ -1,0 +1,217 @@
+@CHARSET "UTF-8";
+/*@font-face
+{
+	font-family: courierb;
+	src:url(../media/desktop/courierb.eot);
+	src:url(../media/desktop/courierb.ttf) format("truetype");
+}*/
+html
+{
+	font-family:tahoma;
+	background:white;
+	font-size:10pt;
+}
+body
+{
+	margin:0px;
+	font-family:tahoma;
+	background:white;
+	font-size:10pt;
+}
+div
+{
+	font-family:tahoma;
+}
+img
+{
+	border:0px;
+	margin:0px;
+}
+a:link
+{
+	color:black;
+	text-decoration:none;
+}
+a:active
+{
+	color:black;
+	text-decoration:none;
+}
+a:visited
+{
+	color:black;
+	text-decoration:none;
+}
+a:hover
+{
+	color:#black;
+	text-decoration:none;
+}
+p
+{
+	margin:0px;
+	padding:0px;
+}
+/*-------------------------------------------------------*/
+#likebox_1
+{
+  z-index: 10005;
+	border:2px solid #3c95d9;
+	background-color: #fff;
+	width:196px;
+	height: 353px;
+	position: fixed;
+	top: 18%;
+	right: -200px;
+}
+#likebox_1_1
+{
+	width:196px;
+	height: 353px;
+	overflow: hidden;
+}
+#likebox_1 img
+{
+	position: absolute; 
+	top: -2px; 
+	left: -35px; 
+	cursor: pointer;
+}
+#likebox_1 iframe
+{
+	border:0px solid #3c95d9;
+	overflow: hidden; 
+	position: static;
+	height: 360px;
+	left:-2px;
+  top:-3px;
+}
+/*-------------------------------------------------------*/
+div.tlostrony
+{
+	width:100%;
+	overflow:hidden;
+	background:url(../../media/desktop/gora.gif);
+	background-repeat:repeat-x;
+}
+div.centruj
+{
+	width:990px;
+	margin:auto;
+	overflow:hidden;
+}
+div.belkalogailoginu
+{
+	margin-top:5px;
+	margin-bottom:5px;
+	width:100%;
+	overflow:hidden;
+	position:relative;
+}
+div.logo
+{
+	width:204px;
+	height:90px;
+	float:left;
+}
+div.logindata
+{
+	float:right;
+	text-align:right;
+}
+/*---------------------- STOPKA -------------------------*/
+div.stopka
+{
+	width:990px;
+	margin:auto;
+	overflow:hidden;
+	text-align:center;
+}
+a.stopkadolna:link
+{
+	color:black;
+}
+a.stopkadolna:active
+{
+	color:black;
+}
+a.stopkadolna:visited
+{
+	color:#aaa;
+}
+a.stopkadolna:hover
+{
+	color:#aaa;
+}
+/*--------------------- NAGŁÓWEK --------------------------*/
+div.godzina
+{
+	font-weight:bold;
+}
+/*--------------------- MENU ------------------------------*/
+div.belkamenu
+{
+	width:100%;
+	height:30px;
+	background:black;
+	font-size:12pt;
+	color:white;
+	overflow:hidden;
+}
+div.belkamenuodstepy
+{
+	padding-left:5px;
+	padding-top:3px;
+}
+a.menugorne
+{
+	color:#fff;
+	font-size:10pt;
+}
+/*-------------------- PRZYCISKI --------------------------*/
+button.przyciskwyloguj
+{
+	color:#666;
+	width:61px;
+	height:27px;
+	border:0px;
+	background:url(../../media/desktop/backgroundbuttonfield.gif);
+}
+input.przyciskzaloguj
+{
+	color:#666;
+	width:61px;
+	height:27px;
+	border:0px;
+	background:url(../../media/desktop/backgroundbuttonfield.gif);
+}
+input.polelogin
+{
+	text-align:center;
+	background:url(../../media/desktop/backgroundtextfield.gif);
+	background-repeat:no-repeat;
+	width:120px;
+	height:25px;
+	border:0px;
+	color:#aaaaaa;
+}
+input.polehasla
+{
+	text-align:center;
+	background:url(../../media/desktop/backgroundtextfield.gif);
+	background-repeat:no-repeat;
+	width:120px;
+	height:25px;
+	border:0px;
+	color:#aaaaaa;
+}
+/* ------------------- ŚRODEK ---------------------------- */
+div.srodek
+{
+	overflow:hidden;
+	width:100%;
+	padding-bottom:20px;
+	margin-bottom:20px;
+	margin-top:10px;
+	border-bottom:1px dashed #aaa;
+}
