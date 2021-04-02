@@ -1,0 +1,36 @@
+@CHARSET "UTF-8";
+html
+{
+	background:red;
+}
+
+body
+{
+	color:#000; 
+	font-family:tahoma; 
+	font-size:14px; 
+	margin:8px;
+	background:inherit;
+}
+
+img
+{
+	border:0px;
+	margin:0px;
+}
+
+p
+{
+	margin:0px;
+	padding:0px;
+}
+
+td
+{
+	
+}
+
+pre
+{
+	
+}

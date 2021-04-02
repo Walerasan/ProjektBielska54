@@ -1,0 +1,172 @@
+@CHARSET "UTF-8";
+@font-face
+{
+	font-family: constan;
+	src:url(../media/desktop/constan.eot);
+	src:url(../media/desktop/constan.ttf) format("truetype");
+}
+@font-face
+{
+	font-family: constanb;
+	src:url(../media/desktop/constanb.eot);
+	src:url(../media/desktop/constanb.ttf) format("truetype");
+}
+html
+{
+	font-family:tahoma;
+	background:#012643;
+}
+body
+{
+	margin:0px;
+	font-family:tahoma;
+	background:#012643;
+	color:white;
+}
+div
+{
+	font-family:tahoma;
+}
+img
+{
+	border:0px;
+	margin:0px;
+}
+a:link
+{
+	color:white;
+	text-decoration:none;
+}
+a:active
+{
+	color:white;
+	text-decoration:none;
+}
+a:visited
+{
+	color:white;
+	text-decoration:none;
+}
+a:hover
+{
+	color:#4a0000;
+	text-decoration:none;
+}
+p
+{
+	margin:0px;
+}
+div.raporty
+{
+	clear:both;
+	width:100%;
+}
+/*---------------------- LOGOWANIE ----------------------*/
+div.loginodstepgorny
+{
+	width:100%;
+	height:150px;
+}
+div.center
+{
+	text-align:center;
+}
+/*-------------------------------------------------------*/
+div.tresc
+{
+	float:left;
+	width:87vw;
+	display:table-cell
+}
+div.trescodstep
+{
+	padding:20px;
+}
+div.menu
+{
+	float:left;
+	clear:both;
+	width:12vw;
+}
+/*-------------------------------------------------------*/
+div.menupionowe
+{
+	color:white;
+	padding-top:20px;
+	height:95vh;
+	width:12vw;
+	border-right:1px solid #2788b0;
+}
+a.menu:link
+{
+	color:white;
+	font-size:17px;
+	font-family:georgia;
+}
+a.menu:active
+{
+	color:white;
+	font-size:17px;
+	font-family:georgia;
+}
+a.menu:visited
+{
+	color:white;
+	font-size:17px;
+	font-family:georgia;
+}
+a.menu:hover
+{
+	color:white;
+	font-size:17px;
+	font-family:georgia;
+}
+
+img.kropkawmenu
+{
+	vertical-align:bottom;
+	margin-right:5px;
+}
+img.kropkawmenu2
+{
+	vertical-align:bottom;
+	margin-right:5px;
+	margin-left:10px;
+}
+
+div.header
+{
+	text-align:center;
+	border-bottom:1px solid #2788b0;
+	width:100%;
+	overflow:hidden;
+}
+div.logo
+{
+	width:12vw;
+	text-align:center;
+	float:left;
+}
+div.komunikat
+{
+	width:78vw;
+	float:left;
+	color:white;
+	text-align:left;
+	padding-top:5px;
+}
+img.labnodelogo
+{
+	
+}
+blad
+{
+	color:#dd0000;
+	font-weight:bold;
+	font-size:20px;
+}
+hr.separatorwmenu
+{
+	border:0px;
+	border-bottom:1px solid #2788B0;
+}
