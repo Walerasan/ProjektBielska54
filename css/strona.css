@@ -1,0 +1,73 @@
+@CHARSET "UTF-8";
+div.cookieinfo
+{
+	position:absolute;
+	bottom:0px;
+	background:#F6F6F6;
+	width:100%;
+	position:fixed;
+	border-top:1px solid gray;
+	z-index:10000;
+}
+div.cookieinfowarstwanosna
+{
+	width:1000px;
+	overflow:hidden;
+	text-align:center;
+	font-size:8pt;
+	margin:auto;
+}
+div.cookieinfowarstwatekstu
+{
+	padding:0px 5px 0px 5px;
+	float:left;
+	width:840px;
+	font-family:tahoma;
+}
+img.cookieinfozamknij
+{
+	width:20px;
+	margin-top:10px;
+	cursor:pointer;
+}
+p.komunikatwarning
+{
+	margin:2px;
+	padding:2px;
+	border:1px dashed #E96B39;
+	color:#E96B39;
+	font-weight:bold;
+	font-size:10pt;
+	font-family:courier;
+}
+p.komunikatok
+{
+	margin:2px;
+	padding:2px;
+	border:1px dashed #154a00;
+	color:#154a00;
+	font-weight:bold;
+	font-size:10pt;
+	font-family:courier;
+}
+p.komunikaterror
+{
+	margin:2px;
+	padding:2px;
+	border:1px dashed red;
+	color:red;
+	font-weight:bold;
+	font-size:10pt;
+	font-family:courier;
+}
+div.raporty
+{
+	width:800px;
+	overflow:hidden;
+}
+p.phperrorblock
+{
+	color:orange;
+	font-size:10pt;
+	font-weight:bold;
+}
