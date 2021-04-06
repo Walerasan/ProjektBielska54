@@ -1,9 +1,9 @@
 <?php
 
 /*
- CREATE DATABASE labnode CHARACTER SET UTF8;
- CREATE USER user1@localhost IDENTIFIED BY 'password1';
- GRANT ALL PRIVILEGES ON *.* TO 'user1'@localhost IDENTIFIED BY 'password1'; 
+ CREATE DATABASE ksiegowosc_nzpe_pl CHARACTER SET UTF8;
+ CREATE USER ksiegowy@localhost IDENTIFIED BY 'Ksiegowy20Nzpe21Pl';
+ GRANT ALL PRIVILEGES ON *.* TO 'ksiegowy'@localhost IDENTIFIED BY 'Ksiegowy20Nzpe21Pl'; 
  FLUSH PRIVILEGES;
  */
 
@@ -23,9 +23,9 @@ if(!class_exists('database_cfg'))
             if($_SERVER['REMOTE_ADDR']=="127.0.0.1")//dla lokalnego serwera włączam imagemagic z lokalnego dysku
             {
                 $this->server="localhost";
-                $this->login="user1";
-                $this->password="password1";
-                $this->database_name="labnode";
+                $this->login="ksiegowy";
+                $this->password="Ksiegowy20Nzpe21Pl";
+                $this->database_name="ksiegowosc_nzpe_pl";
                 $this->show_queries_when_error=true;
                 $this->show_queries_when_ok=true;
             }

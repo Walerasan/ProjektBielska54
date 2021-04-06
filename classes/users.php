@@ -24,10 +24,10 @@ if(!class_exists('users'))
 		        switch($page_obj->target)
 		        {
 		            case "test01":
-		                $rettext=$page_obj->$template_class_name->get_content($page_obj,"test","menu");
+		                $rettext=$page_obj->$template_class_name->get_content($page_obj,"test");
 		                break;
 		            default:
-		                $rettext=$page_obj->$template_class_name->get_content($page_obj,"default","menu");
+		                $rettext=$page_obj->$template_class_name->get_content($page_obj,"default");
 		                break;
 		        }
 			}

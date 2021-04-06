@@ -18,14 +18,16 @@ if(!class_exists('admin_template'))
 		    $rettext="";
 		    if($page_obj->users->is_login())
 		    {
-		        $menupozome="todo";
-		        $komunikat="TODO";
+		        $menupozome="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
+		        $menupozome.="<hr />";
+		        $menupozome.="<a href='users,admin,logout'>Logout</a><br />";
+		        $komunikat="";
 		    }
 		    else
 		    {
 		        $trescstrony="";
 		        $menupozome="";
-		        $komunikat="";
+		        $komunikat="Prosze się zalogować";
 		    }
 		    //--------------------
 		    if(!$page_obj->users->is_login())
@@ -67,8 +69,8 @@ if(!class_exists('admin_template'))
 							</div>
 							<table>
 								<tr>
-									<td style='vertical-align:top;'>$menupozome</td>
-									<td style='vertical-align:top;'>$trescstrony</td>
+									<td style='vertical-align:top;width:200px;padding:10px;border-right:2px solid gray;margin:10px;'>$menupozome</td>
+									<td style='vertical-align:top;padding:10px;'>$trescstrony</td>
 								</tr>
 							</table>
 							<!-- ################################################## -->
