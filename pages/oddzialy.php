@@ -22,19 +22,29 @@ if(!class_exists('oddzialy'))
             {
                 switch($page_obj->target)
                 {
+                    case "przywroc":
+                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
+                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->restore($page_obj,$idod,$confirm));
+                        break;
+                    case "usun":
+                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
+                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->delete($page_obj,$idod,$confirm));
+                        break;
                     case "zapisz":
                         $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
-                        $name=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['name'])?$_POST['name']:"");
-                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->add($idod,$name));                        
+                        $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->add($page_obj,$idod,$nazwa));                        
                         break;
                     case "formularz":                                                
                         $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
-                        $name=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['name'])?$_POST['name']:"");
-                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->form($idod,$name));
+                        $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->form($page_obj,$idod,$nazwa));
                         break;
                     case "lista":
                     default:
-                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->lista());
+                        $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->lista($page_obj));
                         break;
                 }
             }
@@ -42,31 +52,74 @@ if(!class_exists('oddzialy'))
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function lista()
+        public function lista($page_obj)
         {
             $rettext="";
             //--------------------
             $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",admin,formularz\"'>Dodaj nowy</button><br />";
             //--------------------
+            $wynik=$page_obj->database_obj->get_data("select idod,nazwa,usuniety from ".get_class($this).";");
+            if($wynik)
+            {
+                $rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+                $rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";                
+                $rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+                $rettext.="
+					<tr style='font-weight:bold;'>
+						<td style='width:25px;'>Lp.</td>						
+						<td>nazwa</td>						
+						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>						
+					</tr>";
+                $lp=0;
+                while(list($idod,$nazwa,$usuniety)=$wynik->fetch_row())
+                {
+                    $lp++;
+                    //--------------------
+                    if($usuniety=='nie')
+                    {
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",admin,usun,$idod,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+                    }
+                    else
+                  {
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",admin,przywroc,$idod,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+                    }
+                    //--------------------
+                    $rettext.="
+						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idod' onmouseover=\"setopticalwhite50('wiersz$idod')\" onmouseout=\"setoptical0('wiersz$idod')\">
+							<td>$lp</td>							
+							<td>$nazwa</td>							
+							<td style='text-align:center;'><a href='".get_class($this).",admin,formularz,$idod'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'>$operacja</td>							
+						</tr>
+					";
+                }
+                $rettext.="</table>";
+            }
+            else
+            {
+                $rettext.="<br />Brak wpisów<br />";
+            }
             //--------------------
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function form($idod,$name)
+        public function form($page_obj,$idod,$nazwa)
         {
             $rettext="";
             //--------------------
             $_SESSION['antyrefresh']=false;
             //--------------------
-            /*if($idod!="" && is_numeric($idod) && $idod>0)
+            if($idod!="" && is_numeric($idod) && $idod>0)
             {
-                $wynik=$this->strona->baza->pobierzdane("select tytul,rodzic,opis from ".get_class($this)."_opis where usuniety='nie' and idp=$idp");
+                $wynik=$page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
                 if($wynik)
-                    list($tytul,$rodzic,$opis)=mysql_fetch_row($wynik);
-            }*/
+                {
+                    list($nazwa)=$wynik->fetch_row();
+                }
+            }
             //--------------------
-            //TODO: zabezpieczyć dane do edycji
-            //$opis=$this->strona->string->doedycji($opis);
+            $nazwa=$page_obj->text_obj->doedycji($nazwa);
             //--------------------
             $rettext="
                     <style>
@@ -77,7 +130,7 @@ if(!class_exists('oddzialy'))
             $rettext.="
 					<form method='post' action='".get_class($this).",admin,zapisz'>
 						<div style='overflow:hidden;'>							
-							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='tytul' value='$name' style='width:800px;'/></div></div>							
+							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>							
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
@@ -93,47 +146,92 @@ if(!class_exists('oddzialy'))
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function add($idod,$name)
+        public function add($page_obj,$idod,$nazwa)
         {
-            tu skonczylem
-            $rettext="";
+            $rettext = "";
             //--------------------
-            //zabezpieczam dane
-            //$name=$this->strona->string->domysql($name);            
+            // zabezpieczam dane
             //--------------------
+            $nazwa = $page_obj->text_obj->domysql($nazwa);            
             //--------------------
-            if($idod!="" && is_numeric($idod) && $idod>0)
+            if( ($idod != "") && is_numeric($idod) && ($idod > 0) )
             {
-                $zapytanie="update ".get_class($this)." set tytul='$tytul',rodzic=$rodzic,opis='$opis',telefon='$telefon',email='$email',www='$www' where idk=$idk;";//poprawa wpisu
+                $zapytanie="update ".get_class($this)." set nazwa='$nazwa' where idod=$idod;";//poprawa wpisu
             }
             else
            {
-                //pobrac następną dostępną kolejność w drzewie
-                $zapytanie="insert into ".get_class($this)."(tytul,rodzic,opis,kolejnosc,telefon,email,www)values('$tytul',$rodzic,'$opis',$kolejnosc,'$telefon','$email','$www')";//nowy wpis
-             }
-             //--------------------
-             if(!$_SESSION['antyrefresh'])
+                $zapytanie="insert into ".get_class($this)."(nazwa)values('$nazwa')";//nowy wpis
+            }
+            //--------------------
+            if(!$_SESSION['antyrefresh'])
+            {
+                if($page_obj->database_obj->execute_query($zapytanie))
                 {
-                    if($this->strona->baza->operacja($zapytanie))
-                    {
-                        $_SESSION['antyrefresh']=true;
-                        $rettext.="Zapisane<br />";
-                        $rettext.=$this->lista();
-                    }
-                    else
-                    {
-                        $rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-                        $rettext.=$this->formularz($idk,$tytul,$rodzic,$idk2,$telefon,$email,$www);
-                    }
+                    $_SESSION['antyrefresh']=true;
+                    $rettext.="Zapisane<br />";
+                    $rettext.=$this->lista($page_obj);
                 }
                 else
-                    $rettext.=$this->lista();
-                    return $rettext;
+              {
+                    $rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+                    $rettext.=$this->form($page_obj,$idod,$nazwa);
+                }
+            }
+            else
+           {
+               $rettext.=$this->lista($page_obj);
+            }
+            return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function delete($idod,$confirm)
+        public function delete($page_obj,$idod,$confirm)
         {
-            
+            $rettext="";
+            //--------------------
+            if($confirm=="yes")
+            {
+                if($page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idod=$idod;"))
+                {
+                    //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+                    $rettext.=$this->lista($page_obj);
+                }
+                else
+                {
+                    $rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+                    $rettext.=$this->lista($page_obj);
+                }
+            }
+            else
+           {
+                $rettext.="This operation need confirm.";
+            }
+            //--------------------
+            return $rettext;
+        }
+        //----------------------------------------------------------------------------------------------------
+        public function restore($page_obj,$idod,$confirm)
+        {
+            $rettext="";
+            //--------------------
+            if($confirm=="yes")
+            {
+                if($page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idod=$idod;"))
+                {
+                    //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+                    $rettext.=$this->lista($page_obj);
+                }
+                else
+                {
+                    $rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+                    $rettext.=$this->lista($page_obj);
+                }
+            }
+            else
+            {
+                $rettext.="This operation need confirm.";
+            }
+            //--------------------
+            return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
         public function get_list()
@@ -141,9 +239,18 @@ if(!class_exists('oddzialy'))
             
         }
         //----------------------------------------------------------------------------------------------------
-        public function get_name($idod)
+        public function get_name($page_obj,$idod)
         {
-            
+            $nazwa='';
+            if($idod!="" && is_numeric($idod) && $idod>0)
+            {
+                $wynik=$page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
+                if($wynik)
+                {
+                    list($nazwa)=$wynik->fetch_row();
+                }
+            }
+            return $nazwa;
         }
         //----------------------------------------------------------------------------------------------------
         private function definicjabazy($page_obj)
