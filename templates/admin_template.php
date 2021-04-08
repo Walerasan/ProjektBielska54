@@ -19,6 +19,7 @@ if(!class_exists('admin_template'))
 		    if($page_obj->users->is_login())
 		    {
 		        $menupozome="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
+		        $menupozome.="<a href='klasa,admin,lista'>Klasa</a><br />";
 		        $menupozome.="<hr />";
 		        $menupozome.="<a href='users,admin,logout'>Logout</a><br />";
 		        $komunikat="";

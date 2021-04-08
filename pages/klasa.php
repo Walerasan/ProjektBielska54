@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('klasa'))
 {
-    class oddzialy
+    class klasa
     {
         var $page_obj;
         //----------------------------------------------------------------------------------------------------
@@ -25,24 +25,26 @@ if(!class_exists('oddzialy'))
                 switch($this->page_obj->target)
                 {
                     case "przywroc":
-                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->restore($idod,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->restore($idkl,$confirm));
                         break;
                     case "usun":
-                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->delete($idod,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->delete($idkl,$confirm));
                         break;
                     case "zapisz":
-                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
-                        $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->add($idod,$nazwa));                        
+                        $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
+                        $idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->add($idkl,$idod,$nazwa));                        
                         break;
                     case "formularz":                                                
-                        $idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
-                        $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->form($idod,$nazwa));
+                        $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
+                        $idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
+                        $nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->form($idkl,$idod,$nazwa));
                         break;
                     case "lista":
                     default:
@@ -60,7 +62,7 @@ if(!class_exists('oddzialy'))
             //--------------------
             $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",admin,formularz\"'>Dodaj nowy</button><br />";
             //--------------------
-            $wynik=$this->page_obj->database_obj->get_data("select idod,nazwa,usuniety from ".get_class($this).";");
+            $wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa,usuniety from ".get_class($this).";");
             if($wynik)
             {
                 $rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -69,29 +71,31 @@ if(!class_exists('oddzialy'))
                 $rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>						
-						<td>nazwa</td>						
+						<td>nazwa</td>
+                        <td>oddział</td>						
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>						
 					</tr>";
                 $lp=0;
-                while(list($idod,$nazwa,$usuniety)=$wynik->fetch_row())
+                while(list($idkl,$idod,$nazwa,$usuniety)=$wynik->fetch_row())
                 {
                     $lp++;
                     //--------------------
                     if($usuniety=='nie')
                     {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",admin,usun,$idod,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",admin,usun,$idkl,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
                     }
                     else
                   {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",admin,przywroc,$idod,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",admin,przywroc,$idkl,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
                     }
                     //--------------------
                     $rettext.="
-						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idod' onmouseover=\"setopticalwhite50('wiersz$idod')\" onmouseout=\"setoptical0('wiersz$idod')\">
+						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idkl' onmouseover=\"setopticalwhite50('wiersz$idkl')\" onmouseout=\"setoptical0('wiersz$idkl')\">
 							<td>$lp</td>							
-							<td>$nazwa</td>							
-							<td style='text-align:center;'><a href='".get_class($this).",admin,formularz,$idod'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td>$nazwa</td>
+                            <td>".$this->page_obj->oddzialy->get_name($idod)."</td>							
+							<td style='text-align:center;'><a href='".get_class($this).",admin,formularz,$idkl'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>							
 						</tr>
 					";
@@ -106,18 +110,18 @@ if(!class_exists('oddzialy'))
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function form($idod,$nazwa)
+        public function form($idkl,$idod,$nazwa)
         {
             $rettext="";
             //--------------------
             $_SESSION['antyrefresh']=false;
             //--------------------
-            if($idod!="" && is_numeric($idod) && $idod>0)
+            if($idkl!="" && is_numeric($idkl) && $idkl>0)
             {
-                $wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
+                $wynik=$this->page_obj->database_obj->get_data("select nazwa,idod from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
                 if($wynik)
                 {
-                    list($nazwa)=$wynik->fetch_row();
+                    list($nazwa,$idod)=$wynik->fetch_row();
                 }
             }
             //--------------------
@@ -132,7 +136,8 @@ if(!class_exists('oddzialy'))
             $rettext.="
 					<form method='post' action='".get_class($this).",admin,zapisz'>
 						<div style='overflow:hidden;'>							
-							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>							
+							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
+                            <div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>".$this->create_select_field_from_oddzialy($idod)."</div></div>							
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
@@ -141,14 +146,13 @@ if(!class_exists('oddzialy'))
                                 </div>
                             </div>
 						</div>
-						<input type='hidden' name='idod' value='$idod' />						
+						<input type='hidden' name='idkl' value='$idkl' />						
 					</form>";
-            //--------------------
             //--------------------
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function add($idod,$nazwa)
+        public function add($idkl,$idod,$nazwa)
         {
             $rettext = "";
             //--------------------
@@ -156,13 +160,13 @@ if(!class_exists('oddzialy'))
             //--------------------
             $nazwa = $this->page_obj->text_obj->domysql($nazwa);            
             //--------------------
-            if( ($idod != "") && is_numeric($idod) && ($idod > 0) )
+            if( ($idkl != "") && is_numeric($idkl) && ($idkl > 0) )
             {
-                $zapytanie="update ".get_class($this)." set nazwa='$nazwa' where idod=$idod;";//poprawa wpisu
+                $zapytanie="update ".get_class($this)." set nazwa='$nazwa',idod=$idod where idkl=$idkl;";//poprawa wpisu
             }
             else
            {
-                $zapytanie="insert into ".get_class($this)."(nazwa)values('$nazwa')";//nowy wpis
+                $zapytanie="insert into ".get_class($this)."(nazwa,idod)values('$nazwa',$idod)";//nowy wpis
             }
             //--------------------
             if(!$_SESSION['antyrefresh'])
@@ -176,7 +180,7 @@ if(!class_exists('oddzialy'))
                 else
               {
                     $rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-                    $rettext.=$this->form($idod,$nazwa);
+                    $rettext.=$this->form($idkl,$idod,$nazwa);
                 }
             }
             else
@@ -186,13 +190,13 @@ if(!class_exists('oddzialy'))
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function delete($idod,$confirm)
+        public function delete($idkl,$confirm)
         {
             $rettext="";
             //--------------------
             if($confirm=="yes")
             {
-                if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idod=$idod;"))
+                if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idkl=$idkl;"))
                 {
                     //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
                     $rettext.=$this->lista();
@@ -211,13 +215,13 @@ if(!class_exists('oddzialy'))
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function restore($idod,$confirm)
+        public function restore($idkl,$confirm)
         {
             $rettext="";
             //--------------------
             if($confirm=="yes")
             {
-                if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idod=$idod;"))
+                if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idkl=$idkl;"))
                 {
                     //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
                     $rettext.=$this->lista();
@@ -240,30 +244,44 @@ if(!class_exists('oddzialy'))
         {
             $rettext=array();
             //--------------------
-            $wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+            $wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa from ".get_class($this)." where usuniety='nie';");
             if($wynik)
             {
-                while(list($idod,$nazwa)=$wynik->fetch_row())
+                while(list($idkl,$idod,$nazwa)=$wynik->fetch_row())
                 {
-                    $rettext[] = array((int)$idod, $nazwa);
+                    $rettext[] = array((int)$idkl, (int)$idod, $nazwa);
                 }
             }
             //--------------------
             return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
-        public function get_name($idod)
+        public function get_name($idkl)
         {
             $nazwa='';
-            if($idod!="" && is_numeric($idod) && $idod>0)
+            if($idkl!="" && is_numeric($idkl) && $idkl>0)
             {
-                $wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
+                $wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
                 if($wynik)
                 {
                     list($nazwa)=$wynik->fetch_row();
                 }
             }
             return $nazwa;
+        }
+        //----------------------------------------------------------------------------------------------------
+        private function create_select_field_from_oddzialy($idod)
+        {
+            $rettext="<select name='idod'>";
+            //--------------------
+            foreach($this->page_obj->oddzialy->get_list() as $val)
+            {
+                $rettext.="<option value='$val[0]' ".($val[0]=="$idod"?"selected='selected'":"").">$val[1]</option>";
+            }
+            //--------------------
+            $rettext.="</select>";
+            //--------------------
+            return $rettext;
         }
         //----------------------------------------------------------------------------------------------------
         private function definicjabazy()
@@ -273,12 +291,20 @@ if(!class_exists('oddzialy'))
             $pola=array();
             
             //definicja tablicy
-            $nazwa="idod";
+            $nazwa="idkl";
             $pola[$nazwa][0]="int(10)";
             $pola[$nazwa][1]="not null";//null
             $pola[$nazwa][2]="primary key";//key
             $pola[$nazwa][3]="";//default
             $pola[$nazwa][4]="auto_increment";//extra
+            $pola[$nazwa][5]=$nazwa;
+            
+            $nazwa="idod";
+            $pola[$nazwa][0]="int(10)";
+            $pola[$nazwa][1]="not null";//null
+            $pola[$nazwa][2]="";//key
+            $pola[$nazwa][3]="";//default
+            $pola[$nazwa][4]="";//extra
             $pola[$nazwa][5]=$nazwa;
             
             $nazwa="usuniety";
