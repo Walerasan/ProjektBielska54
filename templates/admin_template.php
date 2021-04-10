@@ -20,6 +20,7 @@ if(!class_exists('admin_template'))
 		    {
 		        $menupozome="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
 		        $menupozome.="<a href='klasa,admin,lista'>Klasa</a><br />";
+				$menupozome.="<a href='typy_oplat,admin,lista'>Typy opłat</a><br />";
 		        $menupozome.="<hr />";
 		        $menupozome.="<a href='users,admin,logout'>Logout</a><br />";
 		        $komunikat="";
