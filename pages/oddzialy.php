@@ -20,7 +20,7 @@ if(!class_exists('oddzialy'))
             $rettext="";
             $template_class_name=$this->page_obj->template."_template";
             //--------------------
-            if($this->page_obj->template=="admin")
+            if($this->page_obj->template == "admin")
             {
                 switch($this->page_obj->target)
                 {

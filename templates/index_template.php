@@ -15,57 +15,51 @@ if(!class_exists('index_template'))
 		//----------------------------------------------------------------------------------------------------
 		public function get_content($page_obj,$trescstrony,$menupozome)
 		{
-			$formularzlogowania="";//(is_object($this->silnik->uzytkownicy) && method_exists($this->silnik->uzytkownicy,"formularz")) ?$this->silnik->uzytkownicy->formularz():"";
-			$stopkastrony=$this->stopka();		
-			//--------------------
-			$rettext="
-				<link rel='Stylesheet' type='text/css' href='./css/index.css' />
-				<!-- ################################################## -->
-				 ".$this->infoOCookie($page_obj)."
-					<!-- ################## środek strony ##################### -->
-					<div class='tlostrony'>
-					  <div class='centruj'>
-					  
-						  <!-- ########## -->
-					  	<div class='belkalogailoginu'>
-					  		<div class='logo'><img src='./media/desktop/logo.gif' alt='LabNode - Laboratorium informatyki, matematyki, chemii, mechaniki, elektroniki' /></div>
-					  		<div class='logindata'>
-					  			$formularzlogowania
-					  			<br />
-									Twoje ip: ".((isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'])."
-									<div id='godzina' class='godzina' onclick='var e=arguments[0] || event;kalendarzKG.pokaz(e,\"\",\"\",\"\",\"\",\"\",\"\",this,true);'></div>
-									<script type='text/javascript'>var kalendarzKG=new LabNode.kalendarz('KG');</script>\n 
-									<script type='text/javascript'>new LabNode.zegarek('godzina');</script>\n
-					  		</div>
-					  	</div>
-											
-							<!-- ########## -->				
-					  	<div class='belkamenu'>
-					  		<div class='belkamenuodstepy'>
-					  			$menupozome
-					  		</div>
-					  	</div>
-					  				
-					  	<!-- ########## -->
-					  	<div class='srodek'>
-								$trescstrony
-							</div>
-							
-						 	<!-- ###### koniec środek strony ###### -->
-						 	$stopkastrony
-						</div>
-					</div>
-			";
+			if($page_obj->users->is_login())
+		    {
+				$rettext=$this->index_template_user_is_login();
+			}
+			else
+			{
+				$rettext=$this->index_template_user_is_logout();
+			}
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function stopka()
+		private function index_template_user_is_logout()
 		{
-			$rettext="<div class='stopka'>
-							..:: &#169;opyright: <a href='javascript:window.open(\"http://labnode.org\",\"chaild\");void(null);' class='stopkadolna'>labnode.org</a> 2010 &#183;&#183;::.. Project &#38; fabricating: <a href='javascript:window.open(\"http://labnode.org\",\"chaild\");void(null);' class='stopkadolna'>LabNode</a> ..::&#183;&#183; Programmer: <a href='javascript:window.open(\"mailto:rafal@labnode.org\",\"chaild\");void(null);' class='stopkadolna'>Rafał Oleśkowicz</a> ::..<br />
-							..:: Laboratorium informatyki, matematyki, chemii, mechaniki, elektroniki, psychologii ::..<br />
-							..:: mgr inż. Rafał Oleśkowicz ::..
-						</div>";
+			$rettext="
+				<link rel='Stylesheet' type='text/css' href='./css/index.css' />
+				<!-- ################################################## -->
+				<div class='pasekgorny'><div class='center'><img src='./media/desktop/pasekgorny.gif' alt='' class='pasekgorny'/></div></div>
+				<div class='tlo'>			  
+					<div class='center'>
+						<img src='./media/desktop/tytul.png' alt='' class='tytul'/>
+						<img src='./media/desktop/tytul2.png' alt='' class='tytul2'/>
+						{$this->login_form()}
+						<div class='info'>				  		
+							<img src='./media/desktop/ikonadomku.gif' alt='' style='vertical-align:middle;' /> Bielska 54, 43-200 Pszczyna <img src='./media/desktop/ikonatelefonu.gif' alt='' style='vertical-align:middle;'/>  502 243 181 <img src='./media/desktop/ikonakoperty.gif' alt='' style='vertical-align:middle;' /> <a href='mailto:biuro@nzpe.pl' style='color:inherit;text-decoration:none;'>biuro@nzpe.pl</a> <img src='./media/desktop/ikonamapy.gif' alt='' style='vertical-align:middle;' /> <a href='https://goo.gl/maps/bmHnVLcNAhYVxGy8A' onclick='window.open(\"https://goo.gl/maps/bmHnVLcNAhYVxGy8A\",\"chaild\");return false;' style='color:inherit;text-decoration:none;'> mapa</a> 
+						</div>
+					</div>
+				</div>";
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function index_template_user_is_login()
+		{
+			$rettext="jesteś zalogowany <br />";
+			$rettext.="<a href='staticpages,index,logout'>Logout</a><br />";
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function login_form()
+		{
+			$rettext="<form method='post' action='staticpages,index,login' class='login_form'>";
+			$rettext.="<input type='text' class='login_form_input' name='r_login' value='e-mail' onclick='this.value==\"e-mail\"?this.value=\"\":null'/> <br />";
+			$rettext.="<input type='text' class='login_form_input' name='r_password' value='hasło' onclick='this.value==\"hasło\"?this.value=\"\":null;this.type=\"password\";'/> <br />";
+			$rettext.="<input type='submit' class='login_form_submit' value='zaloguj' />";
+			$rettext.="</form>";
+			//--------------------
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
