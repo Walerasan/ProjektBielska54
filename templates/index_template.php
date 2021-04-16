@@ -4,29 +4,31 @@ if(!class_exists('index_template'))
 {
     class index_template
 	{
+		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct()
+	    public function __construct($page_obj)
 		{
+			$this->page_obj=$page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
 		{
 		}
 		//----------------------------------------------------------------------------------------------------
-		public function get_content($page_obj,$trescstrony,$menupozome)
+		public function get_content($trescstrony)
 		{
-			if($page_obj->users->is_login())
+			if($this->page_obj->users->is_login())
 		    {
-				$rettext=$this->index_template_user_is_login();
+				$rettext=$this->index_template_user_is_login($trescstrony);
 			}
 			else
 			{
-				$rettext=$this->index_template_user_is_logout();
+				$rettext=$this->index_template_user_is_logout($trescstrony);
 			}
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function index_template_user_is_logout()
+		private function index_template_user_is_logout($trescstrony)
 		{
 			$rettext="
 				<link rel='Stylesheet' type='text/css' href='./css/index.css' />
@@ -45,10 +47,15 @@ if(!class_exists('index_template'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function index_template_user_is_login()
+		private function index_template_user_is_login($trescstrony)
 		{
 			$rettext="jesteś zalogowany <br />";
+			$rettext.="<a href='klasa,index,lista'>Klasa</a><br />";
+			$rettext.="<a href='typy_oplat,index,lista'>Typy opłat</a><br />";
 			$rettext.="<a href='staticpages,index,logout'>Logout</a><br />";
+			$rettext.="<hr />";
+			$rettext.=$trescstrony;
+			$rettext.="<hr />";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -63,14 +70,14 @@ if(!class_exists('index_template'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function infoOCookie($page_obj)
+		private function infoOCookie()
 		{
 		    if(isset($_COOKIE['cookieinfo']))$cookieinfo=$_COOKIE['cookieinfo'];else $cookieinfo="";
 		    $rettext="
 			<div id='cookieinfo' class='cookieinfo'>
 				<div class='cookieinfowarstwanosna' style='".($cookieinfo=="potwierdzone"?"display:none;":"")."'>
 					<div class='cookieinfowarstwatekstu'>
-						".$page_obj->language_obj->pobierz("cookieinfo")."
+						".$this->page_obj->language_obj->pobierz("cookieinfo")."
 					</div>
 					<img src='./media/desktop/zamknij.png' alt='' class='cookieinfozamknij' onclick='document.getElementById(\"cookieinfo\").style.display=\"none\";setCookie(\"cookieinfo\",\"potwierdzone\",365);'/>
 				</div>

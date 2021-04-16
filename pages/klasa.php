@@ -20,35 +20,35 @@ if(!class_exists('klasa'))
             $rettext="";
             $template_class_name=$this->page_obj->template."_template";
             //--------------------
-            if($this->page_obj->template=="admin")
+            if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
             {
                 switch($this->page_obj->target)
                 {
                     case "przywroc":
                         $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->restore($idkl,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->restore($idkl,$confirm));
                         break;
                     case "usun":
                         $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->delete($idkl,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->delete($idkl,$confirm));
                         break;
                     case "zapisz":
                         $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
                         $nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->add($idkl,$idod,$nazwa));                        
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->add($idkl,$idod,$nazwa));                        
                         break;
                     case "formularz":                                                
                         $idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
                         $idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
                         $nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->form($idkl,$idod,$nazwa));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->form($idkl,$idod,$nazwa));
                         break;
                     case "lista":
                     default:
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->lista());
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->lista());
                         break;
                 }
             }
@@ -60,7 +60,7 @@ if(!class_exists('klasa'))
         {
             $rettext="";
             //--------------------
-            $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",admin,formularz\"'>Dodaj nowy</button><br />";
+            $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
             //--------------------
             $wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa,usuniety from ".get_class($this).";");
             if($wynik)
@@ -83,11 +83,11 @@ if(!class_exists('klasa'))
                     //--------------------
                     if($usuniety=='nie')
                     {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",admin,usun,$idkl,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idkl,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
                     }
                     else
                   {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",admin,przywroc,$idkl,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idkl,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
                     }
                     //--------------------
                     $rettext.="
@@ -95,7 +95,7 @@ if(!class_exists('klasa'))
 							<td>$lp</td>							
 							<td>$nazwa</td>
                             <td>".$this->page_obj->oddzialy->get_name($idod)."</td>							
-							<td style='text-align:center;'><a href='".get_class($this).",admin,formularz,$idkl'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idkl'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>							
 						</tr>
 					";
@@ -134,7 +134,7 @@ if(!class_exists('klasa'))
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
             $rettext.="
-					<form method='post' action='".get_class($this).",admin,zapisz'>
+					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>							
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
                             <div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>".$this->create_select_field_from_oddzialy($idod)."</div></div>							
@@ -142,7 +142,7 @@ if(!class_exists('klasa'))
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
                                     <input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",admin,lista\"'>Anuluj</button>
+                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
                                 </div>
                             </div>
 						</div>

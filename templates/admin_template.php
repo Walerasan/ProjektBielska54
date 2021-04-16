@@ -4,21 +4,24 @@ if(!class_exists('admin_template'))
 {
     class admin_template
 	{
+		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct()
+	    public function __construct($page_obj)
 		{
+			$this->page_obj=$page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
 		{
 		}
 		//----------------------------------------------------------------------------------------------------
-		public function get_content($page_obj,$trescstrony)
+		public function get_content($trescstrony)
 		{			
 		    $rettext="";
-		    if($page_obj->users->is_login())
+		    if($this->page_obj->users->is_login())
 		    {
-		        $menupozome="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
+				$menupozome="<a href='users,admin,lista'>Użytkownicy</a><br />";
+		        $menupozome.="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
 		        $menupozome.="<a href='klasa,admin,lista'>Klasa</a><br />";
 				$menupozome.="<a href='typy_oplat,admin,lista'>Typy opłat</a><br />";
 		        $menupozome.="<hr />";
@@ -32,7 +35,7 @@ if(!class_exists('admin_template'))
 		        $komunikat="Prosze się zalogować";
 		    }
 		    //--------------------
-		    if(!$page_obj->users->is_login())
+		    if(!$this->page_obj->users->is_login())
 		    {
 		        $rettext.="<body>
 										<link rel='Stylesheet' type='text/css' href='./css/admin.css' />

@@ -20,33 +20,33 @@ if(!class_exists('typy_oplat'))
             $rettext="";
             $template_class_name=$this->page_obj->template."_template";
             //--------------------
-            if($this->page_obj->template=="admin")
+            if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
             {
                 switch($this->page_obj->target)
                 {
                     case "przywroc":
                         $idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->restore($idto,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->restore($idto,$confirm));
                         break;
                     case "usun":
                         $idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
                         $confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->delete($idto,$confirm));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->delete($idto,$confirm));
                         break;
                     case "zapisz":
                         $idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);                        
                         $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->add($idto,$nazwa));                        
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->add($idto,$nazwa));                        
                         break;
                     case "formularz":                                                
                         $idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
                         $nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->form($idto,$nazwa));
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->form($idto,$nazwa));
                         break;
                     case "lista":
                     default:
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->lista());
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->lista());
                         break;
                 }
             }
@@ -58,7 +58,7 @@ if(!class_exists('typy_oplat'))
         {
             $rettext="";
             //--------------------
-            $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",admin,formularz\"'>Dodaj nowy</button><br />";
+            $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
             //--------------------
             $wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,usuniety from ".get_class($this).";");
             if($wynik)
@@ -80,18 +80,18 @@ if(!class_exists('typy_oplat'))
                     //--------------------
                     if($usuniety=='nie')
                     {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",admin,usun,$idto,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idto,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
                     }
                     else
                   {
-                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",admin,przywroc,$idto,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+                        $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idto,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
                     }
                     //--------------------
                     $rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idto' onmouseover=\"setopticalwhite50('wiersz$idto')\" onmouseout=\"setoptical0('wiersz$idto')\">
 							<td>$lp</td>							
 							<td>$nazwa</td>
-							<td style='text-align:center;'><a href='".get_class($this).",admin,formularz,$idto'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idto'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>							
 						</tr>
 					";
@@ -130,14 +130,14 @@ if(!class_exists('typy_oplat'))
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
             $rettext.="
-					<form method='post' action='".get_class($this).",admin,zapisz'>
+					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>							
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>                            
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
                                     <input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",admin,lista\"'>Anuluj</button>
+                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
                                 </div>
                             </div>
 						</div>

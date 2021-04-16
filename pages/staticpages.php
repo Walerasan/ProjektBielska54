@@ -10,34 +10,36 @@ if(!class_exists('staticpages'))
     
 	class staticpages
 	{	    
+		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-		public function __construct()
+		public function __construct($page_obj)
 		{
+			$this->page_obj=$page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
 		{
 		}
 		//----------------------------------------------------------------------------------------------------
-		public function get_content($page_obj)
+		public function get_content()
 		{
 			$rettext="";
-			$template_class_name=$page_obj->template."_template";
+			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($page_obj->template=="admin")
+			if($this->page_obj->template=="admin")
 			{	
-			    switch($page_obj->target)
+			    switch($this->page_obj->target)
 			    {
 			        case "test01":
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->test01_target($page_obj),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->test01_target($page_obj));
 			            break;
 			        default:
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->default_target(),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->default_target());
 			            break;
 			    }
-			    /*if($page_obj->users->is_login())
+			    /*if($this->page_obj->users->is_login())
 				{
-				    switch($page_obj->target)
+				    switch($this->page_obj->target)
 					{
 						
 					}
@@ -45,27 +47,27 @@ if(!class_exists('staticpages'))
 				else
 					$rettext="Proszę się zalogować";*/
 			}
-			else if($page_obj->template=="raw")
+			else if($this->page_obj->template=="raw")
 			{
-			    switch($page_obj->target)
+			    switch($this->page_obj->target)
 			    {
 			        case "test01":
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->test01_target($page_obj),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->test01_target($page_obj));
 			            break;
 			        default:
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->default_target(),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->default_target());
 			            break;
 			    }
 			}
-			else if($page_obj->template=="index")			
+			else if($this->page_obj->template=="index")			
 			{			    
-			    switch($page_obj->target)
+			    switch($this->page_obj->target)
 			    {
 			        case "test01":
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->test01_target($page_obj),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->test01_target($page_obj));
 			            break;
 			        default:
-			            $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->default_target(),"menu");
+			            $rettext=$this->page_obj->$template_class_name->get_content($this->default_target());
 			            break;
 			    }
 			    
@@ -79,12 +81,12 @@ if(!class_exists('staticpages'))
 		    return "Tutaj przypiść stronę główna - plik staticpages - linia kodu 55";
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function test01_target($page_obj)
+		private function test01_target()
 		{		    
 		    
 		    $rettext="To jest sprawdzian klasy generatorów <br />";		    
-		    $generators_obj=new generators($page_obj);		    
-		    $rettext.=$generators_obj->makenumberfield($page_obj->server_cfg_obj->convert,$page_obj->server_cfg_obj->identify);
+		    $generators_obj=new generators($this->page_obj);		    
+		    $rettext.=$generators_obj->makenumberfield($this->page_obj->server_cfg_obj->convert,$this->page_obj->server_cfg_obj->identify);
 		    
 		    $rettext.="To jest sprawdzian klasy data <br />";
 		    $data_obj=new data();
