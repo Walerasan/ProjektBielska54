@@ -52,6 +52,7 @@ if(!class_exists('index_template'))
 			$rettext="jesteś zalogowany <br />";
 			$rettext.="<a href='klasa,index,lista'>Klasa</a><br />";
 			$rettext.="<a href='typy_oplat,index,lista'>Typy opłat</a><br />";
+			$rettext.="<a href='opiekunowie,index,lista'>Opiekunowie</a><br />";
 			$rettext.="<a href='staticpages,index,logout'>Logout</a><br />";
 			$rettext.="<hr />";
 			$rettext.=$trescstrony;
