@@ -63,9 +63,9 @@ if(!class_exists('opiekunowie'))
 				}
 				//--------------------
 				$rettext=$this->page_obj->$template_class_name->get_content($content_text);
-				//--------------------
-				return $rettext;
 			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
