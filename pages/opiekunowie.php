@@ -22,7 +22,6 @@ if(!class_exists('opiekunowie'))
 		#region get_cntent
 		public function get_content()
 		{
-			$rettext="";
 			$content_text="";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
@@ -61,11 +60,9 @@ if(!class_exists('opiekunowie'))
 						$content_text=$this->lista();
 					break;
 				}
-				//--------------------
-				$rettext=$this->page_obj->$template_class_name->get_content($content_text);
 			}
 			//--------------------
-			return $rettext;
+			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

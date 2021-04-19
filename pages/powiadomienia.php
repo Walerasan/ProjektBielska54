@@ -26,7 +26,6 @@ if(!class_exists('powiadomienia'))
 			$content_text="";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			//--------------------
 			return $rettext;
 		}
 		#endregion
