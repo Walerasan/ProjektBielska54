@@ -244,7 +244,7 @@ if(!class_exists('klasa'))
         {
             $rettext=array();
             //--------------------
-            $wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa from ".get_class($this)." where usuniety='nie';");
+            $wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa from ".get_class($this)." where usuniety='nie' order by idod;");
             if($wynik)
             {
                 while(list($idkl,$idod,$nazwa)=$wynik->fetch_row())
@@ -269,6 +269,20 @@ if(!class_exists('klasa'))
             }
             return $nazwa;
         }
+		//----------------------------------------------------------------------------------------------------
+		public function get_oddzial($idkl)
+		{
+			$idod=0;
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select idod from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
+				if($wynik)
+				{
+					list($idod)=$wynik->fetch_row();
+				}
+			}
+			return $idod;
+		}
         //----------------------------------------------------------------------------------------------------
         private function create_select_field_from_oddzialy($idod)
         {
