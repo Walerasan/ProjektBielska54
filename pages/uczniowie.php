@@ -109,7 +109,7 @@ if(!class_exists('uczniowie'))
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
 							<td>$lp</td>
 							<td>$imie, $nazwisko</td>
-							<td>{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get$this->page_obj->klasa->get_oddzial($idkl)}</td>
+							<td>{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 							<td>$numer_indeksu</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
