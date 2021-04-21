@@ -57,6 +57,7 @@ if(!class_exists('index_template'))
 			$rettext.="<a href='konta_bankowe,index,lista'>Konta bankowe</a><br />";
 			$rettext.="<a href='wyciagi,index,lista'>Wyciągi</a><br />";
 			$rettext.="<a href='oplaty,index,lista'>Opłaty</a><br />";
+			$rettext.="<a href='uczniowie_oplaty,index,lista'>Uczniowie opłaty</a><br />";			
 			$rettext.="<a href='staticpages,index,logout'>Logout</a><br />";
 			$rettext.="<hr />";
 			$rettext.=$trescstrony;
