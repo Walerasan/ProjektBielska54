@@ -273,6 +273,24 @@ if(!class_exists('klasa'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_list
+		public function get_list_for_idod($idod)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod;");
+			if($wynik)
+			{
+				while(list($idkl,$nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idkl, (int)$idod, $nazwa);
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region get_name
 		public function get_name($idkl)
 		{

@@ -3,53 +3,54 @@ if(!class_exists('admin'))
 {
 	class admin
 	{
+		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct()
+		public function __construct($page_obj)
 		{
+			$this->page_obj=$page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
 		{
 		}
 		//----------------------------------------------------------------------------------------------------
-		public function get_content($page_obj)
+		public function get_content()
 		{
-		    //this can use only admin template
-		    $page_obj->template="admin";
-		    //--------------------
-		    $rettext="";
-		    $template_class_name=$page_obj->template."_template";
-		    //--------------------
-		    if($page_obj->template=="admin")
-		    {
-		        switch($page_obj->target)
-		        {
-		            case "test01":
-		                $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->test01_target($page_obj));
-		                break;
-		            default:
-		                $rettext=$page_obj->$template_class_name->get_content($page_obj,$this->default_target());
-		                break;
-		        }		        
-		    }
-		    //--------------------
-		    return $rettext;
+			//this can use only admin template
+			$this->page_obj->template="admin";
+			//--------------------
+			$content_text="";
+			$template_class_name=$this->page_obj->template."_template";
+			//--------------------
+			if($this->page_obj->template=="admin")
+			{
+				switch($this->page_obj->target)
+				{
+					case "test01":
+						$content_text=$this->test01_target();
+						break;
+					default:
+						$content_text=$this->default_target();
+						break;
+				}
+			}
+			//--------------------
+			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
 		//----------------------------------------------------------------------------------------------------
 		private function default_target()
 		{
-		    return "Tutaj przypiść stronę główna - plik admin - linia kodu 36";
+			return "Tutaj przypiść stronę główna - plik admin - linia kodu 36";
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function test01_target($page_obj)
+		private function test01_target()
 		{
-		    
-		    $rettext="To jest sprawdzian klasy generatorów <br />";		    		    
-		    return $rettext;
+			$rettext="To jest sprawdzian klasy generatorów <br />";
+			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
 	}//end class
 }//end if
 else
-    die("Class exists: ".__FILE__);
+	die("Class exists: ".__FILE__);
 ?>

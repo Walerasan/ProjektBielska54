@@ -22,7 +22,7 @@ if(!class_exists('oddzialy'))
 		#region get_content
 		public function get_content()
 		{
-			$rettext="";
+			$content_text="";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if($this->page_obj->template == "admin")
@@ -32,31 +32,31 @@ if(!class_exists('oddzialy'))
 					case "przywroc":
 						$idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->restore($idod,$confirm));
+						$content_text=$this->restore($idod,$confirm);
 					break;
 					case "usun":
 						$idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->delete($idod,$confirm));
+						$content_text=$this->delete($idod,$confirm);
 					break;
 					case "zapisz":
 						$idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
 						$nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-						$rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->add($idod,$nazwa));
+						$content_text=$this->add($idod,$nazwa);
 					break;
 					case "formularz":
 						$idod=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idod'])?$_POST['idod']:0);
 						$nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-						$rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->form($idod,$nazwa));
+						$content_text=$this->form($idod,$nazwa);
 					break;
 					case "lista":
 					default:
-						$rettext=$this->page_obj->$template_class_name->get_content($this->page_obj,$this->lista());
+						$content_text=$this->lista();
 					break;
 				}
 			}
 			//--------------------
-			return $rettext;
+			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

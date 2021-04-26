@@ -49,19 +49,24 @@ if(!class_exists('index_template'))
 		//----------------------------------------------------------------------------------------------------
 		private function index_template_user_is_login($trescstrony)
 		{
-			$rettext="jesteś zalogowany <br />";
+			$rettext="<div style='width:100%;'>";
+			$rettext="<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
+			$rettext.="<a href='oplaty,index,lista'>Opłaty</a><br />";
+			$rettext.="<a href='uczniowie,index,lista'>Uczniowie</a><br />";
+			$rettext.="<hr />";
 			$rettext.="<a href='klasa,index,lista'>Klasa</a><br />";
 			$rettext.="<a href='typy_oplat,index,lista'>Typy opłat</a><br />";
-			$rettext.="<a href='opiekunowie,index,lista'>Opiekunowie</a><br />";
-			$rettext.="<a href='uczniowie,index,lista'>Uczniowie</a><br />";
+			$rettext.="<a href='opiekunowie,index,lista'>Opiekunowie</a><br />";			
 			$rettext.="<a href='konta_bankowe,index,lista'>Konta bankowe</a><br />";
-			$rettext.="<a href='wyciagi,index,lista'>Wyciągi</a><br />";
-			$rettext.="<a href='oplaty,index,lista'>Opłaty</a><br />";
-			$rettext.="<a href='uczniowie_oplaty,index,lista'>Uczniowie opłaty</a><br />";			
-			$rettext.="<a href='staticpages,index,logout'>Logout</a><br />";
+			$rettext.="<a href='wyciagi,index,lista'>Wyciągi</a><br />";			
+			$rettext.="<a href='uczniowie_oplaty,index,lista'>Uczniowie opłaty</a><br />";
 			$rettext.="<hr />";
+			$rettext.="<a href='staticpages,index,logout'>Wyloguj</a><br />";
+			$rettext.="</div>";
+			$rettext.="<div style='overflow:hidden;padding:20px;'>";
 			$rettext.=$trescstrony;
-			$rettext.="<hr />";
+			$rettext.="</div>";
+			$rettext.="</div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------

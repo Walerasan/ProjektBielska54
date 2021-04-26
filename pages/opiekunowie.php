@@ -41,19 +41,19 @@ if(!class_exists('opiekunowie'))
 					break;
 					case "zapisz":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
-						$imie=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie'])?$_POST['imie']:"");
-						$nazwisko=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko'])?$_POST['nazwisko']:"");
-						$telefon=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon'])?$_POST['telefon']:"");
-						$email=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email'])?$_POST['email']:"");
-						$content_text=$this->add($ido,$imie,$nazwisko,$telefon,$email);
+						$imie_opiekun=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie_opiekun'])?$_POST['imie_opiekun']:"");
+						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
+						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
+						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
+						$content_text=$this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 					break;
 					case "formularz":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
-						$imie=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie'])?$_POST['imie']:"");
-						$nazwisko=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko'])?$_POST['nazwisko']:"");
-						$telefon=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon'])?$_POST['telefon']:"");
-						$email=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email'])?$_POST['email']:"");
-						$content_text=$this->form($ido,$imie,$nazwisko,$telefon,$email);
+						$imie_opiekun=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie_opiekun'])?$_POST['imie_opiekun']:"");
+						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
+						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
+						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
+						$content_text=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 					break;
 					case "lista":
 					default:
@@ -73,7 +73,7 @@ if(!class_exists('opiekunowie'))
 			//--------------------
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select ido,imie,nazwisko,telefon,email,usuniety from ".get_class($this).";");
+			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -88,7 +88,7 @@ if(!class_exists('opiekunowie'))
 						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
-				while(list($ido,$imie,$nazwisko,$telefon,$email,$usuniety)=$wynik->fetch_row())
+				while(list($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$usuniety)=$wynik->fetch_row())
 				{
 					$lp++;
 					//--------------------
@@ -104,9 +104,9 @@ if(!class_exists('opiekunowie'))
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$ido' onmouseover=\"setopticalwhite50('wiersz$ido')\" onmouseout=\"setoptical0('wiersz$ido')\">
 							<td>$lp</td>
-							<td>$imie,$nazwisko</td>
-							<td>$telefon</td>
-							<td>$email</td>
+							<td>$imie_opiekun,$nazwisko_opiekun</td>
+							<td>$telefon_opiekun</td>
+							<td>$email_opiekun</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$ido'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
@@ -123,7 +123,7 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region form
-		public function form($ido,$imie,$nazwisko,$telefon,$email)
+		public function form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
 		{
 			$rettext="";
 			//--------------------
@@ -131,17 +131,17 @@ if(!class_exists('opiekunowie'))
 			//--------------------
 			if($ido!="" && is_numeric($ido) && $ido>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select imie,nazwisko,telefon,email from ".get_class($this)." where usuniety='nie' and ido=$ido");
+				$wynik=$this->page_obj->database_obj->get_data("select imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun from ".get_class($this)." where usuniety='nie' and ido=$ido");
 				if($wynik)
 				{
-					list($imie,$nazwisko,$telefon,$email)=$wynik->fetch_row();
+					list($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)=$wynik->fetch_row();
 				}
 			}
 			//--------------------
-			$imie=$this->page_obj->text_obj->doedycji($imie);
-			$nazwisko=$this->page_obj->text_obj->doedycji($nazwisko);
-			$telefon=$this->page_obj->text_obj->doedycji($telefon);
-			$email=$this->page_obj->text_obj->doedycji($email);
+			$imie_opiekun=$this->page_obj->text_obj->doedycji($imie_opiekun);
+			$nazwisko_opiekun=$this->page_obj->text_obj->doedycji($nazwisko_opiekun);
+			$telefon_opiekun=$this->page_obj->text_obj->doedycji($telefon_opiekun);
+			$email_opiekun=$this->page_obj->text_obj->doedycji($email_opiekun);
 			//--------------------
 			$rettext="
 				<style>
@@ -152,10 +152,7 @@ if(!class_exists('opiekunowie'))
 			$rettext.="
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
-						<div class='wiersz'><div class='formularzkom1'>Imie: </div><div class='formularzkom2'><input type='text' name='imie' value='$imie' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>Nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko' value='$nazwisko' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>Telefon: </div><div class='formularzkom2'><input type='text' name='telefon' value='$telefon' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>E-mail: </div><div class='formularzkom2'><input type='text' name='email' value='$email' style='width:800px;'/></div></div>
+						{$this->pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)}
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -165,7 +162,7 @@ if(!class_exists('opiekunowie'))
 							</div>
 						</div>
 					</div>
-					<input type='hidden' name='ido' value='$ido' />						
+					<input type='hidden' name='ido' value='$ido' />
 				</form>";
 			//--------------------
 			return $rettext;
@@ -173,24 +170,24 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($ido,$imie,$nazwisko,$telefon,$email)
+		public function add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
 		{
 			$rettext = "";
 			//--------------------
 			// zabezpieczam dane
 			//--------------------
-			$imie = $this->page_obj->text_obj->domysql($imie);
-			$nazwisko = $this->page_obj->text_obj->domysql($nazwisko);
-			$telefon = $this->page_obj->text_obj->domysql($telefon);
-			$email = $this->page_obj->text_obj->domysql($email);
+			$imie_opiekun = $this->page_obj->text_obj->domysql($imie_opiekun);
+			$nazwisko_opiekun = $this->page_obj->text_obj->domysql($nazwisko_opiekun);
+			$telefon_opiekun = $this->page_obj->text_obj->domysql($telefon_opiekun);
+			$email_opiekun = $this->page_obj->text_obj->domysql($email_opiekun);
 			//--------------------
 			if( ($ido != "") && is_numeric($ido) && ($ido > 0) )
 			{
-				$zapytanie="update ".get_class($this)." set imie='$imie',nazwisko='$nazwisko',telefon='$telefon',email='$email' where ido=$ido;";//poprawa wpisu
+				$zapytanie="update ".get_class($this)." set imie_opiekun='$imie_opiekun',nazwisko_opiekun='$nazwisko_opiekun',telefon_opiekun='$telefon_opiekun',email_opiekun='$email_opiekun' where ido=$ido;";//poprawa wpisu
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(imie,nazwisko,telefon,email)values('$imie','$nazwisko','$telefon','$email')";//nowy wpis
+				$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun')";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -204,7 +201,7 @@ if(!class_exists('opiekunowie'))
 				else
 				{
 					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$this->form($ido,$imie,$nazwisko,$telefon,$email);
+					$rettext.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 				}
 			}
 			else
@@ -274,12 +271,12 @@ if(!class_exists('opiekunowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select ido,imie,nazwisko from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun from ".get_class($this)." where usuniety='nie';");
 			if($wynik)
 			{
-				while(list($ido,$imie,$nazwisko)=$wynik->fetch_row())
+				while(list($ido,$imie_opiekun,$nazwisko_opiekun)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$ido, "$imie $nazwisko");
+					$rettext[] = array((int)$ido, "$imie_opiekun $nazwisko_opiekun");
 				}
 			}
 			//--------------------
@@ -287,53 +284,82 @@ if(!class_exists('opiekunowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_imie_nazwisko
-		public function get_imie_nazwisko($ido)
+		#region get_imie_opiekun_nazwisko_opiekun
+		public function get_imie_opiekun_nazwisko_opiekun($ido)
 		{
-			$imie_nazwisko='';
+			$imie_opiekun_nazwisko_opiekun='';
 			if($ido!="" && is_numeric($ido) && $ido>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie,' ',nazwisko) from ".get_class($this)." where usuniety='nie' and ido=$ido");
+				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_opiekun,' ',nazwisko_opiekun) from ".get_class($this)." where usuniety='nie' and ido=$ido");
 				if($wynik)
 				{
-					list($imie_nazwisko)=$wynik->fetch_row();
+					list($imie_opiekun_nazwisko_opiekun)=$wynik->fetch_row();
 				}
 			}
-			return $imie_nazwisko;
+			return $imie_opiekun_nazwisko_opiekun;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_telefon
-		public function get_telefon($ido)
+		#region get_telefon_opiekun
+		public function get_telefon_opiekun($ido)
 		{
-			$telefon='';
+			$telefon_opiekun='';
 			if($ido!="" && is_numeric($ido) && $ido>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select telefon from ".get_class($this)." where usuniety='nie' and ido=$ido");
+				$wynik=$this->page_obj->database_obj->get_data("select telefon_opiekun from ".get_class($this)." where usuniety='nie' and ido=$ido");
 				if($wynik)
 				{
-					list($telefon)=$wynik->fetch_row();
+					list($telefon_opiekun)=$wynik->fetch_row();
 				}
 			}
-			return $telefon;
+			return $telefon_opiekun;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_email
-		public function get_email($ido)
+		#region get_email_opiekun
+		public function get_email_opiekun($ido)
 		{
-			$email='';
+			$email_opiekun='';
 			if($ido!="" && is_numeric($ido) && $ido>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select email from ".get_class($this)." where usuniety='nie' and ido=$ido");
+				$wynik=$this->page_obj->database_obj->get_data("select email_opiekun from ".get_class($this)." where usuniety='nie' and ido=$ido");
 				if($wynik)
 				{
-					list($email)=$wynik->fetch_row();
+					list($email_opiekun)=$wynik->fetch_row();
 				}
 			}
-			return $email;
+			return $email_opiekun;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region pola_formularza
+		public function pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		{
+			$rettext="
+						<div class='wiersz'><div class='formularzkom1'>imie: </div><div class='formularzkom2'><input type='text' name='imie_opiekun' value='$imie_opiekun' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_opiekun' value='$nazwisko_opiekun' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>telefon: </div><div class='formularzkom2'><input type='text' name='telefon_opiekun' value='$telefon_opiekun' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:800px;'/></div></div>						
+					";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		public function insert($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		{
+			$imie_opiekun = $this->page_obj->text_obj->domysql($imie_opiekun);
+			$nazwisko_opiekun = $this->page_obj->text_obj->domysql($nazwisko_opiekun);
+			$telefon_opiekun = $this->page_obj->text_obj->domysql($telefon_opiekun);
+			$email_opiekun = $this->page_obj->text_obj->domysql($email_opiekun);
+			//--------------------
+			$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun')";//nowy wpis
+			if($this->page_obj->database_obj->execute_query($zapytanie))
+			{
+				return $this->page_obj->database_obj->last_id();
+			}
+			return 0;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
@@ -359,7 +385,7 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
-			$nazwa="imie";
+			$nazwa="imie_opiekun";
 			$pola[$nazwa][0]="varchar(50)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
@@ -367,7 +393,7 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
-			$nazwa="nazwisko";
+			$nazwa="nazwisko_opiekun";
 			$pola[$nazwa][0]="varchar(50)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
@@ -375,7 +401,7 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
-			$nazwa="telefon";
+			$nazwa="telefon_opiekun";
 			$pola[$nazwa][0]="varchar(20)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
@@ -383,7 +409,7 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
-			$nazwa="email";
+			$nazwa="email_opiekun";
 			$pola[$nazwa][0]="varchar(100)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
