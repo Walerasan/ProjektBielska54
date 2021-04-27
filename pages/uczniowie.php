@@ -21,7 +21,7 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_cntent
+		#region get_content
 		public function get_content()
 		{
 			$content_text="<b style='font-size:20px;'>UCZNIOWIE</b><hr />";
@@ -149,7 +149,7 @@ if(!class_exists('uczniowie'))
 				{
 					list($idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu)=$wynik->fetch_row();
 					$ido=$this->page_obj->uczniowie_opiekunowie->get_ido($idu);
-					$idod=1;//TODO: pobrać odział dla $idkl;
+					$idod=$this->page_obj->klasa->get_oddzial($idkl);
 				}
 			}
 			else
@@ -172,7 +172,7 @@ if(!class_exists('uczniowie'))
 					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>imie_uczniowie: </div><div class='formularzkom2'><input type='text' name='imie_uczniowie' value='$imie_uczniowie' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>nazwisko_uczniowie: </div><div class='formularzkom2'><input type='text' name='nazwisko_uczniowie' value='$nazwisko_uczniowie' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_from_oddzial($idod,'idkl')}</div></div>
+						<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_from_oddzial($idod,'idkl',$idkl)}</div></div>
 						<div class='wiersz'><div class='formularzkom1'>Klasa: </div><div class='formularzkom2'>{$this->create_select_field_from_klasa($idkl)}</div></div>
 						<div class='wiersz'><div class='formularzkom1'>numer_indeksu: </div><div class='formularzkom2'><input type='text' name='numer_indeksu' value='$numer_indeksu' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>&#160;</div><div class='formularzkom2'>&#160;</div></div>
@@ -396,10 +396,10 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region create_select_field_from_oddzial
-		private function create_select_field_from_oddzial($idod,$select_id)
+		private function create_select_field_from_oddzial($idod,$select_id,$idkl)
 		{
 			$this->update_select_field_from_oddzialy_js_script="";
-			$rettext="<select name='idod_tmp' onchange='update_$select_id(this.value);'>";
+			$rettext="<select name='idod_tmp' onchange='document.getElementById(\"$select_id\").innerHTML = update_$select_id(this.value);'>";
 			//--------------------
 			$this->update_select_field_from_oddzialy_js_script.="<script>";
 			$this->update_select_field_from_oddzialy_js_script.="function update_$select_id(idod){var opcje='';";
@@ -410,12 +410,12 @@ if(!class_exists('uczniowie'))
 				$this->update_select_field_from_oddzialy_js_script.="case '$val[0]':";
 				foreach($this->page_obj->klasa->get_list_for_idod($val[0]) as $kval)
 				{
-					$this->update_select_field_from_oddzialy_js_script.="opcje=opcje+'<option value=\"$kval[0]\">$kval[2]</option>';";
+					$this->update_select_field_from_oddzialy_js_script.="opcje=opcje+'<option value=\"$kval[0]\" ".($kval[0]==$idkl?"selected=\"selected\"":"").">$kval[2]</option>';";
 				}
-				$this->update_select_field_from_oddzialy_js_script.="document.getElementById('$select_id').innerHTML = opcje;";
 				$this->update_select_field_from_oddzialy_js_script.="break;";
-			}			
-			$this->update_select_field_from_oddzialy_js_script.="};}; update_$select_id($idod);</script>";
+			};
+			$this->update_select_field_from_oddzialy_js_script.="};";
+			$this->update_select_field_from_oddzialy_js_script.="return opcje;};document.getElementById('$select_id').innerHTML = update_$select_id('$idod');</script>";
 			//--------------------
 			$rettext.="</select>";
 			
