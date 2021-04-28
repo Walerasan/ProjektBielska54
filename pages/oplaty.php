@@ -4,11 +4,13 @@ if(!class_exists('oplaty'))
 	class oplaty
 	{
 		var $page_obj;
+		var $javascript_select_uczniowie;
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
 		{
 			$this->page_obj=$page_obj;
+			$this->javascript_select_uczniowie="";
 			$this->definicjabazy();
 		}
 		#endregion
@@ -44,14 +46,23 @@ if(!class_exists('oplaty'))
 						$idto=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
 						$kwota=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['kwota'])?$_POST['kwota']:"");
-						$content_text=$this->add($idop,$idto,$nazwa,$kwota);
+						//$content_text=$this->add($idop,$idto,$nazwa,$kwota);
+						$content_text="Blokada"; //delete this line to unlock
 					break;
+					case "zapisz_ucznen":
+						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
+						$content_text=$this->zapisz_ucznen($idop);
+					break;
+					case "formularz_ucznen":
+						$content_text=$this->formularz_ucznen($idop);
+						break;
 					case "formularz":
 						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
 						$idto=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
 						$kwota=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['kwota'])?$_POST['kwota']:"");
-						$content_text=$this->form($idop,$idto,$nazwa,$kwota);
+						//$content_text=$this->form($idop,$idto,$nazwa,$kwota);
+						$content_text="Blokada"; //delete this line to unlock
 					break;
 					case "lista":
 					default:
@@ -68,11 +79,10 @@ if(!class_exists('oplaty'))
 		public function lista()
 		{
 			$rettext="";
-			//--------------------
-			//$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			//--------------------			
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj dla oddziału</button>&#160;";
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj dla klasy</button>&#160;";
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj dla ucznia</button>&#160;";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_ucznen\"'>Dodaj dla ucznia</button>&#160;";
 			$rettext.="<br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
@@ -150,7 +160,7 @@ if(!class_exists('oplaty'))
 					</style>";
 			$rettext.="
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
-						<div style='overflow:hidden;'>							
+						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Typ opłaty: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
 							<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>							
@@ -345,6 +355,114 @@ if(!class_exists('oplaty'))
 			return $idto;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------------
+		#region formularz_ucznen
+		private function formularz_ucznen($idop)
+		{
+			$rettext="";
+			//--------------------
+			$rettext="
+					<style>
+						div.wiersz{float:left;clear:left;}
+						div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+					</style>";
+					$rettext.="
+					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_ucznen'>
+						<div style='overflow:hidden;'>
+							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>Typ opłaty: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
+							<div class='wiersz'>
+								<div class='formularzkom1'>Uczniowie: </div>
+								<div class='formularzkom2'>
+									{$this->create_select_field_from_uczniowie()}
+								</div>
+							</div>
+							<div class='wiersz'>
+								<div class='formularzkom1'>&#160;</div>
+								<div class='formularzkom2'>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
+									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+								</div>
+							</div>
+						</div>
+						<input type='hidden' name='idop' value='$idop' />
+					</form>";
+			//--------------------
+			$rettext.=$this->javascript_select_uczniowie;
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region zapisz_ucznen
+		private function zapisz_ucznen($idop)
+		{
+
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_select_field_from_uczniowie
+		private function create_select_field_from_uczniowie()
+		{
+			$rettext="";
+			//--------------------
+			$rettext.="<select multiple='multiple' id='selected_uczniowie' name='selected_uczniowie'>";
+			$rettext.="</select>";
+			$rettext.="<a href='#' onclick='remov_uczen_from_select();'> -&gt;</a>";
+			$rettext.="<a href='#' onclick='add_uczen_to_select();'> &lt;</a>";
+			$rettext.="<select multiple='multiple' id='uczniowie'>";
+			$rettext.="<option>Ala</option>";
+			$rettext.="<option>Ola</option>";
+			$rettext.="<option>Ela</option>";
+			$rettext.="</select>";
+			//--------------------
+			$this->javascript_select_uczniowie.="<script>";
+			$this->javascript_select_uczniowie.="function add_uczen_to_select()
+															{
+																var uczniowie=document.getElementById(\"uczniowie\");
+																var selected_uczniowie=document.getElementById(\"selected_uczniowie\");
+																if ( uczniowie.selectedIndex >= 0 )
+																{
+																	var index = selected_uczniowie.options.length;
+																	for ( var i = 0; i < uczniowie.options.length; i++ )
+																	{
+																		if ( uczniowie.options[ i ].selected )
+																		{
+																			selected_uczniowie.options[ index ] = uczniowie.options[ i ];
+																			i--;
+																			index++
+																		}
+																	}
+																}
+															};";
+			$this->javascript_select_uczniowie.="function remov_uczen_from_select()
+															{
+																var uczniowie=document.getElementById(\"uczniowie\");
+																var selected_uczniowie=document.getElementById(\"selected_uczniowie\");
+																if ( selected_uczniowie.selectedIndex >= 0 )
+																{
+																	var index = uczniowie.options.length;
+																	for ( var i = 0; i < selected_uczniowie.options.length; i++ )
+																	{
+																		if ( selected_uczniowie.options[ i ].selected )
+																		{
+																			uczniowie.options[ index ] = selected_uczniowie.options[ i ];
+																			i--;
+																			index++
+																		}
+																	}
+																}
+															};";
+			$this->javascript_select_uczniowie.="</script>";
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
