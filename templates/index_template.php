@@ -73,8 +73,8 @@ if(!class_exists('index_template'))
 		private function login_form()
 		{
 			$rettext="<form method='post' action='staticpages,index,login' class='login_form'>";
-			$rettext.="<input type='text' class='login_form_input' name='r_login' value='e-mail' onclick='this.value==\"e-mail\"?this.value=\"\":null'/> <br />";
-			$rettext.="<input type='text' class='login_form_input' name='r_password' value='hasło' onclick='this.value==\"hasło\"?this.value=\"\":null;this.type=\"password\";'/> <br />";
+			$rettext.="<input type='text' class='login_form_input' name='r_login' placeholder='e-mail' onclick='this.value==\"e-mail\"?this.value=\"\":null'/> <br />";
+			$rettext.="<input type='text' class='login_form_input' name='r_password' placeholder='hasło' onclick='this.value==\"hasło\"?this.value=\"\":null;this.type=\"password\";'/> <br />";
 			$rettext.="<input type='submit' class='login_form_submit' value='zaloguj' />";
 			$rettext.="</form>";
 			//--------------------
