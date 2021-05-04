@@ -331,14 +331,24 @@ if(!class_exists('users'))
 							<div class='wiersz'><div class='formularzkom1'>Hasło: </div><div class='formularzkom2'><input type='text' name='haslo' value='$haslo' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Poziom uprawnień: </div>
 								<div class='formularzkom2'>
-									<input type='text' name='poziom' value='$poziom' style='width:800px;'/>
 									<select name='poziom'>
+										<option value='$poziom'>$poziom</option>
 										<option value='user'>User</option>
 										<option value='admin'>Admin</option>
 									</select>
 								</div>
 							</div>
-							<div class='wiersz'><div class='formularzkom1'>Usunięty: </div><div class='formularzkom2'><input type='text' name='usuniety' value='$usuniety' style='width:800px;'/></div></div>
+							<div class='wiersz'>
+								<div class='formularzkom1'>Usunięty: </div>
+								<div class='formularzkom2'>
+									<select name='usuniety'>
+										<option value='$usuniety'>$usuniety</option>
+										<option value='tak'>tak</option>
+										<option value='nie'>nie</option>
+										<option value='zablokowany'>zablokowany</option>
+									</select>
+								</div>
+							</div>
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
