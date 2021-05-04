@@ -294,7 +294,7 @@ if(!class_exists('users'))
             return $rettext;
         }
 		//----------------------------------------------------------------------------------------------------
-		public function formularz($idu,$imie,$nazwisko)
+		public function formularz($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety)
         {
             $rettext="";
             //--------------------
@@ -302,15 +302,19 @@ if(!class_exists('users'))
             //--------------------
             if($idu!="" && is_numeric($idu) && $idu>0)
             {
-                $wynik=$this->page_obj->database_obj->get_data("select imie,nazwisko from ".get_class($this)." where usuniety='nie' and idu=$idu");
+                $wynik=$this->page_obj->database_obj->get_data("select imie,nazwisko,login,haslo,poziom,usuniety from ".get_class($this)." where usuniety='nie' and idu=$idu");
                 if($wynik)
                 {
-                    list($imie,$nazwisko)=$wynik->fetch_row();
+                    list($imie,$nazwisko,$login,$haslo,$poziom,$usuniety)=$wynik->fetch_row();
                 }
             }
             //--------------------
             $imie=$this->page_obj->text_obj->doedycji($imie);
 			$nazwisko=$this->page_obj->text_obj->doedycji($nazwisko);
+			$login=$this->page_obj->text_obj->doedycji($login);
+			$haslo=$this->page_obj->text_obj->doedycji($haslo);
+			$poziom=$this->page_obj->text_obj->doedycji($poziom);
+			$usuniety=$this->page_obj->text_obj->doedycji($usuniety);
             //--------------------
             $rettext="
                     <style>
@@ -323,6 +327,28 @@ if(!class_exists('users'))
 						<div style='overflow:hidden;'>							
 							<div class='wiersz'><div class='formularzkom1'>Imię: </div><div class='formularzkom2'><input type='text' name='imie' value='$imie' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko' value='$nazwisko' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>Login: </div><div class='formularzkom2'><input type='text' name='login' value='$login' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>Hasło: </div><div class='formularzkom2'><input type='text' name='haslo' value='$haslo' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>Poziom uprawnień: </div>
+								<div class='formularzkom2'>
+									<select name='poziom'>
+										<option value='$poziom'>$poziom</option>
+										<option value='user'>User</option>
+										<option value='admin'>Admin</option>
+									</select>
+								</div>
+							</div>
+							<div class='wiersz'>
+								<div class='formularzkom1'>Usunięty: </div>
+								<div class='formularzkom2'>
+									<select name='usuniety'>
+										<option value='$usuniety'>$usuniety</option>
+										<option value='tak'>tak</option>
+										<option value='nie'>nie</option>
+										<option value='zablokowany'>zablokowany</option>
+									</select>
+								</div>
+							</div>
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
@@ -337,7 +363,7 @@ if(!class_exists('users'))
             return $rettext;
         }
 		//----------------------------------------------------------------------------------------------------
-		public function add($idu,$imie,$nazwisko)
+		public function add($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety)
         {
             $rettext = "";
             //--------------------
@@ -345,14 +371,20 @@ if(!class_exists('users'))
             //--------------------
 			$imie = $this->page_obj->text_obj->domysql($imie);
             $nazwisko = $this->page_obj->text_obj->domysql($nazwisko);
+			$login=$this->page_obj->text_obj->domysql($login);
+			$haslo=$this->page_obj->text_obj->domysql($haslo);
+			$poziom=$this->page_obj->text_obj->domysql($poziom);
+			$usuniety=$this->page_obj->text_obj->domysql($usuniety);
+
+			$uprawnienia = $poziom;
             //--------------------
             if( ($idu != "") && is_numeric($idu) && ($idu > 0) )
             {
-                $zapytanie="update ".get_class($this)." set imie='$imie',nazwisko='$nazwisko' where idu=$idu;";//poprawa wpisu
+                $zapytanie="update ".get_class($this)." set imie='$imie',nazwisko='$nazwisko',login='$login',haslo='$haslo',poziom='$poziom',usuniety='$usuniety' where idu=$idu;";//poprawa wpisu
             }
             else
            {
-                $zapytanie="insert into ".get_class($this)."(imie,nazwisko,login,haslo,poziom,uprawnienia)values('$imie','$nazwisko','user','user','user','all')";//nowy wpis
+                $zapytanie="insert into ".get_class($this)."(imie,nazwisko,login,haslo,poziom,uprawnienia)values('$imie','$nazwisko','$login','$haslo','$poziom','$uprawnienia')";//nowy wpis
             }
             //--------------------
             if(!$_SESSION['antyrefresh'])
@@ -367,7 +399,7 @@ if(!class_exists('users'))
               {
                     $rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$zapytanie."<br />";
-                    $rettext.=$this->formularz($idu,$imie,$nazwisko);
+                    $rettext.=$this->formularz($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety);
                 }
             }
             else
