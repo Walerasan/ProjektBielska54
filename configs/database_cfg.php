@@ -23,8 +23,8 @@ if(!class_exists('database_cfg'))
 			if( ($_SERVER['REMOTE_ADDR']=="127.0.0.1") || ($_SERVER['REMOTE_ADDR']=="::1") )//dla lokalnego serwera włączam imagemagic z lokalnego dysku
 			{
 				$this->server="localhost";
-				$this->login="ksiegowy";
-				$this->password="Ksiegowy20Nzpe21Pl";
+				$this->login="root";
+				$this->password="";
 				$this->database_name="ksiegowosc_nzpe_pl";
 				$this->show_queries_when_error=true;
 				$this->show_queries_when_ok=true;
