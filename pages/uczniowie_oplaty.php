@@ -164,7 +164,7 @@ if(!class_exists('uczniowie_oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($iduop,$rabat_kwota,$rabat_nazwa)
+		public function add($iduop,$idu,$rabat_kwota,$rabat_nazwa)
 		{
 			$rettext = "";
 			//--------------------
@@ -255,6 +255,68 @@ if(!class_exists('uczniowie_oplaty'))
 				$rettext.="This operation need confirm.";
 			}
 			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region mark_delete
+		public function mark_delete($idop,$idu)
+		{
+			//don't delete with status == oplacone
+			#region execute
+			return $this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where $idop=$idop and idu=$idu and status<>'oplacone';");
+			#endregion
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region synchronize
+		public function synchronize($idop,$idu)
+		{
+			#region safe
+			if( (!isset($idop)) || ($idop == "") ) $idop = 0;
+			if( (!isset($idu)) || ($idu == "") ) $idu = 0;
+			$deleted = "empty";
+			$sql_query = "";
+			$rettext = "";
+			#endregion
+
+			#region select
+			$wynik=$this->page_obj->database_obj->get_data("select iduop,usuniety,status from ".get_class($this)." where $idop=$idop and idu=$idu;");
+			if($wynik)
+			{
+				list($iduop,$deleted,$status)=$wynik->fetch_row();
+			}
+			#endregion
+
+			#region switch
+			switch($deleted)
+			{
+				case "empty":
+					$sql_query = "insert into ".get_class($this)."(rabat_nazwa,rabat_kwota,idu,idop)values('',0,$idu,$idop)";
+					break;
+				case "tak":
+					$sql_query = "update ".get_class($this)." set usuniety='nie' where iduop=$iduop and idu=$idu;";//poprawa wpisu
+					break;
+				case "nie":
+					// nothing to do here
+					break;
+			}
+			#endregion
+
+			#region execute
+			if( (!$_SESSION['antyrefresh']) && ($sql_query != "") )
+			{
+				if($this->page_obj->database_obj->execute_query($sql_query))
+				{
+				}
+				else
+				{
+					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext.=$sql_query."<br />";
+				}
+			}
+			#endregion
+
 			return $rettext;
 		}
 		#endregion

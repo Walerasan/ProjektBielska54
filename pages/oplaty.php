@@ -50,19 +50,21 @@ if(!class_exists('oplaty'))
 						$content_text="Blokada"; //delete this line to unlock
 					break;
 					case "zapisz_ucznen":
-						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
-						$content_text=$this->zapisz_ucznen($idop);
+						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
+						$nazwa = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
+						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
+						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
+						$content_text=$this->zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 					break;
 					case "formularz_ucznen":
-						$content_text=$this->formularz_ucznen($idop);
+						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
+						$nazwa = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
+						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
+						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
+						$content_text=$this->formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 						break;
-					case "formularz":
-						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
-						$idto=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idto'])?$_POST['idto']:0);
-						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-						$kwota=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['kwota'])?$_POST['kwota']:"");
-						//$content_text=$this->form($idop,$idto,$nazwa,$kwota);
-						$content_text="Blokada"; //delete this line to unlock
 					break;
 					case "lista":
 					default:
@@ -79,7 +81,7 @@ if(!class_exists('oplaty'))
 		public function lista()
 		{
 			$rettext="";
-			//--------------------			
+			//--------------------
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj dla oddziału</button>&#160;";
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj dla klasy</button>&#160;";
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_ucznen\"'>Dodaj dla ucznia</button>&#160;";
@@ -118,7 +120,7 @@ if(!class_exists('oplaty'))
 							<td>$nazwa</td>
 							<td>$kwota</td>
 							<td>{$this->page_obj->typy_oplat->get_name($idto)}</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idop'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_ucznen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
@@ -359,9 +361,23 @@ if(!class_exists('oplaty'))
 		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
 		#region formularz_ucznen
-		private function formularz_ucznen($idop)
+		private function formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
 		{
 			$rettext="";
+			//--------------------
+			$_SESSION['antyrefresh']=false;
+			//--------------------
+			if( isset($idop) && ($idop != "") && is_numeric($idop) && ($idop > 0) )
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				if($wynik)
+				{
+					list($idto,$nazwa,$kwota)=$wynik->fetch_row();
+				}
+			}
+			//--------------------
+			$nazwa=$this->page_obj->text_obj->doedycji($nazwa);
+			$kwota=$this->page_obj->text_obj->doedycji($kwota);
 			//--------------------
 			$rettext="
 					<style>
@@ -399,9 +415,54 @@ if(!class_exists('oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region zapisz_ucznen
-		private function zapisz_ucznen($idop)
+		private function zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
 		{
-
+			$rettext = "";
+			//--------------------
+			// zabezpieczam dane
+			//--------------------
+			$nazwa = $this->page_obj->text_obj->domysql($nazwa);
+			$kwota = $this->page_obj->text_obj->domysql($kwota);
+			//--------------------
+			if( ($idop != "") && is_numeric($idop) && ($idop > 0) )
+			{
+				$zapytanie="update ".get_class($this)." set nazwa='$nazwa', kwota=$kwota, idto=$idto where idop=$idop;";//poprawa wpisu
+			}
+			else
+			{
+				$zapytanie="insert into ".get_class($this)."(nazwa,kwota,idto)values('$nazwa',$kwota,$idto)";//nowy wpis
+			}
+			//--------------------
+			if(!$_SESSION['antyrefresh'])
+			{
+				if($this->page_obj->database_obj->execute_query($zapytanie))
+				{
+					$rettext.="Zapisane<br />";
+					#region save users
+					$idop = $this->page_obj->database_obj->last_id();
+					$this->page_obj->uczniowie_oplaty->mark_delete($idop,$idu);
+					if(isset($selected_uczniowie) && is_array($selected_uczniowie))
+					{
+						foreach($selected_uczniowie as $val)
+						{
+							$rettext.=$this->page_obj->uczniowie_oplaty->synchronize($idop,$val);
+						}
+					}
+					#endregion
+					$_SESSION['antyrefresh']=true;
+					$rettext.=$this->lista();
+				}
+				else
+				{
+					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext.=$this->formularz_ucznen($idop,$idto,$nazwa,$kwota);
+				}
+			}
+			else
+			{
+				$rettext.=$this->lista();
+			}
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -410,14 +471,16 @@ if(!class_exists('oplaty'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<select multiple='multiple' id='selected_uczniowie' name='selected_uczniowie'>";
+			$rettext.="<select multiple='multiple' id='selected_uczniowie' name='selected_uczniowie[]'>";
 			$rettext.="</select>";
 			$rettext.="<a href='#' onclick='remov_uczen_from_select();'> -&gt;</a>";
 			$rettext.="<a href='#' onclick='add_uczen_to_select();'> &lt;</a>";
 			$rettext.="<select multiple='multiple' id='uczniowie'>";
-			$rettext.="<option>Ala</option>";
-			$rettext.="<option>Ola</option>";
-			$rettext.="<option>Ela</option>";
+			$lista_uczniuw = $this->page_obj->uczniowie->get_list();
+			foreach($lista_uczniuw as $val)
+			{
+				$rettext.="<option value='{$val[0]}'>{$val[1]}</option>";
+			}
 			$rettext.="</select>";
 			//--------------------
 			$this->javascript_select_uczniowie.="<script>";

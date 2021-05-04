@@ -340,6 +340,24 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_list
+		public function get_list_for_klasa($idkl)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' and idkl=$idkl;");
+			if($wynik)
+			{
+				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region get_imie_uczniowie_nazwisko_uczniowie
 		public function get_imie_uczniowie_nazwisko_uczniowie($idu)
 		{
