@@ -145,7 +145,7 @@ if(!class_exists('uczniowie_oplaty'))
 				</style>";
 			$rettext.="
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
-					<div style='overflow:hidden;'>							
+					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>rabat nazwa: </div><div class='formularzkom2'><input type='text' name='rabat_nazwa' value='$rabat_nazwa' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>rabat kwota: </div><div class='formularzkom2'><input type='text' name='rabat_kwota' value='$rabat_kwota' style='width:100px;'/></div></div>
 						<div class='wiersz'>
@@ -260,11 +260,11 @@ if(!class_exists('uczniowie_oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region mark_delete
-		public function mark_delete($idop,$idu)
+		public function mark_delete($idop)
 		{
 			//don't delete with status == oplacone
 			#region execute
-			return $this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where $idop=$idop and idu=$idu and status<>'oplacone';");
+			return $this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where $idop=$idop and status<>'oplacone';");
 			#endregion
 		}
 		#endregion
@@ -281,7 +281,7 @@ if(!class_exists('uczniowie_oplaty'))
 			#endregion
 
 			#region select
-			$wynik=$this->page_obj->database_obj->get_data("select iduop,usuniety,status from ".get_class($this)." where $idop=$idop and idu=$idu;");
+			$wynik=$this->page_obj->database_obj->get_data("select iduop,usuniety,status from ".get_class($this)." where idop=$idop and idu=$idu;");
 			if($wynik)
 			{
 				list($iduop,$deleted,$status)=$wynik->fetch_row();
@@ -308,15 +308,34 @@ if(!class_exists('uczniowie_oplaty'))
 			{
 				if($this->page_obj->database_obj->execute_query($sql_query))
 				{
+					//$rettext.=$sql_query."<br />";
 				}
 				else
 				{
 					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$sql_query."<br />";
+					//$rettext.=$sql_query."<br />";
 				}
 			}
 			#endregion
 
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_list
+		public function get_idu_list($idop)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idop=$idop and usuniety='nie';");
+			if($wynik)
+			{
+				while(list($idu)=$wynik->fetch_row())
+				{
+					$rettext[] = (int)$idu;
+				}
+			}
+			//--------------------
 			return $rettext;
 		}
 		#endregion

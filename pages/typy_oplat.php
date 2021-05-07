@@ -139,7 +139,7 @@ if(!class_exists('typy_oplat'))
 				</style>";
 			$rettext.="
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
-					<div style='overflow:hidden;'>							
+					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>								    
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
@@ -149,7 +149,7 @@ if(!class_exists('typy_oplat'))
 							</div>
 						</div>
 					</div>
-					<input type='hidden' name='idto' value='$idto' />						
+					<input type='hidden' name='idto' value='$idto' />
 				</form>";
 			//--------------------
 			return $rettext;
@@ -163,7 +163,7 @@ if(!class_exists('typy_oplat'))
 			//--------------------
 			// zabezpieczam dane
 			//--------------------
-			$nazwa = $this->page_obj->text_obj->domysql($nazwa);				
+			$nazwa = $this->page_obj->text_obj->domysql($nazwa);
 			//--------------------
 			if( ($idto != "") && is_numeric($idto) && ($idto > 0) )
 			{
