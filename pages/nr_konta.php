@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('wyciagi'))
+if(!class_exists('nr_konta'))
 {
-	class wyciagi
+	class nr_konta
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -29,32 +29,27 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
-					case "przetwarzanie":
-						$content_text=$this->processingfile();
-					break;
 					case "przywroc":
-						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($idw,$confirm);
+						$content_text=$this->restore($idkl,$confirm);
 					break;
 					case "usun":
-						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($idw,$confirm);
+						$content_text=$this->delete($idkl,$confirm);
 					break;
 					case "zapisz":
-						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
-						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
-						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
-						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->add($idw,$tytul,$data,$typ);
+						$idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
+						$idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
+						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+						$content_text=$this->add($idkl,$idod,$nazwa);
 					break;
 					case "formularz":
-						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
-						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
-						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
-						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->form($idw,$tytul,$data,$typ);
+						$idkl=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idkl'])?$_POST['idkl']:0);
+						$idod=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idod'])?$_POST['idod']:0);
+						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
+						$content_text=$this->form($idkl,$idod,$nazwa);
 					break;
 					case "lista":
 					default:
@@ -74,7 +69,7 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,data,typ,usuniety from ".get_class($this).";");
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -83,31 +78,31 @@ if(!class_exists('wyciagi'))
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
-						<td>numer konta</td>
+						<td>nazwa</td>
+						<td>oddział</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
-				while(list($idw,$tytul,$data,$typ,$usuniety)=$wynik->fetch_row())
+				while(list($idkl,$idod,$nazwa,$usuniety)=$wynik->fetch_row())
 				{
 					$lp++;
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idkl,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idkl,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
-						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
+						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idkl' onmouseover=\"setopticalwhite50('wiersz$idkl')\" onmouseout=\"setoptical0('wiersz$idkl')\">
 							<td>$lp</td>
-							<td>$tytul</td>
-							<td>$data</td>
-							<td>$typ</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td>$nazwa</td>
+							<td>".$this->page_obj->oddzialy->get_name($idod)."</td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idkl'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
@@ -123,22 +118,22 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region form
-		public function form($idw,$tytul,$data,$typ)
+		public function form($idkl,$idod,$nazwa)
 		{
 			$rettext="";
 			//--------------------
 			$_SESSION['antyrefresh']=false;
 			//--------------------
-			if($idw!="" && is_numeric($idw) && $idw>0)
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select tytul,data,typ from ".get_class($this)." where usuniety='nie' and idw=$idw");
+				$wynik=$this->page_obj->database_obj->get_data("select nazwa,idod from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
 				if($wynik)
 				{
-					list($tytul,$data,$typ)=$wynik->fetch_row();
+					list($nazwa,$idod)=$wynik->fetch_row();
 				}
 			}
 			//--------------------
-			$tytul=$this->page_obj->text_obj->doedycji($tytul);
+			$nazwa=$this->page_obj->text_obj->doedycji($nazwa);
 			//--------------------
 			$rettext="
 					<style>
@@ -149,18 +144,8 @@ if(!class_exists('wyciagi'))
 			$rettext.="
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>							
-							<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:800px;'/></div></div>
-							<div class='wiersz'><div class='formularzkom1'>Data: </div><div class='formularzkom2'><input type='text' name='data' value='$data' style='width:800px;'/></div></div>
-							<div class='wiersz'>
-								<div class='formularzkom1'>Typ: </div>
-								<div class='formularzkom2'>
-									<select name='typ' value='$typ' style='width:800px;'>
-										<option value='bankowy'>bankowy</option>
-										<option value='reczny'>ręczny</option>
-										<option value='inny'>inny</option>
-									</select>
-								</div>
-							</div>
+							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>".$this->create_select_field_from_oddzialy($idod)."</div></div>							
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -169,7 +154,7 @@ if(!class_exists('wyciagi'))
 								</div>
 							</div>
 						</div>
-						<input type='hidden' name='idw' value='$idw' />
+						<input type='hidden' name='idkl' value='$idkl' />
 					</form>";
 			//--------------------
 			return $rettext;
@@ -177,21 +162,21 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($idw,$tytul,$data,$typ)
+		public function add($idkl,$idod,$nazwa)
 		{
 			$rettext = "";
 			//--------------------
 			// zabezpieczam dane
 			//--------------------
-			$tytul = $this->page_obj->text_obj->domysql($tytul);
+			$nazwa = $this->page_obj->text_obj->domysql($nazwa);			
 			//--------------------
-			if( ($idw != "") && is_numeric($idw) && ($idw > 0) )
+			if( ($idkl != "") && is_numeric($idkl) && ($idkl > 0) )
 			{
-				$zapytanie="update ".get_class($this)." set tytul='$tytul', data='$data', typ='$typ' where idw=$idw;";//poprawa wpisu
+				$zapytanie="update ".get_class($this)." set nazwa='$nazwa',idod=$idod where idkl=$idkl;";//poprawa wpisu
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(tytul,data,typ)values('$tytul','$data','$typ')";//nowy wpis
+				$zapytanie="insert into ".get_class($this)."(nazwa,idod)values('$nazwa',$idod)";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -205,7 +190,7 @@ if(!class_exists('wyciagi'))
 				else
 				{
 					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$this->form($idw,$tytul,$data,$typ);
+					$rettext.=$this->form($idkl,$idod,$nazwa);
 				}
 			}
 			else
@@ -217,13 +202,13 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region delete
-		public function delete($idw,$confirm)
+		public function delete($idkl,$confirm)
 		{
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
 			{
-				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idw=$idw;"))
+				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idkl=$idkl;"))
 				{
 					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
@@ -244,13 +229,13 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region restore
-		public function restore($idw,$confirm)
+		public function restore($idkl,$confirm)
 		{
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
 			{
-				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idw=$idw;"))
+				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idkl=$idkl;"))
 				{
 					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
@@ -270,78 +255,85 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region input file to processing 
-		public function processingfile()
+		#region get_list
+		public function get_list()
 		{
-			$rettext="";
+			$rettext=array();
 			//--------------------
-			$rettext.="<h3>Przetwarzanie pliku HTML</h3><br>";
-			$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},uploadfile' enctype='multipart/form-data'>";
-			$rettext.="Pobierz HTML: <input type='file' name='filehtml'>";
-			$rettext.="<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
-			$rettext.="</form>";
-			//--------------------
-			return $rettext;
-		}
-		#endregion
-		//----------------------------------------------------------------------------------------------------
-		#region processing from HTML to SQL db
-		public function przetwarzanie_htmlToSql($file)
-		{
-			$rettext="";
-			$rettext.="<hr>";
-        	$rettext.="<br>pobieram nazwę pliku: ".$file."<br>";
-        	include_once("../media/filehtml/$file");
-        	$rettext.="
-            	<script src='przetwarzanie.js'></script>
-        	";
-        	$rettext.="<hr>";
-			//--------------------
-			return $rettext;
-		}
-		#endregion
-		//----------------------------------------------------------------------------------------------------
-		#region uploadfile
-		public function uploadfile($file)
-		{
-			$rettext="";
-			//--------------------
-			$target_dir = "../media/filehtml";
-			$target_file = $target_dir . basename($file["name"]);
-			$rettext.="Nazwa dokumentu: ".basename($file["name"])."<br>";
-
-			$uploadOk = 1;
-			$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));     
-			// Sprawdzam czy istnieje już plik o tej samej nazwie
-			if (file_exists($target_file)) {
-				echo "Plik istnieje o podanej nazwie.";
-				$uploadOk = 0;
-			}
-			// Sprawdzam rozmiar pliku
-			if ($file["size"] > 500000) {
-				echo "Plik jest za duży......";
-				$uploadOk = 0;
-			}
-			// Przetwarzam tylko pliki o rozszerzeniu html
-			if($FileType != "html") {
-				echo "Przetwarzanie tylko dla plików o rozszerzeniu html.....";
-				$uploadOk = 0;
-			}
-			// Sprawdzam jeżeli $uploadOk 1 to ok a jeżeli 0 to error
-			if ($uploadOk == 0) {
-				echo "Nie można przesłać pliku.";
-			} else {
-				if (move_uploaded_file($file["tmp_name"], $target_file)) {
-				echo "Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
-				$plik = htmlspecialchars( basename( $file["name"]));
-				
-				//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
-				przetwarzanie_htmlToSql($plik);
-				//--------------------------------------------------------------------
-				} else {
-				echo "błąd przesłania pliku na serwer.";
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa from ".get_class($this)." where usuniety='nie' order by idod;");
+			if($wynik)
+			{
+				while(list($idkl,$idod,$nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idkl, (int)$idod, $nazwa);
 				}
 			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_list
+		public function get_list_for_idod($idod)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod;");
+			if($wynik)
+			{
+				while(list($idkl,$nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idkl, (int)$idod, $nazwa);
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_name
+		public function get_name($idkl)
+		{
+			$nazwa='';
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
+				if($wynik)
+				{
+					list($nazwa)=$wynik->fetch_row();
+				}
+			}
+			return $nazwa;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_oddzial
+		public function get_oddzial($idkl)
+		{
+			$idod=0;
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select idod from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
+				if($wynik)
+				{
+					list($idod)=$wynik->fetch_row();
+				}
+			}
+			return $idod;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_select_field_from_oddzialy
+		private function create_select_field_from_oddzialy($idod)
+		{
+			$rettext="<select name='idod'>";
+			//--------------------
+			foreach($this->page_obj->oddzialy->get_list() as $val)
+			{
+				$rettext.="<option value='$val[0]' ".($val[0]=="$idod"?"selected='selected'":"").">$val[1]</option>";
+			}
+			//--------------------
+			$rettext.="</select>";
 			//--------------------
 			return $rettext;
 		}
@@ -355,14 +347,14 @@ if(!class_exists('wyciagi'))
 			$pola=array();
 			
 			//definicja tablicy
-			$nazwa="idw";
+			$nazwa="idnk";
 			$pola[$nazwa][0]="int(10)";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="primary key";//key
 			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="auto_increment";//extra
 			$pola[$nazwa][5]=$nazwa;
-			
+		
 			$nazwa="usuniety";
 			$pola[$nazwa][0]="enum('tak','nie','zablokowany')";
 			$pola[$nazwa][1]="not null";//null
@@ -371,34 +363,18 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
-			$nazwa="tytul";
-			$pola[$nazwa][0]="varchar(50)";
+			$nazwa="numer_konta";
+			$pola[$nazwa][0]="varchar(30)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
-
-			$nazwa="data";
-			$pola[$nazwa][0]="timestamp";
-			$pola[$nazwa][1]="";//null
-			$pola[$nazwa][2]="";//key
-			$pola[$nazwa][3]="";//default
-			$pola[$nazwa][4]="";//extra
-			$pola[$nazwa][5]=$nazwa;
-
-			$nazwa="typ";
-			$pola[$nazwa][0]="enum('bankowy','reczny','inny')";
-			$pola[$nazwa][1]="not null";//null
-			$pola[$nazwa][2]="";//key
-			$pola[$nazwa][3]="'inny'";//default
-			$pola[$nazwa][4]="";//extra
-			$pola[$nazwa][5]=$nazwa;
-
+						
 			//----------------------------------------------------------------------------------------------------
 			$this->page_obj->database_obj->install($nazwatablicy,$pola);
 			unset($pola);
-			//--------------------
+			//--------------------			
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
