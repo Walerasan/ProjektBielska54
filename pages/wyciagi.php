@@ -29,6 +29,9 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "przetwarzanie":
+						$content_text=$this->processingfile();
+					break;
 					case "przywroc":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
@@ -261,6 +264,83 @@ if(!class_exists('wyciagi'))
 			else
 			{
 				$rettext.="This operation need confirm.";
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region input file to processing 
+		public function processingfile()
+		{
+			$rettext="";
+			//--------------------
+			$rettext.="<h3>Przetwarzanie pliku HTML</h3><br>";
+			$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},uploadfile' enctype='multipart/form-data'>";
+			$rettext.="Pobierz HTML: <input type='file' name='filehtml'>";
+			$rettext.="<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
+			$rettext.="</form>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region processing from HTML to SQL db
+		public function przetwarzanie_htmlToSql($file)
+		{
+			$rettext="";
+			$rettext.="<hr>";
+        	$rettext.="<br>pobieram nazwę pliku: ".$file."<br>";
+        	include_once("../media/filehtml/$file");
+        	$rettext.="
+            	<script src='przetwarzanie.js'></script>
+        	";
+        	$rettext.="<hr>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region uploadfile
+		public function uploadfile($file)
+		{
+			$rettext="";
+			//--------------------
+			$target_dir = "../media/filehtml";
+			$target_file = $target_dir . basename($file["name"]);
+			$rettext.="Nazwa dokumentu: ".basename($file["name"])."<br>";
+
+			$uploadOk = 1;
+			$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));     
+			// Sprawdzam czy istnieje już plik o tej samej nazwie
+			if (file_exists($target_file)) {
+				echo "Plik istnieje o podanej nazwie.";
+				$uploadOk = 0;
+			}
+			// Sprawdzam rozmiar pliku
+			if ($file["size"] > 500000) {
+				echo "Plik jest za duży......";
+				$uploadOk = 0;
+			}
+			// Przetwarzam tylko pliki o rozszerzeniu html
+			if($FileType != "html") {
+				echo "Przetwarzanie tylko dla plików o rozszerzeniu html.....";
+				$uploadOk = 0;
+			}
+			// Sprawdzam jeżeli $uploadOk 1 to ok a jeżeli 0 to error
+			if ($uploadOk == 0) {
+				echo "Nie można przesłać pliku.";
+			} else {
+				if (move_uploaded_file($file["tmp_name"], $target_file)) {
+				echo "Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
+				$plik = htmlspecialchars( basename( $file["name"]));
+				
+				//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
+				przetwarzanie_htmlToSql($plik);
+				//--------------------------------------------------------------------
+				} else {
+				echo "błąd przesłania pliku na serwer.";
+				}
 			}
 			//--------------------
 			return $rettext;
