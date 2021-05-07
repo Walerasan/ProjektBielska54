@@ -39,13 +39,21 @@ if(!class_exists('users'))
                         $idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);                        
                         $imie=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie'])?$_POST['imie']:"");
 						$nazwisko=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko'])?$_POST['nazwisko']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->add($idu,$imie,$nazwisko));                        
+						$login=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['login'])?$_POST['login']:"");
+						$haslo=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['haslo'])?$_POST['haslo']:"");
+						$poziom=isset($_GET['par6'])?$_GET['par6']:(isset($_POST['poziom'])?$_POST['poziom']:"");
+						$usuniety=isset($_GET['par7'])?$_GET['par7']:(isset($_POST['usuniety'])?$_POST['usuniety']:""); 
+                        $rettext=$this->page_obj->$template_class_name->get_content($this->add($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety));                        
                         break;
-                    case "formularz":                                                
+                    case "formularz":                                     
                         $idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
                         $imie=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie'])?$_POST['imie']:"");
 						$nazwisko=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko'])?$_POST['nazwisko']:"");
-                        $rettext=$this->page_obj->$template_class_name->get_content($this->formularz($idu,$imie,$nazwisko));
+                        $login=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['login'])?$_POST['login']:"");
+						$haslo=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['haslo'])?$_POST['haslo']:"");
+						$poziom=isset($_GET['par6'])?$_GET['par6']:(isset($_POST['poziom'])?$_POST['poziom']:"");
+						$usuniety=isset($_GET['par7'])?$_GET['par7']:(isset($_POST['usuniety'])?$_POST['usuniety']:""); 
+						$rettext=$this->page_obj->$template_class_name->get_content($this->formularz($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety));
                         break;
                     case "lista":
                     default:
