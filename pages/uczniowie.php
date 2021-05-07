@@ -340,7 +340,7 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_list
+		#region get_list_for_klasa
 		public function get_list_for_klasa($idkl)
 		{
 			$rettext=array();

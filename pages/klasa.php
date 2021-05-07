@@ -273,7 +273,7 @@ if(!class_exists('klasa'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_list
+		#region get_list_for_idod
 		public function get_list_for_idod($idod)
 		{
 			$rettext=array();
