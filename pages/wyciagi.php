@@ -4,12 +4,14 @@ if(!class_exists('wyciagi'))
 	class wyciagi
 	{
 		var $page_obj;
+		var $katalog;//katalog do uploud dokumentów do przetwarzania
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
 		{
 			$this->page_obj=$page_obj;
 			$this->definicjabazy();
+			$this->katalog=$page_obj->create_directory("./media/filehtml",debug_backtrace());
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -29,6 +31,11 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "dodajplik":
+						if(isset($_FILES['filehtml']) && !empty($_FILES['filehtml'])){
+							$content_text=$this->uploadfile($_FILES['filehtml']);
+						}
+					break;
 					case "przetwarzanie":
 						$content_text=$this->processingfile();
 					break;
@@ -268,7 +275,6 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			return $rettext;
 		}
-		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region input file to processing 
 		public function processingfile()
@@ -276,7 +282,7 @@ if(!class_exists('wyciagi'))
 			$rettext="";
 			//--------------------
 			$rettext.="<h3>Przetwarzanie pliku HTML</h3><br>";
-			$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},uploadfile' enctype='multipart/form-data'>";
+			$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},dodajplik' enctype='multipart/form-data'>";
 			$rettext.="Pobierz HTML: <input type='file' name='filehtml'>";
 			$rettext.="<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
 			$rettext.="</form>";
@@ -291,10 +297,9 @@ if(!class_exists('wyciagi'))
 			$rettext="";
 			$rettext.="<hr>";
         	$rettext.="<br>pobieram nazwę pliku: ".$file."<br>";
-        	include_once("../media/filehtml/$file");
-        	$rettext.="
-            	<script src='przetwarzanie.js'></script>
-        	";
+			include_once("./media/filehtml/$file");
+        	//echo("<script>alert('test skryptu');</script>");
+			$rettext.="<script src='./js/przetwarzanie.js'></script>";
         	$rettext.="<hr>";
 			//--------------------
 			return $rettext;
@@ -306,40 +311,39 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$target_dir = "../media/filehtml";
+			$target_dir = "./media/filehtml/";
 			$target_file = $target_dir . basename($file["name"]);
-			$rettext.="Nazwa dokumentu: ".basename($file["name"])."<br>";
+			$rettext.="<hr>Nazwa dokumentu: ".basename($file["name"])."<hr>";
 
 			$uploadOk = 1;
 			$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));     
 			// Sprawdzam czy istnieje już plik o tej samej nazwie
 			if (file_exists($target_file)) {
-				echo "Plik istnieje o podanej nazwie.";
+				$rettext.="<h5 class='warnigs'>Plik istnieje o podanej nazwie.</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam rozmiar pliku
 			if ($file["size"] > 500000) {
-				echo "Plik jest za duży......";
+				$rettext.="<h5 class='warnigs'>Plik jest za duży......</h5>";
 				$uploadOk = 0;
 			}
 			// Przetwarzam tylko pliki o rozszerzeniu html
 			if($FileType != "html") {
-				echo "Przetwarzanie tylko dla plików o rozszerzeniu html.....";
+				$rettext.="<h5 class='warnigs'>Przetwarzanie tylko dla plików o rozszerzeniu html.....</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam jeżeli $uploadOk 1 to ok a jeżeli 0 to error
 			if ($uploadOk == 0) {
-				echo "Nie można przesłać pliku.";
+				$rettext.="<h5 class='warnigs'>Nie można przesłać pliku.</h5>";
 			} else {
 				if (move_uploaded_file($file["tmp_name"], $target_file)) {
-				echo "Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
+					$rettext.="Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
 				$plik = htmlspecialchars( basename( $file["name"]));
-				
 				//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
-				przetwarzanie_htmlToSql($plik);
+				$this->przetwarzanie_htmlToSql($plik);
 				//--------------------------------------------------------------------
 				} else {
-				echo "błąd przesłania pliku na serwer.";
+					$rettext.="<h5 class='warnigs'>błąd przesłania pliku na serwer.</h5>";
 				}
 			}
 			//--------------------

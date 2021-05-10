@@ -4,6 +4,7 @@ Wersja: 1.0
 Author: Hydrotrade Polska
 Data utworzenia: 04.05.2021.
 */
+//alert("test skryptu");
 
 const tabelaRachunek = document.getElementsByTagName("table")[0];//w DOM 1 el. table
 //const tabelaPusta = document.getElementsByTagName("table")[1];//w DOM 2 el. table
@@ -85,7 +86,7 @@ var transakcje = function(){
 
         $.ajax({
             method:"POST",
-            url: "zapisdobazy.php",
+            url: "./media/functions/zapisdobazy.php",
             data:{
                 dataoperacji:dataoperacji,
                 datawaluty:datawaluty,
@@ -103,7 +104,7 @@ var transakcje = function(){
 
 $.ajax({
     method:"POST",
-    url: "zapisdobazy.php",
+    url: "./media/functions/zapisdobazy.php",
     data:{nr:nrKonta,od:od_dnia,do:do_dnia}
 }).done(function(msg){
     alert("Dodano do bazy danych 1: " + msg);
