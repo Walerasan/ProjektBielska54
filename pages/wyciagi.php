@@ -383,11 +383,35 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
-			$nazwa="data";
+			$nazwa="rachuneknadawcy";
+			$pola[$nazwa][0]="varchar(26)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="adresnadawcy";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="dataoperacji";
 			$pola[$nazwa][0]="timestamp";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="kwota";
+			$pola[$nazwa][0]="decimal";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="0";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
