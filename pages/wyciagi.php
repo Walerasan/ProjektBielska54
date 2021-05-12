@@ -338,9 +338,9 @@ if(!class_exists('wyciagi'))
 			} else {
 				if (move_uploaded_file($file["tmp_name"], $target_file)) {
 					$rettext.="Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
-				$plik = htmlspecialchars( basename( $file["name"]));
-				//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
-				$this->przetwarzanie_htmlToSql($plik);
+					$plik = htmlspecialchars( basename( $file["name"]));
+					//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
+					$this->przetwarzanie_htmlToSql($plik);
 				//--------------------------------------------------------------------
 				} else {
 					$rettext.="<h5 class='warnigs'>błąd przesłania pliku na serwer.</h5>";
@@ -357,7 +357,6 @@ if(!class_exists('wyciagi'))
 			//funkcja utrzymuje taka sama strukture w bazie danych
 			$nazwatablicy=get_class($this);
 			$pola=array();
-			
 			//definicja tablicy
 			$nazwa="idw";
 			$pola[$nazwa][0]="int(10)";
@@ -365,6 +364,14 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][2]="primary key";//key
 			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="auto_increment";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="id_nr_konta";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
 			$nazwa="usuniety";
@@ -384,7 +391,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="rachuneknadawcy";
-			$pola[$nazwa][0]="varchar(26)";
+			$pola[$nazwa][0]="varchar(50)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
@@ -412,6 +419,14 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="0";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="opistransakcji";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 

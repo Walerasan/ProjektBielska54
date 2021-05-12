@@ -52,9 +52,10 @@ if(!class_exists('nr_konta'))
 						$content_text=$this->form($idkl,$idod,$nazwa);
 					break;
 					case "lista":
+					break;
 					default:
 						$content_text=$this->lista();
-						break;
+					break;
 				}
 			}
 			//--------------------
@@ -368,6 +369,14 @@ if(!class_exists('nr_konta'))
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="datawp";
+			$pola[$nazwa][0]="timestamp";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="'2021-01-01 12:00:00'";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 						

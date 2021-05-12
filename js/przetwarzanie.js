@@ -23,19 +23,13 @@ for (var i=0;i<iloscwierszytabelaRachunek;i++){
         for (let j = 0; j < dl; j++) {
             //pobieram nr konta z historii wyciągu
             if(i==0 && j==1){
-                var nrKonta = tabelaRachunek.rows[i].getElementsByTagName("td")[j].innerHTML;
-                console.log(nrKonta);
+                //var nrKonta = tabelaRachunek.rows[i].getElementsByTagName("td")[j].innerHTML;
+                var nrKonta = tabelaRachunek.rows[i].cells[j].innerHTML;
             }
             //pobieram datę "od dnia" wygenerowanego wyciągu---------------------------------
             if(i==1 && j==1){
-                var od_dnia = tabelaRachunek.rows[i].getElementsByTagName("td")[j].innerHTML;
-                console.log(od_dnia);
-            }
-            //pobieram datę "do dnia" wygenerowanego wyciągu----------------------------------
-            if(i==2 && j==1){
-                var do_dnia = tabelaRachunek.rows[i].getElementsByTagName("td")[j].innerHTML;
-                console.log(do_dnia);
-            }   
+                var od_dnia = tabelaRachunek.rows[i].cells[j].innerHTML;
+            }  
         }
     }
 }
@@ -46,42 +40,18 @@ var transakcje = function(){
     for (var i=1;i<iloscwierszytabelaTransakcje;i++){
         if(tabelaTransakcje.rows[i].getElementsByTagName("td").length > 0){
                 //pobieram Data operacji
-                
-                    var dataoperacji = tabelaTransakcje.rows[i].getElementsByTagName("td")[0].innerHTML;
-                    //console.log(dataoperacji);
-                    
-                
-                //pobieram Data waluty
-              
-                    var datawaluty = tabelaTransakcje.rows[i].getElementsByTagName("td")[1].innerHTML;
-                    //console.log(datawaluty);
-                   
-               
+                //var dataoperacji = tabelaTransakcje.rows[i].getElementsByTagName("td")[0].innerHTML;
+                    var dataoperacji = tabelaTransakcje.rows[i].cells[0].innerHTML;
                 //pobieram typ transakcji
-                
-                    var typtransakcji = tabelaTransakcje.rows[i].getElementsByTagName("td")[2].innerHTML;
-                    //console.log(typtransakcji);
-                   
-                
+                    var typtransakcji = tabelaTransakcje.rows[i].cells[2].innerHTML;
                 //pobieram Opis transakcji
-                
-                    var opistransakcji = tabelaTransakcje.rows[i].getElementsByTagName("td")[3].innerHTML;
-                    //console.log(opistransakcji);
-                
+                    var opistransakcji = tabelaTransakcje.rows[i].cells[3].innerHTML;
+                //wyciagam nr konta: Rachunek nadawcy z Opisu transakcji
+                    //var opis = opistransakcji.split(":");
+                    //var nrkonta = opis[1].substr(0,opis[1].indexOf("<br>"));
+                //var nrkonta = nr.replace(/&nbsp;/g,'').nr.replace(/=(\r\n|\n|\r)/gm,"");
                 //pobieram Kwota
-                
-                    var kwota = tabelaTransakcje.rows[i].getElementsByTagName("td")[4].innerHTML;
-                    //console.log(kwota);
-              
-                //pobieram Waluta
-            
-                    var waluta = tabelaTransakcje.rows[i].getElementsByTagName("td")[5].innerHTML;
-                    //console.log(waluta);
-            
-                //pobieram saldo po transakcji
-                
-                    var saldopotransakcji = tabelaTransakcje.rows[i].getElementsByTagName("td")[6].innerHTML;
-                    //console.log(saldopotransakcji);      
+                    var kwota = tabelaTransakcje.rows[i].cells[4].innerHTML;   
         }
 
         $.ajax({
@@ -89,12 +59,10 @@ var transakcje = function(){
             url: "./media/functions/zapisdobazy.php",
             data:{
                 dataoperacji:dataoperacji,
-                datawaluty:datawaluty,
                 typtransakcji:typtransakcji,
                 opistransakcji:opistransakcji,
-                kwota:kwota,
-                waluta:waluta,
-                saldopotransakcji:saldopotransakcji
+                kwota:kwota
+                //nrkonta:nrKonta
             }
         }).done(function(msg){
             //alert("Dodano do bazy danych 2: " + msg);
@@ -105,7 +73,7 @@ var transakcje = function(){
 $.ajax({
     method:"POST",
     url: "./media/functions/zapisdobazy.php",
-    data:{nr:nrKonta,od:od_dnia,do:do_dnia}
+    data:{nr:nrKonta,od:od_dnia}
 }).done(function(msg){
     alert("Dodano do bazy danych 1: " + msg);
     transakcje();
