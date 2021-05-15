@@ -339,7 +339,7 @@ if(!class_exists('opiekunowie'))
 						<div class='wiersz'><div class='formularzkom1'>imie: </div><div class='formularzkom2'><input type='text' name='imie_opiekun' value='$imie_opiekun' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_opiekun' value='$nazwisko_opiekun' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>telefon: </div><div class='formularzkom2'><input type='text' name='telefon_opiekun' value='$telefon_opiekun' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:800px;'/></div></div>						
+						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:800px;'/></div></div>
 					";
 			//--------------------
 			return $rettext;

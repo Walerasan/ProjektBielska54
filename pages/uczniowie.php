@@ -4,7 +4,6 @@ if(!class_exists('uczniowie'))
 	class uczniowie
 	{
 		var $page_obj;
-		var $create_select_field_from_opiekunowie_js_script;
 		var $update_select_field_from_oddzialy_js_script;
 		//----------------------------------------------------------------------------------------------------
 		#region construct
@@ -148,7 +147,7 @@ if(!class_exists('uczniowie'))
 				if($wynik)
 				{
 					list($idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu)=$wynik->fetch_row();
-					$ido=$this->page_obj->uczniowie_opiekunowie->get_ido($idu);
+					$ido_array=$this->page_obj->uczniowie_opiekunowie->get_ido($idu);
 					$idod=$this->page_obj->klasa->get_oddzial($idkl);
 				}
 			}
@@ -177,12 +176,7 @@ if(!class_exists('uczniowie'))
 						<div class='wiersz'><div class='formularzkom1'>numer_indeksu: </div><div class='formularzkom2'><input type='text' name='numer_indeksu' value='$numer_indeksu' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>&#160;</div><div class='formularzkom2'>&#160;</div></div>
 						
-						<div class='wiersz'><div class='formularzkom1'>Opiekun($ido): </div><div class='formularzkom2'>{$this->create_select_field_from_opiekunowie($ido,"opiekun_form_fields")}</div></div>
-						<div id='opiekun_form_fields'>
-						{$this->page_obj->opiekunowie->pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)}
-						</div>
-						{$this->create_select_field_from_opiekunowie_js_script}
-						{$this->update_select_field_from_oddzialy_js_script}
+						<div class='wiersz' id='opiekunowie_blocks'><div class='formularzkom1'>Opiekun:</div><div class='formularzkom2'>{$this->create_block_opiekunowie($ido_array)}</div></div>
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -205,14 +199,16 @@ if(!class_exists('uczniowie'))
 			$rettext = "";
 
 			#region insert opiekun
-			if($ido < 1)
+			if(is_array($ido))
 			{
-				$ido=$this->page_obj->opiekunowie->insert($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
-			}
-			if($ido < 1)
-			{
-				$rettext.=$this->form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
-				return $rettext;
+				foreach($ido as $key => $val)
+				{
+					if($ido[$key] == -1)
+					{
+						$ido[$key] = $this->page_obj->opiekunowie->insert($imie_opiekun[$key],$nazwisko_opiekun[$key],$telefon_opiekun[$key],$email_opiekun[$key]);
+						$rettext.="Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
+					}
+				}
 			}
 			#endregion
 
@@ -238,21 +234,22 @@ if(!class_exists('uczniowie'))
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
 					$_SESSION['antyrefresh']=true;
-					if( !( ($idu != "") && is_numeric($idu) && ($idu > 0) )	 )
+					if( !( ($idu != "") && is_numeric($idu) && ($idu > 0) ) )
 					{
 						$idu=$this->page_obj->database_obj->last_id();
 					}
-					$iduo=$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido);
-					if($iduo>0)
+
+					$this->page_obj->uczniowie_opiekunowie->mark_usuniety($idu,"yes");
+					foreach($ido as $key => $val)
 					{
-						$rettext.="Zapisane $idu,$ido,$iduo<br />";
-						$rettext.=$this->lista();
+						if($val > 0)
+						{
+							$rettext.="Zapisano opiekuna {$idu} , {$ido[$key]},<br />";
+							$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
+						}
 					}
-					else
-					{
-						$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-						$rettext.=$this->form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
-					}
+					$rettext.="Zapisane $idu,$ido,$iduo<br />";
+					$rettext.=$this->lista();
 				}
 				else
 				{
@@ -390,29 +387,6 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region create_select_field_from_opiekunowie
-		private function create_select_field_from_opiekunowie($ido,$div_id)
-		{
-			$this->create_select_field_from_opiekunowie_js_script="";
-			$rettext="<select name='ido' onchange='if(this.value == -1){document.getElementById(\"$div_id\").style.display=\"block\";} else {document.getElementById(\"$div_id\").style.display=\"none\";};'>";
-			//--------------------
-			$rettext.="<option value='-1'>nowy-&gt;</option>";
-			//--------------------
-			foreach($this->page_obj->opiekunowie->get_list() as $val)
-			{
-				$rettext.="<option value='$val[0]' ".($val[0]==$ido?"selected='selected'":"").">{$val[1]}</option>";
-				if($val[0]==$ido)
-				{
-					$this->create_select_field_from_opiekunowie_js_script="<script>document.getElementById(\"$div_id\").style.display=\"none\";</script>";
-				}
-			}
-			//--------------------
-			$rettext.="</select>";
-			//--------------------
-			return $rettext;
-		}
-		#endregion
-		//----------------------------------------------------------------------------------------------------
 		#region create_select_field_from_oddzial
 		private function create_select_field_from_oddzial($idod,$select_id,$idkl)
 		{
@@ -437,6 +411,31 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			$rettext.="</select>";
 			
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_block_opiekunowie
+		private function create_block_opiekunowie($opiekunowie_array)
+		{
+			$rettext="";
+			//--------------------
+			$rettext.="<input type='button' value='+' onclick='opiekunowie.create_block();'/>";
+			//--------------------
+			$opcje_wyboru = "";
+			foreach($this->page_obj->opiekunowie->get_list() as $val)
+			{
+				$opcje_wyboru .= "opiekunowie.select_opiekunowie_options.push([{$val[0]},'{$val[1]}']);\n";
+			}
+			//--------------------
+			$rettext.="<script>";
+			$rettext.=$opcje_wyboru;
+			foreach($opiekunowie_array as $val)
+			{
+				$rettext.="opiekunowie.create_block($val[0]);";
+			}
+			$rettext.="</script>";
 			//--------------------
 			return $rettext;
 		}

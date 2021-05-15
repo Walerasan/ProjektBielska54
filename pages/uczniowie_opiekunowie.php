@@ -29,12 +29,15 @@ if(!class_exists('uczniowie_opiekunowie'))
 		#region get_ido
 		public function get_ido($idu)
 		{
-			$rettext=-1;
+			$rettext=array();
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)
 			{
-				list($rettext)=$wynik->fetch_row();
+				while(list($ido)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$ido);
+				}
 			}
 			return $rettext;
 		}
@@ -68,6 +71,21 @@ if(!class_exists('uczniowie_opiekunowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		public function mark_usuniety($idu,$confirm)
+		{
+			$rettext = false;
+			//--------------------
+			if($confirm == "yes")
+			{
+				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idu=$idu;"))
+				{
+					$rettext = true;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
 		#region get_usuniety
 		public function get_usuniety($iduo)
 		{
@@ -87,7 +105,7 @@ if(!class_exists('uczniowie_opiekunowie'))
 		{
 			$rettext=-1;
 			//--------------------
-			$old_ido=$this->get_ido($idu);
+			/*$old_ido=$this->get_ido($idu);
 			if($old_ido != $ido)
 			{
 				$iduo = $this->get_iduo($idu,$old_ido);
@@ -96,8 +114,9 @@ if(!class_exists('uczniowie_opiekunowie'))
 				{
 					$rettext=$iduo;
 				}
-			}
-			if($old_ido<=0)
+			}*/
+			$iduo = $this->get_iduo($idu,$ido);
+			if($iduo<=0)
 			{
 				$zapytanie="insert into ".get_class($this)."(idu,ido)values($idu,$ido);";
 				if($this->page_obj->database_obj->execute_query($zapytanie))
@@ -107,7 +126,6 @@ if(!class_exists('uczniowie_opiekunowie'))
 			}
 			else
 			{
-				$iduo = $this->get_iduo($idu,$ido);
 				$usuniety=$this->get_usuniety($iduo);
 				if($usuniety=="nie")
 				{
