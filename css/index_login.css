@@ -1,0 +1,99 @@
+@CHARSET "UTF-8";
+@font-face
+{
+	font-family: constan;
+	src:url(../media/desktop/constan.eot);
+	src:url(../media/desktop/constan.ttf) format("truetype");
+}
+
+html
+{
+	font-family:tahoma;
+	background:#C5E3F0;
+	font-size:10pt;
+}
+body
+{
+	margin:0px;
+	font-family:tahoma;
+	background:inherit;
+	font-size:10pt;
+}
+div
+{
+	font-family:tahoma;
+}
+img
+{
+	border:0px;
+	margin:0px;
+}
+p
+{
+	margin:0px;
+	padding:0px;
+}
+
+
+
+/* ------------------------------------------------------------------------- */
+/* szablony -> dodatkiprzedstrona i dodatkipodstrona */
+/* ------------------------------------------------------------------------- */
+div.naglowekdlarobotow 
+{
+	display:none;
+}
+
+/* ------------------------------------------------------------------------- */
+/* szablony */
+/* ------------------------------------------------------------------------- */
+div.button
+{
+	width:240px;
+	height:30px;
+	border:3px solid #3A7090;
+	background: rgb(197,227,240);
+	background: linear-gradient(180deg, rgba(197,227,240,1) 0%, rgba(197,227,240,1) 10%, rgba(118,150,163,1) 100%);
+	border-radius: 15px;
+	text-align:center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 16px;
+	font-weight: bold;
+	color: #020202;
+	cursor: hand;
+	cursor: pointer;
+}
+div.button_spacing
+{
+	width:240px;
+	height:10px;
+}
+div.button_spacing_x4
+{
+	width:240px;
+	height:40px;
+}
+p.title
+{
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	border-bottom: 2px solid #3A7090;
+}
+button.test
+{
+	border:3px solid #3A7090;
+	background: rgb(197,227,240);
+	background: linear-gradient(180deg, rgba(197,227,240,1) 0%, rgba(197,227,240,1) 10%, rgba(118,150,163,1) 100%);
+	border-radius: 15px;
+	width:150px;
+	height:30px;
+	font-weight: bold;
+	font-size: 14px;
+	color: #020202;
+	vertical-align: middle;
+	float:right;
+}
