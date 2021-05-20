@@ -297,10 +297,108 @@ if(!class_exists('wyciagi'))
 			$rettext="";
 			$rettext.="<hr>";
         	$rettext.="<br>pobieram nazwę pliku: ".$file."<br>";
-			include_once("./media/filehtml/$file");
-        	//echo("<script>alert('test skryptu');</script>");
-			$rettext.="<script src='./js/przetwarzanie.js'></script>";
-        	$rettext.="<hr>";
+			/**
+			* dokument przetwarza plik html i zapisuje do bazy
+			* Hydrotrade Polska Rafał Płatkowski, Arkadiusz Waliczek
+			*/
+
+			//Tworzę nowy obiekt struktury pliku html "dom"
+			$dom = new domDocument; 
+			
+			//dynamicznie pobieram dokument do przetwarzania 
+			$dom->loadHTMLFile("./media/filehtml/$file"); 
+
+			//Zezwalamy na usuwanie nadmiarowych białych znaków z dokumentu HTML
+			$dom->preserveWhiteSpace = false; 
+			
+			//tworzę uchwyt do znaczników <table> (jest ich w obenym dokumencie 3)
+			$tables = $dom->getElementsByTagName('table'); 
+				
+			//dla pierwszej tabeli, pierwszy wiersz, dwie komórki
+			$rows = $tables->item(0)->getElementsByTagName('tr'); 
+			$nrkonta = $rows[0]->getElementsByTagName('td');
+
+			$nrkontaBaza = $nrkonta->item(1)->nodeValue;
+			echo "Nr konta bankowego<b>".$nrkontaBaza.'</b><br/><br/>';
+
+			//uchwyt do trzeciej tabeli
+			$rowsTr3Tabela = $tables->item(2)->getElementsByTagName('tr');
+			foreach($rowsTr3Tabela as $tr){
+				$cols = $tr->getElementsByTagName('td');
+				if($cols->item(2)->nodeValue == "Przelew na rachunek"){
+					
+					$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
+					$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
+					$opisDane = explode(":", $opis);//rozdzielam na tablice $opisDane...
+					
+					$rachunekNadawcy = substr($opisDane[1], 0, strpos($opisDane[1], "Nazwa nadawcy"));
+					//echo "Rachunek Nadawcy: ".$rachunekNadawcy.'<br>';
+					
+					$NazwaNadawcy = substr($opisDane[2], 0, strpos($opisDane[2], "Adres nadawcy"));
+					//echo "3: ".$NazwaNadawcy.'<br>';
+					
+					$AdresNadawcy = substr($opisDane[3], 0, strpos($opisDane[3], "Tytuł"));
+					//echo "4: ".$AdresNadawcy."<br>";
+					
+					if(isset($opisDane[4])){
+
+						if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+						$tytul = substr($opisDane[4], 0, strpos($opisDane[4], "Referencje własne zleceniodawcy"));
+						//echo "5: ".$tytul."<br>";
+						} else {
+						$tytul = $opisDane[4];
+						//echo "5: ".$tytul."<br>";
+						}
+						
+						//jeśli "Referencje własne zleceniodawcy" to pokaż nr:....
+						if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+						$Referencje = $opisDane[5]; 
+						//echo "6: ".$Referencje."<br>";
+						} else {
+							$Referencje = 0;
+						}
+					}
+					$wplyw = $cols->item(4)->nodeValue;//zawiera całą komórkę wraz z kwota
+					//echo $data."<br>";
+					//echo $wplyw."<hr>";
+					//skrypt dodaje do bazy z przetworzonego pliku html
+					//INSERT INTO wyciagi(idw, usuniety, tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, opistransakcji, id_nr_konta)
+					//INSERT INTO nr_konta(idnk, usuniety, numer_konta, datawp)
+
+					$nrkontaBaza = $this->page_obj->text_obj->domysql($nrkontaBaza);
+					$tytul = $this->page_obj->text_obj->domysql($tytul);
+					$rachunekNadawcy = $this->page_obj->text_obj->domysql($rachunekNadawcy);
+					$AdresNadawcy = $this->page_obj->text_obj->domysql($AdresNadawcy);
+					$wplyw = $this->page_obj->text_obj->domysql($wplyw);
+					$data = $this->page_obj->text_obj->domysql($data);
+					$NazwaNadawcy = $this->page_obj->text_obj->domysql($NazwaNadawcy);
+					$Referencje = $this->page_obj->text_obj->domysql($Referencje);
+
+					$tytul = trim($tytul);
+					$rachunekNadawcy = trim($rachunekNadawcy);
+					$NazwaNadawcy = trim($NazwaNadawcy);
+					$Referencje = trim($Referencje);
+					$AdresNadawcy = trim($AdresNadawcy);
+					
+					$tytul = preg_replace('/\t/', '', $tytul);
+					//$rachunekNadawcy = preg_replace('/\s/', '', $rachunekNadawcy);
+					$NazwaNadawcy = preg_replace('/\t/', '', $NazwaNadawcy);
+					$AdresNadawcy = preg_replace('/\t/', '', $AdresNadawcy);
+					$wynik=$this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta='$nrkontaBaza' limit 1;");
+					if($wynik)
+					{
+						list($idnk)=$wynik->fetch_row();
+					} else {
+						$zapytanie="insert into nr_konta(numer_konta) values('$nrkontaBaza')";
+						$this->page_obj->database_obj->execute_query($zapytanie);
+						$idnk =  $this->page_obj->database_obj->last_id();
+					}
+					//zabezpieczyć przed kolejnym wgraniem takiego samego rekordu
+					$zapytanie="insert into ".get_class($this)."(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta)
+					values('$tytul','bankowy','$rachunekNadawcy','$AdresNadawcy',$wplyw,'$data','$NazwaNadawcy','$Referencje',$idnk)";
+					$this->page_obj->database_obj->execute_query($zapytanie);
+				}	
+			}
 			//--------------------
 			return $rettext;
 		}
@@ -339,7 +437,7 @@ if(!class_exists('wyciagi'))
 				if (move_uploaded_file($file["tmp_name"], $target_file)) {
 					$rettext.="Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
 					$plik = htmlspecialchars( basename( $file["name"]));
-					//uruchamiam funkcje do przetwarzania skryptu JS do dalszych operacji
+					//uruchamiam funkcje do przetwarzania skryptu
 					$this->przetwarzanie_htmlToSql($plik);
 				//--------------------------------------------------------------------
 				} else {
@@ -422,11 +520,19 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
-			$nazwa="opistransakcji";
+			$nazwa="nazwanadawcy";
 			$pola[$nazwa][0]="varchar(255)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="nrreferencyjny";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="0";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
