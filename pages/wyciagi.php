@@ -24,7 +24,7 @@ if(!class_exists('wyciagi'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="<p class='title'>WYCIAGI BANKOWE</p>";
+			$content_text="";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -33,39 +33,39 @@ if(!class_exists('wyciagi'))
 				{
 					case "dodajplik":
 						if(isset($_FILES['filehtml']) && !empty($_FILES['filehtml'])){
-							$content_text.=$this->uploadfile($_FILES['filehtml']);
+							$content_text=$this->uploadfile($_FILES['filehtml']);
 						}
 					break;
 					case "przetwarzanie":
-						$content_text.=$this->processingfile();
+						$content_text=$this->processingfile();
 					break;
 					case "przywroc":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text.=$this->restore($idw,$confirm);
+						$content_text=$this->restore($idw,$confirm);
 					break;
 					case "usun":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text.=$this->delete($idw,$confirm);
+						$content_text=$this->delete($idw,$confirm);
 					break;
 					case "zapisz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text.=$this->add($idw,$tytul,$data,$typ);
+						$content_text=$this->add($idw,$tytul,$data,$typ);
 					break;
 					case "formularz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text.=$this->form($idw,$tytul,$data,$typ);
+						$content_text=$this->form($idw,$tytul,$data,$typ);
 					break;
 					case "lista":
 					default:
-						$content_text.=$this->lista();
+						$content_text=$this->lista();
 						break;
 				}
 			}
@@ -79,14 +79,14 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,data,typ,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
+				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
@@ -101,20 +101,20 @@ if(!class_exists('wyciagi'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
-							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
+							<td>$lp</td>
 							<td>$tytul</td>
 							<td>$data</td>
 							<td>$typ</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
@@ -320,86 +320,126 @@ if(!class_exists('wyciagi'))
 
 			$nrkontaBaza = $nrkonta->item(1)->nodeValue;
 			echo "Nr konta bankowego<b>".$nrkontaBaza.'</b><br/><br/>';
+			$nrkontaBaza = $this->page_obj->text_obj->domysql($nrkontaBaza);
 
 			//uchwyt do trzeciej tabeli
 			$rowsTr3Tabela = $tables->item(2)->getElementsByTagName('tr');
+			
+			
+			$tablicaData = [];
 			foreach($rowsTr3Tabela as $tr){
 				$cols = $tr->getElementsByTagName('td');
-				if($cols->item(2)->nodeValue == "Przelew na rachunek"){
-					
-					$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
-					$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
-					$opisDane = explode(":", $opis);//rozdzielam na tablice $opisDane...
-					
-					$rachunekNadawcy = substr($opisDane[1], 0, strpos($opisDane[1], "Nazwa nadawcy"));
-					//echo "Rachunek Nadawcy: ".$rachunekNadawcy.'<br>';
-					
-					$NazwaNadawcy = substr($opisDane[2], 0, strpos($opisDane[2], "Adres nadawcy"));
-					//echo "3: ".$NazwaNadawcy.'<br>';
-					
-					$AdresNadawcy = substr($opisDane[3], 0, strpos($opisDane[3], "Tytuł"));
-					//echo "4: ".$AdresNadawcy."<br>";
-					
-					if(isset($opisDane[4])){
-
-						if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
-						$tytul = substr($opisDane[4], 0, strpos($opisDane[4], "Referencje własne zleceniodawcy"));
-						//echo "5: ".$tytul."<br>";
-						} else {
-						$tytul = $opisDane[4];
-						//echo "5: ".$tytul."<br>";
-						}
-						
-						//jeśli "Referencje własne zleceniodawcy" to pokaż nr:....
-						if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
-						$Referencje = $opisDane[5]; 
-						//echo "6: ".$Referencje."<br>";
-						} else {
-							$Referencje = 0;
-						}
-					}
-					$wplyw = $cols->item(4)->nodeValue;//zawiera całą komórkę wraz z kwota
-					//echo $data."<br>";
-					//echo $wplyw."<hr>";
-					//skrypt dodaje do bazy z przetworzonego pliku html
-					//INSERT INTO wyciagi(idw, usuniety, tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, opistransakcji, id_nr_konta)
-					//INSERT INTO nr_konta(idnk, usuniety, numer_konta, datawp)
-
-					$nrkontaBaza = $this->page_obj->text_obj->domysql($nrkontaBaza);
-					$tytul = $this->page_obj->text_obj->domysql($tytul);
-					$rachunekNadawcy = $this->page_obj->text_obj->domysql($rachunekNadawcy);
-					$AdresNadawcy = $this->page_obj->text_obj->domysql($AdresNadawcy);
-					$wplyw = $this->page_obj->text_obj->domysql($wplyw);
-					$data = $this->page_obj->text_obj->domysql($data);
-					$NazwaNadawcy = $this->page_obj->text_obj->domysql($NazwaNadawcy);
-					$Referencje = $this->page_obj->text_obj->domysql($Referencje);
-
-					$tytul = trim($tytul);
-					$rachunekNadawcy = trim($rachunekNadawcy);
-					$NazwaNadawcy = trim($NazwaNadawcy);
-					$Referencje = trim($Referencje);
-					$AdresNadawcy = trim($AdresNadawcy);
-					
-					$tytul = preg_replace('/\t/', '', $tytul);
-					//$rachunekNadawcy = preg_replace('/\s/', '', $rachunekNadawcy);
-					$NazwaNadawcy = preg_replace('/\t/', '', $NazwaNadawcy);
-					$AdresNadawcy = preg_replace('/\t/', '', $AdresNadawcy);
-					$wynik=$this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta='$nrkontaBaza' limit 1;");
-					if($wynik)
-					{
-						list($idnk)=$wynik->fetch_row();
-					} else {
-						$zapytanie="insert into nr_konta(numer_konta) values('$nrkontaBaza')";
-						$this->page_obj->database_obj->execute_query($zapytanie);
-						$idnk =  $this->page_obj->database_obj->last_id();
-					}
-					//zabezpieczyć przed kolejnym wgraniem takiego samego rekordu
-					$zapytanie="insert into ".get_class($this)."(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta)
-					values('$tytul','bankowy','$rachunekNadawcy','$AdresNadawcy',$wplyw,'$data','$NazwaNadawcy','$Referencje',$idnk)";
-					$this->page_obj->database_obj->execute_query($zapytanie);
-				}	
+				if($cols->item(2)->nodeValue == "Przelew na rachunek"){		
+					array_push($tablicaData,$cols->item(0)->nodeValue);//zawiera daty przelewów dla Przelewu na rachunek
+				}
 			}
+			$dlugosc_tablicaData = sizeof($tablicaData)-1;
+			$dataOd = $tablicaData[$dlugosc_tablicaData];
+			$dataDo = $tablicaData[0];
+
+			//sprawdzam czy zakres przetwarzania historii tranzackji jest w przedziale czasowym?
+			//jeśli tak to przerywam wprowadzanie do bazy a jeśli nie do dodaje do bazy i zmieniam zakres przetwarzania
+			$wynik_spr_data=$this->page_obj->database_obj->get_data("select idnk from nr_konta where datado >= '$dataOd' AND numer_konta = '$nrkontaBaza';");
+			if($wynik_spr_data){
+				echo("<h3>Dane zostały już przetworzone</h3><br>");
+			}else {
+				
+					foreach($rowsTr3Tabela as $tr){
+						$cols = $tr->getElementsByTagName('td');
+						if($cols->item(2)->nodeValue == "Przelew na rachunek"){
+							
+							$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
+							$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
+							$opisDane = explode(":", $opis);//rozdzielam na tablice $opisDane...
+							
+							$rachunekNadawcy = substr($opisDane[1], 0, strpos($opisDane[1], "Nazwa nadawcy"));
+							//echo "Rachunek Nadawcy: ".$rachunekNadawcy.'<br>';
+							
+							$NazwaNadawcy = substr($opisDane[2], 0, strpos($opisDane[2], "Adres nadawcy"));
+							//echo "3: ".$NazwaNadawcy.'<br>';
+							
+							$AdresNadawcy = substr($opisDane[3], 0, strpos($opisDane[3], "Tytuł"));
+							//echo "4: ".$AdresNadawcy."<br>";
+							
+							if(isset($opisDane[4])){
+		
+								if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+								$tytul = substr($opisDane[4], 0, strpos($opisDane[4], "Referencje własne zleceniodawcy"));
+								//echo "5: ".$tytul."<br>";
+								} else {
+								$tytul = $opisDane[4];
+								//echo "5: ".$tytul."<br>";
+								}
+								
+								//jeśli "Referencje własne zleceniodawcy" to pokaż nr:....
+								if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+								$Referencje = $opisDane[5]; 
+								//echo "6: ".$Referencje."<br>";
+								} else {
+									$Referencje = 0;
+								}
+							}
+							$wplyw = $cols->item(4)->nodeValue;//zawiera całą komórkę wraz z kwota
+		
+							$tytul = $this->page_obj->text_obj->domysql($tytul);
+							$rachunekNadawcy = $this->page_obj->text_obj->domysql($rachunekNadawcy);
+							$AdresNadawcy = $this->page_obj->text_obj->domysql($AdresNadawcy);
+							$wplyw = $this->page_obj->text_obj->domysql($wplyw);
+							$data = $this->page_obj->text_obj->domysql($data);
+							$NazwaNadawcy = $this->page_obj->text_obj->domysql($NazwaNadawcy);
+							$Referencje = $this->page_obj->text_obj->domysql($Referencje);
+		
+							$tytul = trim($tytul);
+							$rachunekNadawcy = trim($rachunekNadawcy);
+							$NazwaNadawcy = trim($NazwaNadawcy);
+							$Referencje = trim($Referencje);
+							$AdresNadawcy = trim($AdresNadawcy);
+							
+							$tytul = preg_replace('/\t/', '', $tytul);
+							//$rachunekNadawcy = preg_replace('/\s/', '', $rachunekNadawcy);
+							$NazwaNadawcy = preg_replace('/\t/', '', $NazwaNadawcy);
+							$AdresNadawcy = preg_replace('/\t/', '', $AdresNadawcy);
+							$wynik=$this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta='$nrkontaBaza' limit 1;");
+							if($wynik)
+							{
+								list($idnk)=$wynik->fetch_row();
+							} else {
+								$zapytanie="insert into nr_konta(numer_konta,dataod,datado) values('$nrkontaBaza','$dataOd','$dataDo')";
+								$this->page_obj->database_obj->execute_query($zapytanie);
+								$idnk =  $this->page_obj->database_obj->last_id();
+							}
+								$zapytanie="insert into ".get_class($this)."(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta)
+								values('$tytul','bankowy','$rachunekNadawcy','$AdresNadawcy',$wplyw,'$data','$NazwaNadawcy','$Referencje',$idnk)";
+								$this->page_obj->database_obj->execute_query($zapytanie);
+							
+						}	
+					}
+					//UPDATE Zakres daty....
+		
+					$zapytanie="update nr_konta set datado='$dataDo' where numer_konta='$nrkontaBaza';";//poprawa wpisu
+			
+					if(!$_SESSION['antyrefresh'])
+					{
+						if($this->page_obj->database_obj->execute_query($zapytanie))
+						{
+							$_SESSION['antyrefresh']=true;
+							$rettext.="Zapisane<br />";
+						}
+						else
+						{
+							$rettext.="Błąd zapisu - kontakt z administratorem Oprogramowania <br />";
+						}
+					}
+					//----Koniec UPDATE nr_konta
+			}
+
 			//--------------------
+			/*
+			testy
+				TRUNCATE wyciagi;
+				TRUNCATE nr_konta;
+				SELECT count(*) FROM wyciagi;
+			*/
 			return $rettext;
 		}
 		#endregion
