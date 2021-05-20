@@ -24,7 +24,7 @@ if(!class_exists('wyciagi'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="";
+			$content_text="<p class='title'>WYCIAGI BANKOWE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -33,39 +33,39 @@ if(!class_exists('wyciagi'))
 				{
 					case "dodajplik":
 						if(isset($_FILES['filehtml']) && !empty($_FILES['filehtml'])){
-							$content_text=$this->uploadfile($_FILES['filehtml']);
+							$content_text.=$this->uploadfile($_FILES['filehtml']);
 						}
 					break;
 					case "przetwarzanie":
-						$content_text=$this->processingfile();
+						$content_text.=$this->processingfile();
 					break;
 					case "przywroc":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($idw,$confirm);
+						$content_text.=$this->restore($idw,$confirm);
 					break;
 					case "usun":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($idw,$confirm);
+						$content_text.=$this->delete($idw,$confirm);
 					break;
 					case "zapisz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->add($idw,$tytul,$data,$typ);
+						$content_text.=$this->add($idw,$tytul,$data,$typ);
 					break;
 					case "formularz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->form($idw,$tytul,$data,$typ);
+						$content_text.=$this->form($idw,$tytul,$data,$typ);
 					break;
 					case "lista":
 					default:
-						$content_text=$this->lista();
+						$content_text.=$this->lista();
 						break;
 				}
 			}
@@ -79,14 +79,14 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,data,typ,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
@@ -101,20 +101,20 @@ if(!class_exists('wyciagi'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
-							<td>$lp</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
 							<td>$tytul</td>
 							<td>$data</td>
 							<td>$typ</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}

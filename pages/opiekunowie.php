@@ -22,7 +22,7 @@ if(!class_exists('opiekunowie'))
 		#region get_cntent
 		public function get_content()
 		{
-			$content_text="";
+			$content_text="<p class='title'>OPIEKUNOWIE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -32,12 +32,12 @@ if(!class_exists('opiekunowie'))
 					case "przywroc":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($ido,$confirm);
+						$content_text.=$this->restore($ido,$confirm);
 					break;
 					case "usun":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($ido,$confirm);
+						$content_text.=$this->delete($ido,$confirm);
 					break;
 					case "zapisz":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
@@ -45,7 +45,7 @@ if(!class_exists('opiekunowie'))
 						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
 						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text=$this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$content_text.=$this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 					break;
 					case "formularz":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
@@ -53,11 +53,11 @@ if(!class_exists('opiekunowie'))
 						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
 						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$content_text.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 					break;
 					case "lista":
 					default:
-						$content_text=$this->lista();
+						$content_text.=$this->lista();
 					break;
 				}
 			}
@@ -71,19 +71,20 @@ if(!class_exists('opiekunowie'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
 						<td>nazwa</td>
-						<td>oddział</td
+						<td>telefon</td>
+						<td>e-mail</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
@@ -94,20 +95,20 @@ if(!class_exists('opiekunowie'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$ido,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$ido,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$ido,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$ido,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$ido' onmouseover=\"setopticalwhite50('wiersz$ido')\" onmouseout=\"setoptical0('wiersz$ido')\">
-							<td>$lp</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
 							<td>$imie_opiekun,$nazwisko_opiekun</td>
 							<td>$telefon_opiekun</td>
 							<td>$email_opiekun</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$ido'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$ido'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}

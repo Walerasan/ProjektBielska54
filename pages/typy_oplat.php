@@ -22,7 +22,7 @@ if(!class_exists('typy_oplat'))
 		#region get_cntent
 		public function get_content()
 		{
-			$content_text="";
+			$content_text="<p class='title'>RODZAJE OPŁAT</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -32,26 +32,26 @@ if(!class_exists('typy_oplat'))
 					case "przywroc":
 						$idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($idto,$confirm);
+						$content_tex.=$this->restore($idto,$confirm);
 					break;
 					case "usun":
 						$idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($idto,$confirm);
+						$content_text.=$this->delete($idto,$confirm);
 					break;
 					case "zapisz":
 						$idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-						$content_text=$this->add($idto,$nazwa);
+						$content_text.=$this->add($idto,$nazwa);
 					break;
 					case "formularz":
 						$idto=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$nazwa=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
-						$content_text=$this->form($idto,$nazwa);
+						$content_text.=$this->form($idto,$nazwa);
 					break;
 					case "lista":
 					default:
-						$content_text=$this->lista();
+						$content_text.=$this->lista();
 					break;
 				}
 			}
@@ -65,20 +65,20 @@ if(!class_exists('typy_oplat'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";				    
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext.="
 					<tr style='font-weight:bold;'>
-						<td style='width:25px;'>Lp.</td>						
+						<td style='width:25px;'>Lp.</td>
 						<td>nazwa</td>
 						<td style='width:18px;'></td>
-						<td style='width:18px;'></td>						
+						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
 				while(list($idto,$nazwa,$usuniety)=$wynik->fetch_row())
@@ -87,18 +87,18 @@ if(!class_exists('typy_oplat'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idto,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idto,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idto,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idto,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idto' onmouseover=\"setopticalwhite50('wiersz$idto')\" onmouseout=\"setoptical0('wiersz$idto')\">
-							<td>$lp</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
 							<td>$nazwa</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idto'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idto'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}

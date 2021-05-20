@@ -26,7 +26,7 @@ if(!class_exists('oplaty'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="";
+			$content_text="<p class='title'>OPŁATY</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -36,12 +36,12 @@ if(!class_exists('oplaty'))
 					case "przywroc":
 						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($idop,$confirm);
+						$content_text.=$this->restore($idop,$confirm);
 					break;
 					case "usun":
 						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($idop,$confirm);
+						$content_text.=$this->delete($idop,$confirm);
 					break;
 					case "zapisz":
 						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
@@ -49,7 +49,7 @@ if(!class_exists('oplaty'))
 						$nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
 						$kwota=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						//$content_text=$this->add($idop,$idto,$nazwa,$kwota);
-						$content_text="Blokada"; //delete this line to unlock
+						$content_text.="Blokada"; //delete this line to unlock
 					break;
 					case "zapisz_ucznen":
 						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
@@ -57,7 +57,7 @@ if(!class_exists('oplaty'))
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text=$this->zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$content_text.=$this->zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 					break;
 					case "formularz_ucznen":
 						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
@@ -65,12 +65,12 @@ if(!class_exists('oplaty'))
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text=$this->formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$content_text.=$this->formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 						break;
 					break;
 					case "lista":
 					default:
-						$content_text=$this->lista();
+						$content_text.=$this->lista();
 						break;
 				}
 			}
@@ -84,7 +84,7 @@ if(!class_exists('oplaty'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='Dodaj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_ucznen\"'>Dodaj</button>&#160;";
+			$rettext.="<button class='test' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_ucznen\"'>Dodaj nowy</button>&#160;";
 			$rettext.="<br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
@@ -92,11 +92,13 @@ if(!class_exists('oplaty'))
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
-						<td>numer konta</td>
+						<td>tytuł</td>
+						<td>kwota</td>
+						<td>komentarz</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
@@ -107,20 +109,20 @@ if(!class_exists('oplaty'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idop,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idop,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idop,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idop,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 					}
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idop' onmouseover=\"setopticalwhite50('wiersz$idop')\" onmouseout=\"setoptical0('wiersz$idop')\">
-							<td>$lp</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
 							<td>$nazwa</td>
 							<td>$kwota</td>
 							<td>{$this->page_obj->typy_oplat->get_name($idto)}</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_ucznen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_ucznen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
