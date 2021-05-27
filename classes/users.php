@@ -378,7 +378,7 @@ if(!class_exists('users'))
             // zabezpieczam dane
             //--------------------
 			$imie = $this->page_obj->text_obj->domysql($imie);
-            $nazwisko = $this->page_obj->text_obj->domysql($nazwisko);
+         $nazwisko = $this->page_obj->text_obj->domysql($nazwisko);
 			$login=$this->page_obj->text_obj->domysql($login);
 			$haslo=$this->page_obj->text_obj->domysql($haslo);
 			$poziom=$this->page_obj->text_obj->domysql($poziom);
@@ -470,7 +470,7 @@ if(!class_exists('users'))
 		private function definicjabazy()
 		{
 			//funkcja utrzymuje takasama strukture w bazie danych
-		    $nazwatablicy=get_class($this);
+			$nazwatablicy=get_class($this);
 			//definicja tablicy
 			$nazwa="idu";
 			$pola[$nazwa][0]="int(10)";

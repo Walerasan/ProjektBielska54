@@ -51,7 +51,9 @@ if(!class_exists('uczniowie'))
 						$nazwisko_opiekun=isset($_GET['par8'])?$_GET['par8']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
 						$telefon_opiekun=isset($_GET['par9'])?$_GET['par9']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun=isset($_GET['par10'])?$_GET['par10']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text.=$this->add($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$haslo=isset($_GET['par10'])?$_GET['par10']:(isset($_POST['haslo'])?$_POST['haslo']:"");
+						$haslo_confirm=isset($_GET['par10'])?$_GET['par10']:(isset($_POST['haslo_confirm'])?$_POST['haslo_confirm']:"");
+						$content_text.=$this->add($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm);
 					break;
 					case "formularz":
 						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
@@ -139,6 +141,7 @@ if(!class_exists('uczniowie'))
 		public function form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
 		{
 			$rettext="";
+			$ido_array = array();
 			//--------------------
 			$_SESSION['antyrefresh']=false;
 			//--------------------
@@ -195,7 +198,7 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		public function add($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm)
 		{
 			$rettext = "";
 
@@ -206,7 +209,7 @@ if(!class_exists('uczniowie'))
 				{
 					if($ido[$key] == -1)
 					{
-						$ido[$key] = $this->page_obj->opiekunowie->insert($imie_opiekun[$key],$nazwisko_opiekun[$key],$telefon_opiekun[$key],$email_opiekun[$key]);
+						$ido[$key] = $this->page_obj->opiekunowie->insert($imie_opiekun[$key],$nazwisko_opiekun[$key],$telefon_opiekun[$key],$email_opiekun[$key],$haslo[$key],$haslo_confirm[$key]);
 						$rettext.="Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
 					}
 				}

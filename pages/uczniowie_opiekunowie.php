@@ -29,7 +29,7 @@ if(!class_exists('uczniowie_opiekunowie'))
 		#region get_ido
 		public function get_ido($idu)
 		{
-			$rettext=array();
+			$rettext = array();
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)

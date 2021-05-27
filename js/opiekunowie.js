@@ -60,6 +60,18 @@ LabNode.opiekunowie.prototype.create_block=function(ido)
 	additional_fields_input_imie_opiekun.type = "text";
 	additional_fields_input_imie_opiekun.name = "email_opiekun["+this.blocks_count.toString()+"]";
 	this.create_wiersz2("additional_fields"+this.blocks_count.toString(),"e-mail:",additional_fields_input_imie_opiekun,null);
+
+	//dodaje nowe pola hasło
+	var  additional_fields_input_imie_opiekun = document.createElement("input");
+	additional_fields_input_imie_opiekun.type = "password";
+	additional_fields_input_imie_opiekun.name = "haslo["+this.blocks_count.toString()+"]";
+	this.create_wiersz2("additional_fields"+this.blocks_count.toString(),"hasło:",additional_fields_input_imie_opiekun,null);
+
+	//dodaje nowe pola hasło potwierdzenie
+	var  additional_fields_input_imie_opiekun = document.createElement("input");
+	additional_fields_input_imie_opiekun.type = "password";
+	additional_fields_input_imie_opiekun.name = "haslo_confirm["+this.blocks_count.toString()+"]";
+	this.create_wiersz2("additional_fields"+this.blocks_count.toString(),"potwierdzenie hasła:",additional_fields_input_imie_opiekun,null);	
 }
 //----------------------------------------------------------------------------------------------------
 LabNode.opiekunowie.prototype.delete_block=function(blok_id)

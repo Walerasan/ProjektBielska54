@@ -4,6 +4,7 @@ if(!class_exists('opiekunowie'))
 	class opiekunowie
 	{
 		var $page_obj;
+		var $password_protection = "shadow_password";
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
@@ -40,12 +41,14 @@ if(!class_exists('opiekunowie'))
 						$content_text.=$this->delete($ido,$confirm);
 					break;
 					case "zapisz":
-						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
-						$imie_opiekun=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie_opiekun'])?$_POST['imie_opiekun']:"");
-						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
-						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
-						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text.=$this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$ido = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
+						$imie_opiekun = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['imie_opiekun'])?$_POST['imie_opiekun']:"");
+						$nazwisko_opiekun = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
+						$telefon_opiekun = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
+						$email_opiekun = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
+						$haslo = isset($_GET['par6'])?$_GET['par6']:(isset($_POST['haslo'])?$_POST['haslo']:"");
+						$haslo_confirm = isset($_GET['par7'])?$_GET['par7']:(isset($_POST['#'])?$_POST['haslo_confirm']:"");
+						$content_text .= $this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm);
 					break;
 					case "formularz":
 						$ido=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['ido'])?$_POST['ido']:0);
@@ -53,7 +56,8 @@ if(!class_exists('opiekunowie'))
 						$nazwisko_opiekun=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
 						$telefon_opiekun=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun=isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$haslo=isset($_GET['par6'])?$_GET['par6']:(isset($_POST['haslo'])?$_POST['haslo']:"");
+						$content_text.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo);
 					break;
 					case "lista":
 					default:
@@ -124,7 +128,7 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region form
-		public function form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		public function form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo)
 		{
 			$rettext="";
 			//--------------------
@@ -137,12 +141,14 @@ if(!class_exists('opiekunowie'))
 				{
 					list($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)=$wynik->fetch_row();
 				}
+				$haslo = $this->password_protection;
 			}
 			//--------------------
-			$imie_opiekun=$this->page_obj->text_obj->doedycji($imie_opiekun);
-			$nazwisko_opiekun=$this->page_obj->text_obj->doedycji($nazwisko_opiekun);
-			$telefon_opiekun=$this->page_obj->text_obj->doedycji($telefon_opiekun);
-			$email_opiekun=$this->page_obj->text_obj->doedycji($email_opiekun);
+			$imie_opiekun = $this->page_obj->text_obj->doedycji($imie_opiekun);
+			$nazwisko_opiekun = $this->page_obj->text_obj->doedycji($nazwisko_opiekun);
+			$telefon_opiekun = $this->page_obj->text_obj->doedycji($telefon_opiekun);
+			$email_opiekun = $this->page_obj->text_obj->doedycji($email_opiekun);
+			$haslo = $this->page_obj->text_obj->doedycji($haslo);
 			//--------------------
 			$rettext="
 				<style>
@@ -153,7 +159,7 @@ if(!class_exists('opiekunowie'))
 			$rettext.="
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
-						{$this->pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)}
+						{$this->pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo)}
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -171,9 +177,10 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		public function add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm)
 		{
 			$rettext = "";
+			$password_message = "";
 			//--------------------
 			// zabezpieczam dane
 			//--------------------
@@ -181,14 +188,26 @@ if(!class_exists('opiekunowie'))
 			$nazwisko_opiekun = $this->page_obj->text_obj->domysql($nazwisko_opiekun);
 			$telefon_opiekun = $this->page_obj->text_obj->domysql($telefon_opiekun);
 			$email_opiekun = $this->page_obj->text_obj->domysql($email_opiekun);
+			$haslo = $this->page_obj->text_obj->domysql($haslo);
+			$haslo_confirm = $this->page_obj->text_obj->domysql($haslo_confirm);
+			//--------------------
+			if($haslo != $haslo_confirm)
+			{
+				$password_message = "Password confirmation does not match<br />";
+				$haslo = "";
+			}
+			if($haslo == $this->password_protection)
+			{
+				$haslo = "";
+			}
 			//--------------------
 			if( ($ido != "") && is_numeric($ido) && ($ido > 0) )
 			{
-				$zapytanie="update ".get_class($this)." set imie_opiekun='$imie_opiekun',nazwisko_opiekun='$nazwisko_opiekun',telefon_opiekun='$telefon_opiekun',email_opiekun='$email_opiekun' where ido=$ido;";//poprawa wpisu
+				$zapytanie="update ".get_class($this)." set imie_opiekun='$imie_opiekun',nazwisko_opiekun='$nazwisko_opiekun',telefon_opiekun='$telefon_opiekun',email_opiekun='$email_opiekun'".(($haslo != "")?",haslo=PASSWORD('$haslo')":"")." where ido=$ido;";//poprawa wpisu
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun')";//nowy wpis
+				$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -197,12 +216,13 @@ if(!class_exists('opiekunowie'))
 				{
 					$_SESSION['antyrefresh']=true;
 					$rettext.="Zapisane<br />";
+					$rettext.=$password_message;
 					$rettext.=$this->lista();
 				}
 				else
 				{
 					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+					$rettext.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo);
 				}
 			}
 			else
@@ -334,33 +354,49 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region pola_formularza
-		public function pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		public function pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo)
 		{
 			$rettext="
 						<div class='wiersz'><div class='formularzkom1'>imie: </div><div class='formularzkom2'><input type='text' name='imie_opiekun' value='$imie_opiekun' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_opiekun' value='$nazwisko_opiekun' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>telefon: </div><div class='formularzkom2'><input type='text' name='telefon_opiekun' value='$telefon_opiekun' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>hasło: </div><div class='formularzkom2'><input type='password' name='haslo' value='$haslo' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>potwierdzenie hasła: </div><div class='formularzkom2'><input type='password' name='haslo_confirm' value='$haslo' style='width:800px;'/></div></div>
 					";
 			//--------------------
 			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		public function insert($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
+		#region insert
+		public function insert($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm)
 		{
 			$imie_opiekun = $this->page_obj->text_obj->domysql($imie_opiekun);
 			$nazwisko_opiekun = $this->page_obj->text_obj->domysql($nazwisko_opiekun);
 			$telefon_opiekun = $this->page_obj->text_obj->domysql($telefon_opiekun);
 			$email_opiekun = $this->page_obj->text_obj->domysql($email_opiekun);
 			//--------------------
-			$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun')";//nowy wpis
+			$haslo = $this->page_obj->text_obj->domysql($haslo);
+			$haslo_confirm = $this->page_obj->text_obj->domysql($haslo_confirm);
+			//--------------------
+			if($haslo != $haslo_confirm)
+			{
+				$haslo = "";
+			}
+			if($haslo == $this->password_protection)
+			{
+				$haslo = "";
+			}
+			//--------------------
+			$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
 			if($this->page_obj->database_obj->execute_query($zapytanie))
 			{
 				return $this->page_obj->database_obj->last_id();
 			}
 			return 0;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
@@ -418,6 +454,21 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			
+			$nazwa="haslo";
+			$pola[$nazwa][0]="varchar(128)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="ostatnielogowanie";
+			$pola[$nazwa][0]="datetime";
+			$pola[$nazwa][1]="null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
 			//----------------------------------------------------------------------------------------------------
 			$this->page_obj->database_obj->install($nazwatablicy,$pola);
 			unset($pola);
