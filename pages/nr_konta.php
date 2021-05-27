@@ -372,7 +372,15 @@ if(!class_exists('nr_konta'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
-			$nazwa="datawp";
+			$nazwa="dataod";
+			$pola[$nazwa][0]="timestamp";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="'2021-01-01 12:00:00'";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="datado";
 			$pola[$nazwa][0]="timestamp";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
