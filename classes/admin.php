@@ -40,7 +40,7 @@ if(!class_exists('admin'))
 		//----------------------------------------------------------------------------------------------------
 		private function default_target()
 		{
-			return "Tutaj przypiść stronę główna - plik admin - linia kodu 36";
+			return "";
 		}
 		//----------------------------------------------------------------------------------------------------
 		private function test01_target()

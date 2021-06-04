@@ -17,7 +17,7 @@ if(!class_exists('index_template'))
 		//----------------------------------------------------------------------------------------------------
 		public function get_content($trescstrony)
 		{
-			if($this->page_obj->users->is_login())
+			if($this->page_obj->opiekunowie->is_login())
 			{
 				$rettext=$this->index_template_user_is_login($trescstrony);
 			}
@@ -53,17 +53,14 @@ if(!class_exists('index_template'))
 			$rettext.="<div style='width:100%;'>";
 			$rettext.="<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
 			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= "<div class='login_imie_nazwisko'>".$this->page_obj->opiekunowie->get_login_imie_nazwisko()."</div>";
+			$rettext .= "<div class='button_spacing_x4'></div>";
 			$rettext .= $this->button("Uczniowie","uczniowie,index,lista");
 			$rettext .= "<div class='button_spacing'></div>";
 			$rettext .= $this->button("Opłaty","oplaty,index,lista");
 			$rettext .= "<div class='button_spacing'></div>";
 			$rettext .= $this->button("Wyciągi","wyciagi,index,lista");
 			$rettext .= "<div class='button_spacing_x4'></div>";
-			$rettext .= $this->button("Klasa","klasa,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Typy opłat","typy_oplat,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Opiekunowie","opiekunowie,index,lista");
 			$rettext .= "<div class='button_spacing_x4'></div>";
 			$rettext .= $this->button("Wyloguj","staticpages,index,logout");
 			$rettext.="</div>";

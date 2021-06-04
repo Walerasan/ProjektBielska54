@@ -18,7 +18,7 @@ if(!class_exists('admin_template'))
 		public function get_content($trescstrony)
 		{
 			$rettext="";
-			if(!$this->page_obj->users->is_login())
+			if(!$this->page_obj->opiekunowie->is_login())
 			{
 				$trescstrony="";
 				$menupozome="";
@@ -51,10 +51,7 @@ if(!class_exists('admin_template'))
 			}
 			else
 			{
-				$menupozome="<a href='users,admin,lista'>Użytkownicy</a><br />";
-				$menupozome.="<a href='oddzialy,admin,lista'>Oddziały</a><br />";
-				$menupozome.="<hr />";
-				$menupozome.="<a href='users,admin,logout'>Logout</a><br />";
+				$menupozome="<a href='users,admin,logout'>Logout</a><br />";
 				$komunikat="";
 				//--------------------
 				$rettext.="<body>

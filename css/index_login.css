@@ -97,3 +97,10 @@ button.test
 	vertical-align: middle;
 	float:right;
 }
+div.login_imie_nazwisko
+{
+	font-size:18px;
+	font-weight: bold;
+	text-align: center;
+	color: #020202;
+}

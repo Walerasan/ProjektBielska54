@@ -24,7 +24,7 @@ if(!class_exists('language'))
 			
 			//--------------------
 			// create ini object
-			//--------------------			
+			//--------------------
 			$this->ini_obj=new ini();
 			//~~~~~~~~~~~~~~~~~~~~
 		}
@@ -38,7 +38,7 @@ if(!class_exists('language'))
 			$rettext="";
 			if($this->silnik->szablon=="admin")
 			{
-				if($this->silnik->uzytkownicy->is_login())
+				if($this->silnik->users->is_login())
 				{
 					switch($this->silnik->zmk)
 					{

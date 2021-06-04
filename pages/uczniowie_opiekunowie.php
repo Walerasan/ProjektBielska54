@@ -57,6 +57,23 @@ if(!class_exists('uczniowie_opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_idu
+		public function get_idu_list($ido)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where ido=$ido and usuniety='nie';");
+			if($wynik)
+			{
+				while(list($idu)=$wynik->fetch_row())
+				{
+					$rettext[] = (int)$idu;
+				}
+			}
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_idu
 		public function get_idu($ido)
 		{
 			$rettext=-1;

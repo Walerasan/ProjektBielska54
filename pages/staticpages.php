@@ -42,7 +42,7 @@ if(!class_exists('staticpages'))
 						$content_text=$this->default_target();
 					break;
 				}
-				/*if($this->page_obj->users->is_login())
+				/*if($this->page_obj->opiekunowie->is_login())
 				{
 					switch($this->page_obj->target)
 					{
@@ -83,7 +83,7 @@ if(!class_exists('staticpages'))
 		#region default_target
 		private function default_target()
 		{
-			return "Tutaj przypiść stronę główna - plik staticpages - linia kodu 55";
+			return "";
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

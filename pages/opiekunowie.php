@@ -95,7 +95,7 @@ if(!class_exists('opiekunowie'))
 			$r_login=str_replace("\"","&quot;",$r_login);
 			$r_haslo=str_replace("'","&quot;",$r_haslo);
 			$r_haslo=str_replace("\"","&quot;",$r_haslo);
-			// funkcja dokonuje loginu przez ustawienie w cookie r_access na oki oraz w sesji r_idu na numer id uzytkownika
+			// funkcja dokonuje loginu przez ustawienie w cookie r_access na oki oraz w sesji r_ido na numer id uzytkownika
 			// funckja zwraca
 			// -3 jezeli jakis user nie posiada hasla
 			// -2 jezeli jakis user jest zalogowany
@@ -103,8 +103,8 @@ if(!class_exists('opiekunowie'))
 			//  0 jezeli blad loginu badz hasla
 			//	1 gdy wszystko oki i zostal zalogowany
 			$r_access=isset($_COOKIE['r_access'])?$_COOKIE['r_access']:'';
-			$r_idu=isset($_SESSION['r_idu'])?$_SESSION['r_idu']:'';
-			if($r_access=="" || $r_idu==-1 || $r_idu=="")$r_access="no";
+			$r_ido=isset($_SESSION['r_ido'])?$_SESSION['r_ido']:'';
+			if($r_access=="" || $r_ido==-1 || $r_ido=="")$r_access="no";
 			if($this->is_login())
 				return -2;
 			$r_MySqlLogin=$page_obj->database_obj->get_handle();
@@ -112,7 +112,7 @@ if(!class_exists('opiekunowie'))
 				return -1;
 			//mysql_select_db("presinfo");
 			//pobranie hasla uzytkownika
-				$r_wynik=$r_MySqlLogin->query("select ido,haslo from ".get_class($this)." where email_opiekun='$r_login';");
+			$r_wynik=$r_MySqlLogin->query("select ido,haslo from ".get_class($this)." where email_opiekun='$r_login';");
 			//jezeli puste zglosic info o zmiane hasla jezeli brak to wylot na zewnatrz
 			if($r_access=="no" && $r_MySqlLogin->affected_rows!=1)
 			{
@@ -120,11 +120,11 @@ if(!class_exists('opiekunowie'))
 			}
 			else
 			{
-				list($idu,$pas)=$r_wynik->fetch_row();
-				if($pas=="")
+				list($ido,$pas)=$r_wynik->fetch_row();
+				if($pas == "")
 				{
-					$r_idu=$idu;
-					$_SESSION['r_idu']=$r_idu;
+					$r_ido=$ido;
+					$_SESSION['r_ido']=$r_ido;
 					setcookie("r_access","oki",time()+session_cache_expire());
 					return -3;
 				};
@@ -132,7 +132,7 @@ if(!class_exists('opiekunowie'))
 			//jezeli nie puste to sprawdzamy
 			$r_wynik=$r_MySqlLogin->query("select ido from ".get_class($this)." where email_opiekun='$r_login' and haslo=old_PASSWORD('$r_haslo');");
 			if($r_MySqlLogin->affected_rows<1)//jezeli nie ma starego sprawdzamy nowe ?
-			$r_wynik=$r_MySqlLogin->query("select idu from ".get_class($this)." where email_opiekun='$r_login' and haslo=PASSWORD('$r_haslo');");
+			$r_wynik=$r_MySqlLogin->query("select ido from ".get_class($this)." where email_opiekun='$r_login' and haslo=PASSWORD('$r_haslo');");
 			if($r_access=="no" && $r_MySqlLogin->affected_rows!=1)
 			{
 				return 0;
@@ -140,12 +140,12 @@ if(!class_exists('opiekunowie'))
 			//-------------------------
 			if($r_access=="no")
 			{
-				$r_idu=$r_wynik->fetch_row();
-				$r_idu=$r_idu[0];
-				$_SESSION['r_idu']=$r_idu;
+				$r_ido=$r_wynik->fetch_row();
+				$r_ido=$r_ido[0];
+				$_SESSION['r_ido']=$r_ido;
 				setcookie("r_access","oki",time()+session_cache_expire());
 				$_SESSION['timeoflogon']=time();
-				$page_obj->database_obj->execute_query("update ".get_class($this)." set ostatnielogowanie=now() where ido=$r_idu");
+				$page_obj->database_obj->execute_query("update ".get_class($this)." set ostatnielogowanie=now() where ido=$r_ido");
 				return 1;
 			};
 			echo("out of range !!");
@@ -155,7 +155,7 @@ if(!class_exists('opiekunowie'))
 		#region logout
 		public function logout()
 		{
-			$_SESSION['r_idu']=-1;
+			$_SESSION['r_ido']=-1;
 			$_SESSION['timeoflogon']="";
 			setcookie("r_access","no",time()+session_cache_expire());
 			session_destroy();
@@ -167,11 +167,29 @@ if(!class_exists('opiekunowie'))
 		public function is_login()
 		{
 			//jezeli jest zalogowany uzytkownik zwraca true jezeli nie zwraca false
-			$r_idu=isset($_SESSION['r_idu'])?$_SESSION['r_idu']:'';
-			if($r_idu!=-1 && $r_idu!="")
+			$r_ido=isset($_SESSION['r_ido'])?$_SESSION['r_ido']:'';
+			if($r_ido!=-1 && $r_ido!="")
 				return true;
 			else
-			return false;
+				return false;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_login_ido
+		public function get_login_ido()
+		{
+			return isset($_SESSION['r_ido'])?$_SESSION['r_ido']:'';
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_login_imie_nazwisko
+		public function get_login_imie_nazwisko()
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= $this->get_imie_opiekun_nazwisko_opiekun($this->get_login_ido());
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

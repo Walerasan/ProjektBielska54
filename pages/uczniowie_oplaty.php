@@ -40,16 +40,16 @@ if(!class_exists('uczniowie_oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_list
-		public function get_idu_list($idop)
+		public function get_ido_list($idu)
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idop=$idop and usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)
 			{
 				while(list($idu)=$wynik->fetch_row())
 				{
-					$rettext[] = (int)$idu;
+					$rettext[] =(int)$idu;
 				}
 			}
 			//--------------------

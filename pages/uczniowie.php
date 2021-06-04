@@ -30,7 +30,7 @@ if(!class_exists('uczniowie'))
 				switch($this->page_obj->target)
 				{
 					default:
-						$content_text.="No access is available";
+						$content_text.=$this->uczniowie_info();
 						break;
 				}
 			}
@@ -39,23 +39,39 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_list
-		public function get_list()
+		#region uczniowie_info
+		private function uczniowie_info()
 		{
-			$rettext=array();
+			$rettext = "";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie';");
-			if($wynik)
+			$idu_array = $this->page_obj->uczniowie_opiekunowie->get_idu_list($this->page_obj->opiekunowie->get_login_ido());
+			if(sizeof($idu_array) > 0)
 			{
-				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
+				foreach($idu_array as $idu)
 				{
-					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
+					$rettext .= "<div style='padding-bottom:20px;'>";
+					$rettext .= $this->get_imie_uczniowie_nazwisko_uczniowie($idu)."<br />";
+					$rettext .= $this->szczegoly_dla_ucznia($idu);
+					$rettext .= "</div>";
 				}
+			}
+			else
+			{
+				$rettext .= "Brak przypisanych uczniów.";
 			}
 			//--------------------
 			return $rettext;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function szczegoly_dla_ucznia($idu)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region get_list_for_klasa
 		public function get_list_for_klasa($idkl)

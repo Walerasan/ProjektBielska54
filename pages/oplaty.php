@@ -32,12 +32,33 @@ if(!class_exists('oplaty'))
 				switch($this->page_obj->target)
 				{
 					default:
-						$content_text.="No access is available";
+						$content_text.=$this->get_payments_list($this->page_obj->opiekunowie->get_login_ido());
 						break;
 				}
 			}
 			//--------------------
 			return $this->page_obj->$template_class_name->get_content($content_text);
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_payments_list
+		private function get_payments_list($ido)
+		{
+			// pobrać wszystkich uczniów i dla nich pobrać wszystkie opłaty
+			
+			$rettext = "";
+			//--------------------
+			$idu_array = $this->page_obj->uczniowie_opiekunowie->get_idu_list($this->page_obj->opiekunowie->get_login_ido());
+			foreach($idu_array as $idu)
+			{
+				$ido_array = $this->page_obj->uczniowie_oplaty->get_ido_list($idu);
+				foreach($ido_array as $ido)
+				{
+					$rettext .= $idu." ".$ido." <br />";
+				}
+			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -159,7 +159,7 @@ if(!class_exists('page'))
 				case "login":
 					if(isset($_POST['r_login']) && isset($_POST['r_password']))
 					{
-							$this->opiekunowie->login($this,$_POST['r_login'],$_POST['r_password']);
+						$this->opiekunowie->login($this,$_POST['r_login'],$_POST['r_password']);
 					}
 					break;
 				case "logout":

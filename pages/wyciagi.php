@@ -31,12 +31,23 @@ if(!class_exists('wyciagi'))
 				switch($this->page_obj->target)
 				{
 					default:
-						$content_text.="No access is available";
+						$content_text.=$this->get_statements_list($this->page_obj->opiekunowie->get_login_ido());
 						break;
 				}
 			}
 			//--------------------
 			return $this->page_obj->$template_class_name->get_content($content_text);
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_statements_list
+		private function get_statements_list($ido)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext = "ido = $ido";
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
