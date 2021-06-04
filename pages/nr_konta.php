@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('nr_konta'))
 {
-	class oddzialy
+	class nr_konta
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ if(!class_exists('oddzialy'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="<p class='title'>ODDZIAŁY</p>";
+			$content_text="<p class='title'>NR KONTA</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template == "admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -44,12 +44,30 @@ if(!class_exists('oddzialy'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa from ".get_class($this)." where usuniety='nie' order by idod;");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($idkl,$idod,$nazwa)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idod, $nazwa);
+					$rettext[] = array((int)$idkl, (int)$idod, $nazwa);
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_list
+		public function get_list_for_idod($idod)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idkl,nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod;");
+			if($wynik)
+			{
+				while(list($idkl,$nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idkl, (int)$idod, $nazwa);
 				}
 			}
 			//--------------------
@@ -58,18 +76,34 @@ if(!class_exists('oddzialy'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_name
-		public function get_name($idod)
+		public function get_name($idkl)
 		{
 			$nazwa='';
-			if($idod!="" && is_numeric($idod) && $idod>0)
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
+				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
 				if($wynik)
 				{
 					list($nazwa)=$wynik->fetch_row();
 				}
 			}
 			return $nazwa;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_oddzial
+		public function get_oddzial($idkl)
+		{
+			$idod=0;
+			if($idkl!="" && is_numeric($idkl) && $idkl>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select idod from ".get_class($this)." where usuniety='nie' and idkl=$idkl");
+				if($wynik)
+				{
+					list($idod)=$wynik->fetch_row();
+				}
+			}
+			return $idod;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

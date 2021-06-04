@@ -2,86 +2,111 @@
 //--------------------
 if(!class_exists('index_template'))
 {
-    class index_template
+	class index_template
 	{
+		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct()
+		public function __construct($page_obj)
 		{
+			$this->page_obj=$page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
 		{
 		}
 		//----------------------------------------------------------------------------------------------------
-		public function get_content($page_obj,$trescstrony,$menupozome)
+		public function get_content($trescstrony)
 		{
-			$formularzlogowania="";//(is_object($this->silnik->uzytkownicy) && method_exists($this->silnik->uzytkownicy,"formularz")) ?$this->silnik->uzytkownicy->formularz():"";
-			$stopkastrony=$this->stopka();		
-			//--------------------
+			if($this->page_obj->users->is_login())
+			{
+				$rettext=$this->index_template_user_is_login($trescstrony);
+			}
+			else
+			{
+				$rettext=$this->index_template_user_is_logout($trescstrony);
+			}
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function index_template_user_is_logout($trescstrony)
+		{
 			$rettext="
 				<link rel='Stylesheet' type='text/css' href='./css/index.css' />
 				<!-- ################################################## -->
-				 ".$this->infoOCookie($page_obj)."
-					<!-- ################## środek strony ##################### -->
-					<div class='tlostrony'>
-					  <div class='centruj'>
-					  
-						  <!-- ########## -->
-					  	<div class='belkalogailoginu'>
-					  		<div class='logo'><img src='./media/desktop/logo.gif' alt='LabNode - Laboratorium informatyki, matematyki, chemii, mechaniki, elektroniki' /></div>
-					  		<div class='logindata'>
-					  			$formularzlogowania
-					  			<br />
-									Twoje ip: ".((isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:$_SERVER['REMOTE_ADDR'])."
-									<div id='godzina' class='godzina' onclick='var e=arguments[0] || event;kalendarzKG.pokaz(e,\"\",\"\",\"\",\"\",\"\",\"\",this,true);'></div>
-									<script type='text/javascript'>var kalendarzKG=new LabNode.kalendarz('KG');</script>\n 
-									<script type='text/javascript'>new LabNode.zegarek('godzina');</script>\n
-					  		</div>
-					  	</div>
-											
-							<!-- ########## -->				
-					  	<div class='belkamenu'>
-					  		<div class='belkamenuodstepy'>
-					  			$menupozome
-					  		</div>
-					  	</div>
-					  				
-					  	<!-- ########## -->
-					  	<div class='srodek'>
-								$trescstrony
-							</div>
-							
-						 	<!-- ###### koniec środek strony ###### -->
-						 	$stopkastrony
+				<div class='pasekgorny'><div class='center'><img src='./media/desktop/pasekgorny.gif' alt='' class='pasekgorny'/></div></div>
+				<div class='tlo'>
+					<div class='center'>
+						<img src='./media/desktop/tytul.png' alt='' class='tytul'/>
+						<img src='./media/desktop/tytul2.png' alt='' class='tytul2'/>
+						{$this->login_form()}
+						<div class='info'>
+							<img src='./media/desktop/ikonadomku.gif' alt='' style='vertical-align:middle;' /> Bielska 54, 43-200 Pszczyna <img src='./media/desktop/ikonatelefonu.gif' alt='' style='vertical-align:middle;'/>  502 243 181 <img src='./media/desktop/ikonakoperty.gif' alt='' style='vertical-align:middle;' /> <a href='mailto:biuro@nzpe.pl' style='color:inherit;text-decoration:none;'>biuro@nzpe.pl</a> <img src='./media/desktop/ikonamapy.gif' alt='' style='vertical-align:middle;' /> <a href='https://goo.gl/maps/bmHnVLcNAhYVxGy8A' onclick='window.open(\"https://goo.gl/maps/bmHnVLcNAhYVxGy8A\",\"chaild\");return false;' style='color:inherit;text-decoration:none;'> mapa</a> 
 						</div>
 					</div>
-			";
+				</div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function stopka()
+		private function index_template_user_is_login($trescstrony)
 		{
-			$rettext="<div class='stopka'>
-							..:: &#169;opyright: <a href='javascript:window.open(\"http://labnode.org\",\"chaild\");void(null);' class='stopkadolna'>labnode.org</a> 2010 &#183;&#183;::.. Project &#38; fabricating: <a href='javascript:window.open(\"http://labnode.org\",\"chaild\");void(null);' class='stopkadolna'>LabNode</a> ..::&#183;&#183; Programmer: <a href='javascript:window.open(\"mailto:rafal@labnode.org\",\"chaild\");void(null);' class='stopkadolna'>Rafał Oleśkowicz</a> ::..<br />
-							..:: Laboratorium informatyki, matematyki, chemii, mechaniki, elektroniki, psychologii ::..<br />
-							..:: mgr inż. Rafał Oleśkowicz ::..
-						</div>";
+			$rettext="<link rel='Stylesheet' type='text/css' href='./css/index_login.css' />";
+			$rettext.="<div style='width:100%;'>";
+			$rettext.="<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
+			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= $this->button("Uczniowie","uczniowie,index,lista");
+			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= $this->button("Opłaty","oplaty,index,lista");
+			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= $this->button("Wyciągi","wyciagi,index,lista");
+			$rettext .= "<div class='button_spacing_x4'></div>";
+			$rettext .= $this->button("Klasa","klasa,index,lista");
+			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= $this->button("Typy opłat","typy_oplat,index,lista");
+			$rettext .= "<div class='button_spacing'></div>";
+			$rettext .= $this->button("Opiekunowie","opiekunowie,index,lista");
+			$rettext .= "<div class='button_spacing_x4'></div>";
+			$rettext .= $this->button("Wyloguj","staticpages,index,logout");
+			$rettext.="</div>";
+			$rettext.="<div style='overflow:hidden;padding:20px;'>";
+			$rettext.=$trescstrony;
+			$rettext.="</div>";
+			$rettext.="</div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function infoOCookie($page_obj)
+		private function button($title,$link)
 		{
-		    if(isset($_COOKIE['cookieinfo']))$cookieinfo=$_COOKIE['cookieinfo'];else $cookieinfo="";
-		    $rettext="
-			<div id='cookieinfo' class='cookieinfo'>
-				<div class='cookieinfowarstwanosna' style='".($cookieinfo=="potwierdzone"?"display:none;":"")."'>
-					<div class='cookieinfowarstwatekstu'>
-						".$page_obj->language_obj->pobierz("cookieinfo")."
+			$rettext = "";
+			//--------------------
+			$rettext = "<div class='button' onclick='window.location=\"{$link}\"'>{$title}</div>";
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function login_form()
+		{
+			$rettext="<form method='post' action='staticpages,index,login' class='login_form'>";
+			$rettext.="<input type='text' class='login_form_input' name='r_login' placeholder='e-mail' /> <br />";
+			$rettext.="<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
+			$rettext.="<input type='submit' class='login_form_submit' value='zaloguj' />";
+			$rettext.="</form>";
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function infoOCookie()
+		{
+			if(isset($_COOKIE['cookieinfo']))$cookieinfo=$_COOKIE['cookieinfo'];else $cookieinfo="";
+			$rettext="
+				<div id='cookieinfo' class='cookieinfo'>
+					<div class='cookieinfowarstwanosna' style='".($cookieinfo=="potwierdzone"?"display:none;":"")."'>
+						<div class='cookieinfowarstwatekstu'>
+							".$this->page_obj->language_obj->pobierz("cookieinfo")."
+						</div>
+						<img src='./media/desktop/zamknij.png' alt='' class='cookieinfozamknij' onclick='document.getElementById(\"cookieinfo\").style.display=\"none\";setCookie(\"cookieinfo\",\"potwierdzone\",365);'/>
 					</div>
-					<img src='./media/desktop/zamknij.png' alt='' class='cookieinfozamknij' onclick='document.getElementById(\"cookieinfo\").style.display=\"none\";setCookie(\"cookieinfo\",\"potwierdzone\",365);'/>
-				</div>
-			</div>";
-		    return $rettext;
+				</div>";
+			return $rettext;
 		}
 	}
 }

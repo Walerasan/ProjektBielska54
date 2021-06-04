@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('konta_bankowe'))
 {
-	class oddzialy
+	class konta_bankowe
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ if(!class_exists('oddzialy'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="<p class='title'>ODDZIAŁY</p>";
+			$content_text="<p class='title'>KONTA BANKOWE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template == "admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -44,12 +44,12 @@ if(!class_exists('oddzialy'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idk,numer_konta from ".get_class($this)." where usuniety='nie' order by idod;");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($idk,$numer_konta)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idod, $nazwa);
+					$rettext[] = array((int)$idk, $numer_konta);
 				}
 			}
 			//--------------------
@@ -58,18 +58,18 @@ if(!class_exists('oddzialy'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_name
-		public function get_name($idod)
+		public function get_numer_konta($idk)
 		{
-			$nazwa='';
-			if($idod!="" && is_numeric($idod) && $idod>0)
+			$numer_konta='';
+			if($idk!="" && is_numeric($idk) && $idk>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
+				$wynik=$this->page_obj->database_obj->get_data("select numer_konta from ".get_class($this)." where usuniety='nie' and idk=$idk");
 				if($wynik)
 				{
-					list($nazwa)=$wynik->fetch_row();
+					list($numer_konta)=$wynik->fetch_row();
 				}
 			}
-			return $nazwa;
+			return $numer_konta;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -6,8 +6,10 @@
 function potwierdzenie(pytanie,akcja,ramkaokna)
 {
 	var answer = confirm(pytanie);
-	if(answer)
+	if(answer == true)
+	{
 		ramkaokna.location=akcja;
+	}
 	return void(null);
 }
 

@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('uczniowie'))
 {
-	class oddzialy
+	class uczniowie
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ if(!class_exists('oddzialy'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="<p class='title'>ODDZIAŁY</p>";
+			$content_text="<p class='title'>UCZNIOWIE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template == "admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -44,12 +44,12 @@ if(!class_exists('oddzialy'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idod, $nazwa);
+					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
 				}
 			}
 			//--------------------
@@ -57,19 +57,37 @@ if(!class_exists('oddzialy'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_name
-		public function get_name($idod)
+		#region get_list_for_klasa
+		public function get_list_for_klasa($idkl)
 		{
-			$nazwa='';
-			if($idod!="" && is_numeric($idod) && $idod>0)
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' and idkl=$idkl;");
+			if($wynik)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
-				if($wynik)
+				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
-					list($nazwa)=$wynik->fetch_row();
+					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
 				}
 			}
-			return $nazwa;
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_imie_uczniowie_nazwisko_uczniowie
+		public function get_imie_uczniowie_nazwisko_uczniowie($idu)
+		{
+			$imie_uczniowie_nazwisko_uczniowie='';
+			if($idu!="" && is_numeric($idu) && $idu>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_uczniowie,' ',nazwisko_uczniowie) from ".get_class($this)." where usuniety='nie' and idu=$idu");
+				if($wynik)
+				{
+					list($imie_uczniowie_nazwisko_uczniowie)=$wynik->fetch_row();
+				}
+			}
+			return $imie_uczniowie_nazwisko_uczniowie;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

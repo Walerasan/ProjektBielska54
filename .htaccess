@@ -10,17 +10,17 @@ AddType  application/vnd.openxmlformats  .docx .pptx .xlsx
 
 RewriteRule ^$ index.php
 RewriteRule ^admin$ index.php?page=admin&template=admin
-RewriteRule ^([0-9a-zA-Z-]*)$ index.php?page=$1
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*)$ index.php?page=$1&template=$2
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*)$ index.php?page=$1&template=$2&target=$3
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9&par7=$10
-RewriteRule ^([0-9a-zA-Z-]*),([0-9a-zA-Z-]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9&par7=$10&par8=$11
+RewriteRule ^([0-9a-zA-Z-_]*)$ index.php?page=$1
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*)$ index.php?page=$1&template=$2
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*)$ index.php?page=$1&template=$2&target=$3
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9&par7=$10
+RewriteRule ^([0-9a-zA-Z-_]*),([0-9a-zA-Z-_]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$ index.php?page=$1&template=$2&target=$3&par1=$4&par2=$5&par3=$6&par4=$7&par5=$8&par6=$9&par7=$10&par8=$11
 
 #ExpiresActive On
 #ExpiresDefault "access plus 30 days"

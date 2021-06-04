@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('uczniowie_opiekunowie'))
 {
-	class oddzialy
+	class uczniowie_opiekunowie
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -22,10 +22,10 @@ if(!class_exists('oddzialy'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="<p class='title'>ODDZIAŁY</p>";
+			$content_text="<p class='title'>UCZNIOWIE - OKIEKUNOWIE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template == "admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -39,40 +39,51 @@ if(!class_exists('oddzialy'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_list
-		public function get_list()
+		#region get_ido
+		public function get_ido($idu)
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($ido)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idod, $nazwa);
+					$rettext[] = array((int)$ido);
 				}
 			}
-			//--------------------
 			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_name
-		public function get_name($idod)
+		#region get_idu
+		public function get_idu($ido)
 		{
-			$nazwa='';
-			if($idod!="" && is_numeric($idod) && $idod>0)
+			$rettext=-1;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where ido=$ido and usuniety='nie';");
+			if($wynik)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
-				if($wynik)
-				{
-					list($nazwa)=$wynik->fetch_row();
-				}
+				list($rettext)=$wynik->fetch_row();
 			}
-			return $nazwa;
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_iduo
+		public function get_iduo($idu,$ido)
+		{
+			$rettext=-1;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select iduo from ".get_class($this)." where idu=$idu and ido=$ido;");
+			if($wynik)
+			{
+				list($rettext)=$wynik->fetch_row();
+			}
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------		
 		#region definicjabazy
 		private function definicjabazy()
 		{

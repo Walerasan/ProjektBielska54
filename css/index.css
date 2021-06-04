@@ -1,10 +1,11 @@
 @CHARSET "UTF-8";
-/*@font-face
+@font-face
 {
-	font-family: courierb;
-	src:url(../media/desktop/courierb.eot);
-	src:url(../media/desktop/courierb.ttf) format("truetype");
-}*/
+	font-family: constan;
+	src:url(../media/desktop/constan.eot);
+	src:url(../media/desktop/constan.ttf) format("truetype");
+}
+
 html
 {
 	font-family:tahoma;
@@ -15,7 +16,7 @@ body
 {
 	margin:0px;
 	font-family:tahoma;
-	background:white;
+	background:inherit;
 	font-size:10pt;
 }
 div
@@ -27,191 +28,262 @@ img
 	border:0px;
 	margin:0px;
 }
-a:link
-{
-	color:black;
-	text-decoration:none;
-}
-a:active
-{
-	color:black;
-	text-decoration:none;
-}
-a:visited
-{
-	color:black;
-	text-decoration:none;
-}
-a:hover
-{
-	color:#black;
-	text-decoration:none;
-}
 p
 {
 	margin:0px;
 	padding:0px;
 }
-/*-------------------------------------------------------*/
-#likebox_1
+
+
+
+/* ------------------------------------------------------------------------- */
+/* szablony -> dodatkiprzedstrona i dodatkipodstrona */
+/* ------------------------------------------------------------------------- */
+div.naglowekdlarobotow 
 {
-  z-index: 10005;
-	border:2px solid #3c95d9;
-	background-color: #fff;
-	width:196px;
-	height: 353px;
-	position: fixed;
-	top: 18%;
-	right: -200px;
+	display:none;
 }
-#likebox_1_1
-{
-	width:196px;
-	height: 353px;
-	overflow: hidden;
-}
-#likebox_1 img
-{
-	position: absolute; 
-	top: -2px; 
-	left: -35px; 
-	cursor: pointer;
-}
-#likebox_1 iframe
-{
-	border:0px solid #3c95d9;
-	overflow: hidden; 
-	position: static;
-	height: 360px;
-	left:-2px;
-  top:-3px;
-}
-/*-------------------------------------------------------*/
-div.tlostrony
+
+/* ------------------------------------------------------------------------- */
+/* szablony */
+/* ------------------------------------------------------------------------- */
+div.pasekgorny
 {
 	width:100%;
-	overflow:hidden;
-	background:url(../../media/desktop/gora.gif);
-	background-repeat:repeat-x;
+	height:10px;
+	background:#00aef0;
 }
-div.centruj
+img.pasekgorny
 {
-	width:990px;
+	display:block;
+}
+div.center
+{
+	width:983px;
 	margin:auto;
-	overflow:hidden;
-}
-div.belkalogailoginu
-{
-	margin-top:5px;
-	margin-bottom:5px;
-	width:100%;
-	overflow:hidden;
 	position:relative;
 }
-div.logo
+div.tlo
 {
-	width:204px;
-	height:90px;
-	float:left;
+	width:100%;
+	height:1012px;
+	background:url(../media/desktop/tlo.jpg);
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-position:left top;
+	position:relative; 
 }
-div.logindata
+div.tlobelkidolnej
 {
-	float:right;
-	text-align:right;
+	width:100%;
+	height:274px;
+	background:url(../media/desktop/tlobelkidolnej.gif);
 }
-/*---------------------- STOPKA -------------------------*/
 div.stopka
 {
-	width:990px;
+	width:903px;
 	margin:auto;
+	height:160px;
+	position:relative;
 	overflow:hidden;
-	text-align:center;
+	z-index:5;
+	margin-top:0px;
+	margin-bottom:0px;
 }
-a.stopkadolna:link
+img.tytul
 {
-	color:black;
+	position:absolute;
+	top:36px;
+	left:255px;
 }
-a.stopkadolna:active
+img.tytul2
 {
-	color:black;
+	position:absolute;
+	top:233px;
+	left:377px;
 }
-a.stopkadolna:visited
+img.blok01
 {
-	color:#aaa;
+	position:absolute;
+	top:412px;
+	left:133px;/*-200*/
+	width:223px;
 }
-a.stopkadolna:hover
+img.blok02
 {
-	color:#aaa;
+	position:absolute;
+	top:412px;
+	left:394px;/*-200*/
+	width:223px;
 }
-/*--------------------- NAGŁÓWEK --------------------------*/
-div.godzina
+img.blok03
 {
+	position:absolute;
+	top:412px;
+	left:661px;
+	width:223px;
+}
+
+img.blok04
+{
+	position:absolute;
+	top:655px;
+	left:133px;/*-200*/
+	width:223px;
+}
+img.blok05
+{
+	position:absolute;
+	top:655px;
+	left:394px;/*-200*/
+	width:223px;
+}
+img.blok06
+{
+	position:absolute;
+	top:655px;
+	left:661px;
+	width:223px;
+}
+
+div.info
+{
+	position:absolute;
+	width:920px;
+	height:43px;
+	top:925px;
+	left:33px;
+	font-size:18px;
+	color:#34de32;
 	font-weight:bold;
+	
 }
-/*--------------------- MENU ------------------------------*/
-div.belkamenu
+div.partnerzyokno
 {
-	width:100%;
-	height:30px;
-	background:black;
-	font-size:12pt;
-	color:white;
+	width:815px;
 	overflow:hidden;
+	position:relative;
+	height:160px;
+	float:left;
+	margin-left:10px;
+	margin-right:10px;
 }
-div.belkamenuodstepy
+div.stopkaodstep
 {
-	padding-left:5px;
-	padding-top:3px;
+	z-index:2;
+	position:absolute;
+	top:23px;
+	left:20px;
 }
-a.menugorne
+img.partnerzyleft
 {
-	color:#fff;
-	font-size:10pt;
+	float:left;
+	z-index:5;
+	margin-left:5px;
+	margin-top:37px;
+	cursor:hand;
+	cursor:pointer;
 }
-/*-------------------- PRZYCISKI --------------------------*/
-button.przyciskwyloguj
+img.partnerzyright
 {
-	color:#666;
-	width:61px;
-	height:27px;
-	border:0px;
-	background:url(../../media/desktop/backgroundbuttonfield.gif);
+	float:left;
+	z-index:5;
+	margin-top:37px;
+	cursor:hand;
+	cursor:pointer;
 }
-input.przyciskzaloguj
+img.partnerzyseparator
 {
-	color:#666;
-	width:61px;
-	height:27px;
-	border:0px;
-	background:url(../../media/desktop/backgroundbuttonfield.gif);
+	margin-left:20px;
+	margin-right:20px;
+	float:left;
 }
-input.polelogin
+div.ramkapartnerzy
 {
-	text-align:center;
-	background:url(../../media/desktop/backgroundtextfield.gif);
-	background-repeat:no-repeat;
-	width:120px;
-	height:25px;
-	border:0px;
-	color:#aaaaaa;
+	float:left;
+	height:90px;
 }
-input.polehasla
+div.ramkapartnerzy:before
 {
-	text-align:center;
-	background:url(../../media/desktop/backgroundtextfield.gif);
-	background-repeat:no-repeat;
-	width:120px;
-	height:25px;
-	border:0px;
-	color:#aaaaaa;
+    content:'';
+    display:inline-block;
+    vertical-align:middle;
+    height:90px;
 }
-/* ------------------- ŚRODEK ---------------------------- */
-div.srodek
+img.logopartnera
 {
-	overflow:hidden;
-	width:100%;
-	padding-bottom:20px;
-	margin-bottom:20px;
-	margin-top:10px;
-	border-bottom:1px dashed #aaa;
+	vertical-align: middle;
+  display: inline-block;
+}
+img.biofeedback
+{
+	position:absolute;
+	left:10px;
+	top:0px;
+	opacity: 0.6;
+  filter: alpha(opacity=60);
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=60);
+  -moz-opacity: 0.60;
+}
+img.johansenias
+{
+	position:absolute;
+	left:10px;
+	top:40px;
+	opacity: 0.6;
+  filter: alpha(opacity=60);
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=60);
+  -moz-opacity: 0.60;
+}
+img.neuroflow
+{
+	position:absolute;
+	left:10px;
+	top:190px;
+	opacity: 0.6;
+  filter: alpha(opacity=60);
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=60);
+  -moz-opacity: 0.60;
+}
+img.Warnke
+{
+	position:absolute;
+	left:10px;
+	top:250px;
+	opacity: 0.6;
+  filter: alpha(opacity=60);
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=60);
+  -moz-opacity: 0.60;
+}
+img.SzkolaPamieta
+{
+	position:absolute;
+	left:10px;
+	top:370px;
+	width:150px;
+	opacity: 0.8;
+  filter: alpha(opacity=80);
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=80);
+  -moz-opacity: 0.80;
+}
+form.login_form
+{
+	position:absolute;
+	left:460px;
+	top:300px;
+	text-align: center;	
+}
+input.login_form_input
+{
+	width:300px;
+	font-size: 24px;
+	text-align: center;
+	margin:5px;
+}
+input.login_form_submit
+{
+	width:308px;
+	font-size: 24px;
+	text-align: center;
+	margin:5px;
 }

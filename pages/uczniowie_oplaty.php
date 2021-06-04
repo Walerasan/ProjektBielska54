@@ -1,7 +1,7 @@
 <?php
-if(!class_exists('oddzialy'))
+if(!class_exists('uczniowie_oplaty'))
 {
-	class oddzialy
+	class uczniowie_oplaty
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
@@ -19,13 +19,13 @@ if(!class_exists('oddzialy'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_content
+		#region get_cntent
 		public function get_content()
 		{
-			$content_text="<p class='title'>ODDZIAŁY</p>";
+			$content_text="<p class='title'>UCZNIOWIE - OPŁATY</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template == "admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -40,36 +40,20 @@ if(!class_exists('oddzialy'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_list
-		public function get_list()
+		public function get_idu_list($idop)
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idop=$idop and usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($idu)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idod, $nazwa);
+					$rettext[] = (int)$idu;
 				}
 			}
 			//--------------------
 			return $rettext;
-		}
-		#endregion
-		//----------------------------------------------------------------------------------------------------
-		#region get_name
-		public function get_name($idod)
-		{
-			$nazwa='';
-			if($idod!="" && is_numeric($idod) && $idod>0)
-			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idod=$idod");
-				if($wynik)
-				{
-					list($nazwa)=$wynik->fetch_row();
-				}
-			}
-			return $nazwa;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -1,55 +1,52 @@
 <?php
-if(!class_exists('admin'))
+if(!class_exists('powiadomienia'))
 {
-	class admin
+	class powiadomienia
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
+		#region construct
 		public function __construct($page_obj)
 		{
 			$this->page_obj=$page_obj;
+			$this->definicjabazy();
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region destructor
 		public function __destruct()
 		{
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_cntent
 		public function get_content()
 		{
-			//this can use only admin template
-			$this->page_obj->template="admin";
-			//--------------------
-			$content_text="";
+			$content_text="<p class='title'>POWIADOMIENIA</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if($this->page_obj->template=="admin")
+			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
-					case "test01":
-						$content_text=$this->test01_target();
-						break;
 					default:
-						$content_text=$this->default_target();
+						$content_text.="No access is available";
 						break;
 				}
 			}
 			//--------------------
 			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
-		//----------------------------------------------------------------------------------------------------
-		private function default_target()
+		#endregion
+		//----------------------------------------------------------------------------------------------------		
+		#region definicjabazy
+		private function definicjabazy()
 		{
-			return "Tutaj przypiść stronę główna - plik admin - linia kodu 36";
+			//definition is in ksiegowosc.nzpe.pl
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
-		private function test01_target()
-		{
-			$rettext="To jest sprawdzian klasy generatorów <br />";
-			return $rettext;
-		}
-		//----------------------------------------------------------------------------------------------------
-	}//end class
+	}
 }//end if
 else
 	die("Class exists: ".__FILE__);
