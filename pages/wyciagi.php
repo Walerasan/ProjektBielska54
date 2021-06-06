@@ -433,28 +433,32 @@ if(!class_exists('wyciagi'))
 						
 						while(list($idt, $rachuneknadawcy, $dataoperacji, $kwota, $id_nr_konta, $tytul, $adresnadawcy, $nazwanadawcy, $nrreferencyjny, $nazwapliku_id)=$wynik->fetch_row()){
 							
-							$wynik_wyciagi=$this->page_obj->database_obj->get_data("SELECT COUNT(idw) as ilosc FROM wyciagi WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							$wynik_wyciagi_template=$this->page_obj->database_obj->get_data("SELECT COUNT(idt) FROM wyciagi_template WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							if($wynik_wyciagi_template)
+							{
+								list($ilosc_wyciagi_template)=$wynik_wyciagi_template->fetch_row();
+							}
+													
+							$wynik_wyciagi=$this->page_obj->database_obj->get_data("SELECT COUNT(idw) FROM wyciagi WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
 							if($wynik_wyciagi)
 							{
 								list($ilosc_wyciagi)=$wynik_wyciagi->fetch_row();
 							}
 
-							$wynik_wyciagi_template=$this->page_obj->database_obj->get_data("SELECT COUNT(idt) as ilosc FROM wyciagi_template WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
-							if($wynik_wyciagi_template)
-							{
-								list($ilosc_wyciagi_template)=$wynik_wyciagi_template->fetch_row();
-							}
-							echo("$ilosc_wyciagi_template - $ilosc_wyciagi<br>");
+							//test !!!
+							echo("$ilosc_wyciagi_template : $ilosc_wyciagi<br>");
 							//jeśli ilosc wyciagi < wyciagi_template to dodajemy do tabeli wyciagi
+							
 							if(($ilosc_wyciagi_template > $ilosc_wyciagi)){
 								echo("ok<br>");
 								// dodajemy do bazy danych
-								//$zapytanie_wyciagi="insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
-								//values('$tytul','bankowy','$rachunekNadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
-								//$this->page_obj->database_obj->execute_query($zapytanie_wyciagi);
+								$zapytanie_wyciagi="insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
+								values('$tytul','bankowy','$rachunekNadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
+								$this->page_obj->database_obj->execute_query($zapytanie_wyciagi);
 							} else {
-								echo("baza posiada wpisy");
+								echo("baza posiada wpisy<br>");
 							}
+							
 						}
 							//czyszczenie tablicy tymczasowej
 							//truncate wyciagi_template
