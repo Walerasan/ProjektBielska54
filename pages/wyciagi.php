@@ -337,107 +337,139 @@ if(!class_exists('wyciagi'))
 			$dataOd = $tablicaData[$dlugosc_tablicaData];
 			$dataDo = $tablicaData[0];
 
-			//sprawdzam czy zakres przetwarzania historii tranzackji jest w przedziale czasowym?
-			//jeśli tak to przerywam wprowadzanie do bazy a jeśli nie do dodaje do bazy i zmieniam zakres przetwarzania
-			$wynik_spr_data=$this->page_obj->database_obj->get_data("select idnk from nr_konta where datado >= '$dataOd' AND numer_konta = '$nrkontaBaza';");
-			if($wynik_spr_data){
-				echo("<h3>Dane zostały już przetworzone</h3><br>");
-			}else {
-				
-					foreach($rowsTr3Tabela as $tr){
-						$cols = $tr->getElementsByTagName('td');
-						if($cols->item(2)->nodeValue == "Przelew na rachunek"){
-							
-							$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
-							$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
-							$opisDane = explode(":", $opis);//rozdzielam na tablice $opisDane...
-							
-							$rachunekNadawcy = substr($opisDane[1], 0, strpos($opisDane[1], "Nazwa nadawcy"));
-							//echo "Rachunek Nadawcy: ".$rachunekNadawcy.'<br>';
-							
-							$NazwaNadawcy = substr($opisDane[2], 0, strpos($opisDane[2], "Adres nadawcy"));
-							//echo "3: ".$NazwaNadawcy.'<br>';
-							
-							$AdresNadawcy = substr($opisDane[3], 0, strpos($opisDane[3], "Tytuł"));
-							//echo "4: ".$AdresNadawcy."<br>";
-							
-							if(isset($opisDane[4])){
-		
-								if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
-								$tytul = substr($opisDane[4], 0, strpos($opisDane[4], "Referencje własne zleceniodawcy"));
-								//echo "5: ".$tytul."<br>";
+			//------Dodaje do tablicy tymczasowej i porównuje je z tabelą stała wyciagi
+			//-----------------------Tablica tymczasowa----------------------
+						foreach($rowsTr3Tabela as $tr){
+							$cols = $tr->getElementsByTagName('td');
+							if($cols->item(2)->nodeValue == "Przelew na rachunek"){
+								
+								$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
+								$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
+								$opisDane = explode(":", $opis);//rozdzielam na tablice $opisDane...
+								
+								$rachunekNadawcy = substr($opisDane[1], 0, strpos($opisDane[1], "Nazwa nadawcy"));
+								//echo "Rachunek Nadawcy: ".$rachunekNadawcy.'<br>';
+								
+								$NazwaNadawcy = substr($opisDane[2], 0, strpos($opisDane[2], "Adres nadawcy"));
+								//echo "3: ".$NazwaNadawcy.'<br>';
+								
+								$AdresNadawcy = substr($opisDane[3], 0, strpos($opisDane[3], "Tytuł"));
+								//echo "4: ".$AdresNadawcy."<br>";
+								
+								if(isset($opisDane[4])){
+			
+									if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+									$tytul = substr($opisDane[4], 0, strpos($opisDane[4], "Referencje własne zleceniodawcy"));
+									//echo "5: ".$tytul."<br>";
+									} else {
+									$tytul = $opisDane[4];
+									//echo "5: ".$tytul."<br>";
+									}
+									
+									//jeśli "Referencje własne zleceniodawcy" to pokaż nr:....
+									if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
+									$Referencje = $opisDane[5]; 
+									//echo "6: ".$Referencje."<br>";
+									} else {
+										$Referencje = 0;
+									}
+								}
+								$wplyw = $cols->item(4)->nodeValue;//zawiera całą komórkę wraz z kwota
+			
+								$tytul = $this->page_obj->text_obj->domysql($tytul);
+								$rachunekNadawcy = $this->page_obj->text_obj->domysql($rachunekNadawcy);
+								$AdresNadawcy = $this->page_obj->text_obj->domysql($AdresNadawcy);
+								$wplyw = $this->page_obj->text_obj->domysql($wplyw);
+								$data = $this->page_obj->text_obj->domysql($data);
+								$NazwaNadawcy = $this->page_obj->text_obj->domysql($NazwaNadawcy);
+								$Referencje = $this->page_obj->text_obj->domysql($Referencje);
+			
+								$tytul = trim($tytul);
+								$rachunekNadawcy = trim($rachunekNadawcy);
+								$NazwaNadawcy = trim($NazwaNadawcy);
+								$Referencje = trim($Referencje);
+								$AdresNadawcy = trim($AdresNadawcy);
+								
+								$tytul = preg_replace('/\t/', '', $tytul);
+								//$rachunekNadawcy = preg_replace('/\s/', '', $rachunekNadawcy);
+								$NazwaNadawcy = preg_replace('/\t/', '', $NazwaNadawcy);
+								$AdresNadawcy = preg_replace('/\t/', '', $AdresNadawcy);
+
+								//pobieram nr konta jesli nie mam to wpierw dodaje do bazy--------------------------------------
+								$wynik=$this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta='$nrkontaBaza' limit 1;");
+								if($wynik)
+								{
+									list($idnk)=$wynik->fetch_row();
 								} else {
-								$tytul = $opisDane[4];
-								//echo "5: ".$tytul."<br>";
+									$zapytanie="insert into nr_konta(numer_konta,dataod,datado) values('$nrkontaBaza','$dataOd','$dataDo')";
+									$this->page_obj->database_obj->execute_query($zapytanie);
+									$idnk =  $this->page_obj->database_obj->last_id();
+								}
+								//---------------------------------------------------------------------------------------------
+								//dodaj do tabeli "dokumenthtml" i pobierz lastid dokumenthtml (idhtml, nazwa)
+								
+								$wynik_dokumenthtml=$this->page_obj->database_obj->get_data("select idhtml from dokumenthtml where nazwa='$file' limit 1;");
+								if($wynik_dokumenthtml)
+								{
+									list($iddokumenthtml)=$wynik_dokumenthtml->fetch_row();
+								} else {
+									$zapytanie2="insert into dokumenthtml(nazwa) values('$file')";
+									$this->page_obj->database_obj->execute_query($zapytanie2);
+									$iddokumenthtml =  $this->page_obj->database_obj->last_id();
 								}
 								
-								//jeśli "Referencje własne zleceniodawcy" to pokaż nr:....
-								if(strpos($opisDane[4], "Referencje własne zleceniodawcy")){
-								$Referencje = $opisDane[5]; 
-								//echo "6: ".$Referencje."<br>";
-								} else {
-									$Referencje = 0;
-								}
-							}
-							$wplyw = $cols->item(4)->nodeValue;//zawiera całą komórkę wraz z kwota
-		
-							$tytul = $this->page_obj->text_obj->domysql($tytul);
-							$rachunekNadawcy = $this->page_obj->text_obj->domysql($rachunekNadawcy);
-							$AdresNadawcy = $this->page_obj->text_obj->domysql($AdresNadawcy);
-							$wplyw = $this->page_obj->text_obj->domysql($wplyw);
-							$data = $this->page_obj->text_obj->domysql($data);
-							$NazwaNadawcy = $this->page_obj->text_obj->domysql($NazwaNadawcy);
-							$Referencje = $this->page_obj->text_obj->domysql($Referencje);
-		
-							$tytul = trim($tytul);
-							$rachunekNadawcy = trim($rachunekNadawcy);
-							$NazwaNadawcy = trim($NazwaNadawcy);
-							$Referencje = trim($Referencje);
-							$AdresNadawcy = trim($AdresNadawcy);
-							
-							$tytul = preg_replace('/\t/', '', $tytul);
-							//$rachunekNadawcy = preg_replace('/\s/', '', $rachunekNadawcy);
-							$NazwaNadawcy = preg_replace('/\t/', '', $NazwaNadawcy);
-							$AdresNadawcy = preg_replace('/\t/', '', $AdresNadawcy);
-							$wynik=$this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta='$nrkontaBaza' limit 1;");
-							if($wynik)
-							{
-								list($idnk)=$wynik->fetch_row();
-							} else {
-								$zapytanie="insert into nr_konta(numer_konta,dataod,datado) values('$nrkontaBaza','$dataOd','$dataDo')";
-								$this->page_obj->database_obj->execute_query($zapytanie);
-								$idnk =  $this->page_obj->database_obj->last_id();
-							}
-								$zapytanie="insert into ".get_class($this)."(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta)
-								values('$tytul','bankowy','$rachunekNadawcy','$AdresNadawcy',$wplyw,'$data','$NazwaNadawcy','$Referencje',$idnk)";
-								$this->page_obj->database_obj->execute_query($zapytanie);
-							
-						}	
-					}
-					//UPDATE Zakres daty....
-		
-					$zapytanie="update nr_konta set datado='$dataDo' where numer_konta='$nrkontaBaza';";//poprawa wpisu
-			
-					if(!$_SESSION['antyrefresh'])
-					{
-						if($this->page_obj->database_obj->execute_query($zapytanie))
-						{
-							$_SESSION['antyrefresh']=true;
-							$rettext.="Zapisane<br />";
-						}
-						else
-						{
-							$rettext.="Błąd zapisu - kontakt z administratorem Oprogramowania <br />";
-						}
-					}
-					//----Koniec UPDATE nr_konta
-			}
+								//-----------------------------------------------------------------------------
 
+								$zapytanie="insert into wyciagi_template(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
+								values('$tytul','bankowy','$rachunekNadawcy','$AdresNadawcy',$wplyw,'$data','$NazwaNadawcy','$Referencje',$idnk,$iddokumenthtml)";
+								$this->page_obj->database_obj->execute_query($zapytanie);	
+							}	
+						}
+
+			
+					$wynik=$this->page_obj->database_obj->get_data("SELECT idt, rachuneknadawcy, dataoperacji, kwota, id_nr_konta, tytul, adresnadawcy, nazwanadawcy, nrreferencyjny, nazwapliku_id FROM wyciagi_template;");
+					if($wynik)
+					{
+						
+						while(list($idt, $rachuneknadawcy, $dataoperacji, $kwota, $id_nr_konta, $tytul, $adresnadawcy, $nazwanadawcy, $nrreferencyjny, $nazwapliku_id)=$wynik->fetch_row()){
+							
+							$wynik_wyciagi=$this->page_obj->database_obj->get_data("SELECT COUNT(idw) as ilosc FROM wyciagi WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							if($wynik_wyciagi)
+							{
+								list($ilosc_wyciagi)=$wynik_wyciagi->fetch_row();
+							}
+
+							$wynik_wyciagi_template=$this->page_obj->database_obj->get_data("SELECT COUNT(idt) as ilosc FROM wyciagi_template WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							if($wynik_wyciagi_template)
+							{
+								list($ilosc_wyciagi_template)=$wynik_wyciagi_template->fetch_row();
+							}
+							echo("$ilosc_wyciagi_template - $ilosc_wyciagi<br>");
+							//jeśli ilosc wyciagi < wyciagi_template to dodajemy do tabeli wyciagi
+							if(($ilosc_wyciagi_template > $ilosc_wyciagi)){
+								echo("ok<br>");
+								// dodajemy do bazy danych
+								//$zapytanie_wyciagi="insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
+								//values('$tytul','bankowy','$rachunekNadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
+								//$this->page_obj->database_obj->execute_query($zapytanie_wyciagi);
+							} else {
+								echo("baza posiada wpisy");
+							}
+						}
+							//czyszczenie tablicy tymczasowej
+							//truncate wyciagi_template
+							$truncate_wyciagi_template="TRUNCATE TABLE wyciagi_template";
+							$this->page_obj->database_obj->execute_query($truncate_wyciagi_template);
+					}
+					//------------------------------------------------------------------------------
+				
 			//--------------------
 			/*
 			testy
 				TRUNCATE wyciagi;
 				TRUNCATE nr_konta;
+                TRUNCATE wyciagi_template;
+				TRUNCATE dokumenthtml;
 				SELECT count(*) FROM wyciagi;
 			*/
 			return $rettext;
@@ -584,10 +616,147 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 
+			$nazwa="nazwapliku_id";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
 			//----------------------------------------------------------------------------------------------------
 			$this->page_obj->database_obj->install($nazwatablicy,$pola);
 			unset($pola);
 			//--------------------
+
+			//funkcja utrzymuje taka sama strukture w bazie danych
+			$nazwatablicy="dokumenthtml";
+			$pola=array();
+			//definicja tablicy
+			$nazwa="idhtml";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="primary key";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="auto_increment";//extra
+			$pola[$nazwa][5]=$nazwa;
+			
+			$nazwa="nazwa";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			//----------------------------------------------------------------------------------------------------
+			$this->page_obj->database_obj->install($nazwatablicy,$pola);
+			unset($pola);
+
+			//funkcja utrzymuje taka sama strukture w bazie danych
+			$nazwatablicy="wyciagi_template";
+			$pola=array();
+			//definicja tablicy
+			$nazwa="idt";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="primary key";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="auto_increment";//extra
+			$pola[$nazwa][5]=$nazwa;
+			
+			$nazwa="id_nr_konta";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+			
+			$nazwa="usuniety";
+			$pola[$nazwa][0]="enum('tak','nie','zablokowany')";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="'nie'";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+			
+			$nazwa="tytul";
+			$pola[$nazwa][0]="varchar(50)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="rachuneknadawcy";
+			$pola[$nazwa][0]="varchar(50)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="adresnadawcy";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="dataoperacji";
+			$pola[$nazwa][0]="timestamp";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="kwota";
+			$pola[$nazwa][0]="decimal";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="0";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="nazwanadawcy";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="nrreferencyjny";
+			$pola[$nazwa][0]="varchar(255)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="0";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="typ";
+			$pola[$nazwa][0]="enum('bankowy','reczny','inny')";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="'inny'";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="nazwapliku_id";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			//----------------------------------------------------------------------------------------------------
+			$this->page_obj->database_obj->install($nazwatablicy,$pola);
+			unset($pola);
+
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
