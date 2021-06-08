@@ -10,6 +10,7 @@ include_once("./classes/statistics.php");
 include_once("./classes/graphic.php");
 include_once("./classes/imagemagic.php");
 include_once("./classes/admin.php");
+include_once("./classes/subpages.php");
 //----------------------------------------------------------------------------------------------------
 if(!class_exists('page'))
 {
@@ -26,6 +27,7 @@ if(!class_exists('page'))
 		var $graphic_obj;
 		var $imagemagic_obj;
 		var $admin;
+		var $subpage;
 		
 		var $page;
 		var $template;
@@ -78,13 +80,13 @@ if(!class_exists('page'))
 				
 			//--------------------
 			// create language object
-			//--------------------				
+			//--------------------
 			$this->language_obj=new language();
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
 			// create keyword obiect
-			//--------------------				
+			//--------------------
 			$this->keywords_obj=new keywords();
 			//~~~~~~~~~~~~~~~~~~~~
 			
@@ -111,10 +113,16 @@ if(!class_exists('page'))
 			//--------------------
 			$this->imagemagic_obj=new imagemagic();
 			//~~~~~~~~~~~~~~~~~~~~
+
+			//--------------------
+			// create subpages obiect
+			//--------------------
+			$this->subpages=new subpages();
+			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
 			// create pages object
-			//--------------------				
+			//--------------------
 			$fuse=100;
 			$dirs_to_load[0]="./pages";
 			$dirs_to_load[1]="./templates";

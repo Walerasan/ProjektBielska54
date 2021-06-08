@@ -68,7 +68,8 @@ if(!class_exists('wyciagi'))
 					break;
 					case "lista":
 					default:
-						$content_text=$this->lista();
+						$aktualnailosc=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$content_text=$this->lista($aktualnailosc);
 						break;
 				}
 			}
@@ -78,14 +79,20 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista()
+		public function lista($aktualnailosc)
 		{
 			$rettext="";
 			//--------------------
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button><br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,data,typ,usuniety from ".get_class($this).";");
+			if($aktualnailosc=="")$aktualnailosc=0;
+			$this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where usuniety='nie'");
+			$iloscwszystkich=$this->page_obj->database_obj->result_count();
+			$iloscnastronie=25;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
 			if($wynik)
 			{
 				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -94,7 +101,9 @@ if(!class_exists('wyciagi'))
 				$rettext.="
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
-						<td>numer konta</td>
+						<td>Tytuł</td>
+						<td>Data</td>
+						<td>Typ</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
@@ -114,15 +123,16 @@ if(!class_exists('wyciagi'))
 					//--------------------
 					$rettext.="
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
-							<td>$lp</td>
+							<td>".($aktualnailosc + $lp)."</td>
 							<td>$tytul</td>
-							<td>$data</td>
+							<td>".substr($data,0,10)."</td>
 							<td>$typ</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
 				$rettext.="</table>";
+				$rettext.="<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 			}
 			else
 			{
@@ -279,6 +289,7 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			return $rettext;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region input file to processing 
 		public function processingfile()
@@ -547,6 +558,7 @@ if(!class_exists('wyciagi'))
 
 			return $rettext;
 		}
+		#endregion
 		//-----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
