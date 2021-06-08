@@ -63,6 +63,9 @@ if(!class_exists('wyciagi'))
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
 						$content_text=$this->form($idw,$tytul,$data,$typ);
 					break;
+					case "raporty":
+						$content_text=$this->raporty();
+					break;
 					case "lista":
 					default:
 						$content_text=$this->lista();
@@ -79,7 +82,8 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,data,typ,usuniety from ".get_class($this).";");
 			if($wynik)
@@ -437,12 +441,16 @@ if(!class_exists('wyciagi'))
 							if($wynik_wyciagi_template)
 							{
 								list($ilosc_wyciagi_template)=$wynik_wyciagi_template->fetch_row();
+							} else {
+								echo "błąd ilość rekordów tabeli wyciagi_template";
 							}
 													
 							$wynik_wyciagi=$this->page_obj->database_obj->get_data("SELECT COUNT(idw) FROM wyciagi WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
 							if($wynik_wyciagi)
 							{
 								list($ilosc_wyciagi)=$wynik_wyciagi->fetch_row();
+							} else {
+								echo "błąd ilość rekordów tabeli wyciagi";
 							}
 
 							//test !!!
@@ -453,7 +461,7 @@ if(!class_exists('wyciagi'))
 								echo("ok<br>");
 								// dodajemy do bazy danych
 								$zapytanie_wyciagi="insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
-								values('$tytul','bankowy','$rachunekNadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
+								values('$tytul','bankowy','$rachuneknadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
 								$this->page_obj->database_obj->execute_query($zapytanie_wyciagi);
 							} else {
 								echo("baza posiada wpisy<br>");
@@ -525,6 +533,21 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region uploadfile
+		public function raporty()
+		{
+			$rettext="";
+			//--------------------
+			// Raport 1 na podstawie kalendarza od daty do daty wybiera się zakres raportu: suma wpłat
+			// Raport 2 zapisanie do formatu csv/xls/pdf jw.
+			// Raport 3 suma wpłat dla nrreferencyjnego
+			// Raport 4 wpłaty z danego rachunku + imie i nazwieko osoby wpłacającej (po przypisaniu rachunku do os wpłacajacej)
+
+			$rettext="RAPORTY";
+
+			return $rettext;
+		}
+		//-----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
