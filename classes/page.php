@@ -194,7 +194,7 @@ if(!class_exists('page'))
 		{
 			//--------------------
 			// get content from template
-			//--------------------				
+			//--------------------
 			if( isset($this->{$this->page}) && (is_object($this->{$this->page})) && (method_exists($this->{$this->page},"get_content")) )
 			{
 				$page_content=$this->{$this->page}->get_content($this);
@@ -391,6 +391,67 @@ if(!class_exists('page'))
 				}
 			error_reporting($error);
 			return $jestkatalog;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function syslog($trace, $dane)
+		{
+			//$this->strona->syslog(debug_backtrace(), $dane);
+			$chceckpoint=$this->checkpoint($trace);
+			$jestkatalognalogi=true;
+			if(!file_exists($this->RootPath()."/logs"))
+			if(!mkdir($this->RootPath()."/logs"))
+				$jestkatalognalogi=false;
+			if($jestkatalognalogi)
+			{
+				$plik=fopen($this->RootPath()."/logs/syslog",'a');
+				fwrite($plik, $chceckpoint."\n".$dane."\n\n");
+				fclose($plik);
+			}
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function checkpoint($trace)
+		{
+			//$trace=debug_backtrace();
+			$rettext="";
+			$caller=isset($trace[0])?$trace[0]:array();
+			$owner=isset($trace[1])?$trace[1]:array();
+			$file=isset($caller['file'])?$caller['file']:null;
+			$class=isset($owner['class'])?$owner['class']:null;
+			$function=isset($owner['function'])?$owner['function']:null;
+			$line=isset($caller['line'])?$caller['line']:null;
+			$type=isset($owner['type'])?$owner['type']:null;
+			list($timeSub,$time)=explode(' ',microtime());
+			$timeSub=preg_replace("/^[^.]\./","",$timeSub);
+			$timeSub=substr(str_pad($timeSub,6,'0'),0,6);
+			$rettext.='['.date( 'Y-m-d H:i:s', $time ).'.'.$timeSub.']: '.($file === null?'':$file.' ').($line===null?'':sprintf('{%05d} ',$line)).($class===null?'':$class.$type).($function===null?'':$function.'()');
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function RootPath()
+		{
+			$path_full = dirname($_SERVER['PHP_SELF']);
+			$path_tab = explode("/", $path_full);
+			$path_count = count($path_tab);
+			$path="";
+			for($i=2;$i<count($path_tab);$i++)
+			$path.="../";
+			if($path=="")$path="./";
+			return $path;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function instaldir($kat,$debug)
+		{
+			//sprawdzić czy istnieje taki katalog
+			/*$error=error_reporting(0);
+			$jestkatalog=$kat;
+			if(!file_exists($kat))
+				if(!mkdir($kat))
+				{
+					$this->strona->logtofile($debug,"Brak katalogu '".$folder."' i nie można go utworzyć");
+					$jestkatalog=null;
+				}
+			error_reporting($error);
+			return $jestkatalog;*/
 		}
 		//----------------------------------------------------------------------------------------------------
 	}//end class

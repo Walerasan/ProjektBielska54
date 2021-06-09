@@ -73,6 +73,16 @@ if(!class_exists('wyciagi'))
 						break;
 				}
 			}
+			else if ($this->page_obj->template=="raw")
+			{
+				switch($this->page_obj->target)
+				{
+					case "refresh":
+					default:
+						$content_text = $this->refresh();
+						break;
+				}
+			}
 			//--------------------
 			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
@@ -559,7 +569,15 @@ if(!class_exists('wyciagi'))
 			return $rettext;
 		}
 		#endregion
-		//-----------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------------
+		#region refresh
+		private function refresh()
+		{
+			$this->page_obj->syslog(debug_backtrace(),"Execute - ".date("Y-m-d H:i:s"));
+			return "refresh";
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
