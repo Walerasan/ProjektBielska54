@@ -68,7 +68,35 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
-			$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
+			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
+			
+			$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
+			if($wynik)
+			{
+				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
+				$rettext.="
+					<tr style='font-weight:bold;'>
+						<td style='width:25px;'>Lp.</td>
+						<td>nazwa</td>
+						<td>kwota</td>
+						<td style='width:18px;'>Opłaty</td>
+						<td style='width:18px;'></td>
+					</tr>";
+				$lp=1;
+				while(list($idop,$nazwa,$kwota)=$wynik->fetch_row())
+				{
+					$rettext.="
+						<tr>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
+							<td>$nazwa</td>
+							<td>$kwota</td>
+							<td>opłać</td>
+							<td></td>
+						</tr>";
+					$lp++;
+				}
+				$rettext.="</table>";
+			}
 			//--------------------
 			return $rettext;
 		}
