@@ -70,7 +70,14 @@ if(!class_exists('statistics'))
 			//--------------------
 			//pobieram id przeglądarki
 			//--------------------
-			$nazwap=$_SERVER['HTTP_USER_AGENT'];
+			if(isset($_SERVER['HTTP_USER_AGENT']))
+			{
+				$nazwap=$_SERVER['HTTP_USER_AGENT'];
+			}
+			else
+			{
+				$nazwap = "USER AGENT UNKNOW";
+			}
 			$wynik=$page_obj->database_obj->get_data("select idsp from ".get_class($this)."_p where nazwa='$nazwap'",0,0);
 			if($wynik)
 			    list($idsp)=$wynik->fetch_row();
