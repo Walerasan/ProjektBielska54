@@ -73,25 +73,64 @@ if(!class_exists('uczniowie'))
 			$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
 			if($wynik)
 			{
-				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext.="
-					<tr style='font-weight:bold;'>
-						<td style='width:25px;'>Lp.</td>
-						<td>nazwa</td>
-						<td>kwota</td>
-						<td style='width:18px;'>Opłaty</td>
-						<td style='width:18px;'></td>
+				<style>
+					#customers {
+					font-family: Arial, Helvetica, sans-serif;
+					border-collapse: collapse;
+					width: 100%;
+					}
+
+					#customers td, #customers th {
+					border: 1px solid gray;
+					padding: 8px;
+					}
+
+					#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+					#customers tr:hover {background-color: #ddd;}
+
+					#customers th {
+					padding-top: 12px;
+					padding-bottom: 12px;
+					text-align: left;
+					background-color: orange;
+					color: white;
+					}
+					button.oplac{
+						background-color: yellow;
+						border:2px solid black;
+						border-radius:10px;
+						font-weight:bold;
+						padding:5px;
+					}
+					button.oplac:hover{
+						background-color: #2F4F4F;
+						border:2px solid black;
+						border-radius:10px;
+						font-weight:bold;
+						color:white;
+						padding:5px;
+					}
+				</style>
+				";
+				$rettext.="<table id='customers'>";
+				$rettext.="
+					<tr>
+						<th>Lp.</th>
+						<th>nazwa</th>
+						<th>kwota</th>
+						<th>Opłaty</th>
 					</tr>";
 				$lp=1;
 				while(list($idop,$nazwa,$kwota)=$wynik->fetch_row())
 				{
 					$rettext.="
 						<tr>
-							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
+							<td>$lp.</td>
 							<td>$nazwa</td>
-							<td>$kwota</td>
-							<td>opłać</td>
-							<td></td>
+							<td>$kwota zł</td>
+							<td><button class='oplac'>OPŁAĆ</button></td>
 						</tr>";
 					$lp++;
 				}

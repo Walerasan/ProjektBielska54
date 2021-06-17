@@ -47,9 +47,9 @@ if(!class_exists('uczniowie_oplaty'))
 			$wynik=$this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idu)=$wynik->fetch_row())
+				while(list($ido)=$wynik->fetch_row())
 				{
-					$rettext[] =(int)$idu;
+					$rettext[] =(int)$ido;
 				}
 			}
 			//--------------------
