@@ -5,13 +5,19 @@ if(!class_exists('wyciagi'))
 	{
 		var $page_obj;
 		var $katalog;//katalog do uploud dokumentów do przetwarzania
+		var $javascript_select_uczniowie;
+		var $update_select_field_from_oddzialy_js_script;
+		var $update_select_field_from_klasa_js_script;
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
 		{
-			$this->page_obj=$page_obj;
+			$this->page_obj = $page_obj;
 			$this->definicjabazy();
-			$this->katalog=$page_obj->create_directory("./media/filehtml",debug_backtrace());
+			$this->katalog = $page_obj->create_directory("./media/filehtml",debug_backtrace());
+			$this->javascript_select_uczniowie = "";
+			$this->update_select_field_from_oddzialy_js_script = "";
+			$this->update_select_field_from_klasa_js_script = "";
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -31,45 +37,57 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "assign_write":
+						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$idu=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$aktualnailosc=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$content_text .= $this->assign_select_idu_write($idw,$idu,$aktualnailosc);
+						break;
+					case "assign_select_idu":
+						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$aktualnailosc=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$content_text .= $this->assign_select_idu_form($idw,$aktualnailosc);
+						break;
 					case "dodajplik":
-						if(isset($_FILES['filehtml']) && !empty($_FILES['filehtml'])){
-							$content_text=$this->uploadfile($_FILES['filehtml']);
+						if(isset($_FILES['filehtml']) && !empty($_FILES['filehtml']))
+						{
+							$content_text .= $this->uploadfile($_FILES['filehtml']);
 						}
 					break;
 					case "przetwarzanie":
-						$content_text=$this->processingfile();
+						$content_text .= $this->processingfile();
 					break;
 					case "przywroc":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->restore($idw,$confirm);
+						$content_text .= $this->restore($idw,$confirm);
 					break;
 					case "usun":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text=$this->delete($idw,$confirm);
+						$content_text .= $this->delete($idw,$confirm);
 					break;
 					case "zapisz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->add($idw,$tytul,$data,$typ);
+						$content_text .= $this->add($idw,$tytul,$data,$typ);
 					break;
 					case "formularz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$tytul=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['tytul'])?$_POST['tytul']:"");
 						$data=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['data'])?$_POST['data']:"");
 						$typ=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['typ'])?$_POST['typ']:"");
-						$content_text=$this->form($idw,$tytul,$data,$typ);
+						$content_text .= $this->form($idw,$tytul,$data,$typ);
 					break;
 					case "raporty":
-						$content_text=$this->raporty();
+						$content_text .= $this->raporty();
 					break;
 					case "lista":
 					default:
 						$aktualnailosc=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
-						$content_text=$this->lista($aktualnailosc);
+						$content_text .= $this->lista($aktualnailosc);
 						break;
 				}
 			}
@@ -79,7 +97,7 @@ if(!class_exists('wyciagi'))
 				{
 					case "refresh":
 					default:
-						$content_text = $this->refresh();
+						$content_text .= $this->refresh();
 						break;
 				}
 			}
@@ -116,6 +134,7 @@ if(!class_exists('wyciagi'))
 						<td>Typ</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
 				while(list($idw,$tytul,$data,$typ,$usuniety)=$wynik->fetch_row())
@@ -137,6 +156,7 @@ if(!class_exists('wyciagi'))
 							<td>$tytul</td>
 							<td>".substr($data,0,10)."</td>
 							<td>$typ</td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'>A</a></td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
@@ -179,7 +199,7 @@ if(!class_exists('wyciagi'))
 					</style>";
 			$rettext.="
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
-						<div style='overflow:hidden;'>							
+						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Data: </div><div class='formularzkom2'><input type='text' name='data' value='$data' style='width:800px;'/></div></div>
 							<div class='wiersz'>
@@ -715,6 +735,265 @@ if(!class_exists('wyciagi'))
 		{
 			$this->page_obj->syslog(debug_backtrace(),"Execute - ".date("Y-m-d H:i:s"));
 			return "refresh";
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region assign_select_idu_form
+		private function assign_select_idu_form($idw,$aktualnailosc)
+		{
+			$rettext="";
+			//--------------------
+			$_SESSION['antyrefresh']=false;
+			//--------------------
+			$rettext="
+					<style>
+						div.wiersz{float:left;clear:left;}
+						div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+					</style>";
+			$rettext.="
+					<form method='post' action='".get_class($this).",{$this->page_obj->template},assign_write'>
+						<div style='overflow:hidden;'>
+							Tu jeszcze wyświetlić szczegóły opłaty <br />
+							<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_for_oddzial('klasa_select')}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>Klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
+						
+							<div class='wiersz'>
+								<div class='formularzkom1'>Uczeń: </div>
+								<div class='formularzkom2'>
+									".$this->create_uczniowie_select_field($idw,'uczniowie_select','selected_uczniowie')."
+								</div>
+							</div>
+						
+							<div class='wiersz'>
+								<div class='formularzkom1'>&#160;</div>
+								<div class='formularzkom2'>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
+									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista,$aktualnailosc\"'>Anuluj</button>
+								</div>
+							</div>
+						</div>
+						<input type='hidden' name='idw' value='$idw' />
+						<input type='hidden' name='aktualnailosc' value='$aktualnailosc' />
+					</form>
+					{$this->update_select_field_from_oddzialy_js_script}
+					{$this->update_select_field_from_klasa_js_script}
+					{$this->javascript_select_uczniowie}";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region assign_select_idu_write
+		private function assign_select_idu_write($idw,$idu,$aktualnailosc)
+		{
+			$rettext = "Save account number to student.";
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_uczniowie_select_field
+		private function create_uczniowie_select_field($idw,$uczniowie_select_id,$selected_uczniowie_select_id)
+		{
+			$selected_uczniowie = "";
+			$uczniowie = "";
+			//todo
+			$lista_uczniow = $this->page_obj->uczniowie->get_list();
+			$lista_idu_w_wyciagach = $this->page_obj->wyciagi_uczniowie->get_idu_list_for_idw($idw);
+			foreach($lista_uczniow as $val)
+			{
+				if(in_array($val[0], $lista_idu_w_wyciagach))
+				{
+					$selected_uczniowie .= "selected_option.push([{$val[0]},'{$val[1]}']);\n";
+				}
+				else
+				{
+					$uczniowie .= "available_option.push([{$val[0]},'{$val[1]}']);\n";
+				}
+			}
+			//--------------------
+			$rettext = "<select multiple='multiple' id='$selected_uczniowie_select_id' name='selected_uczniowie[]'>";
+			$rettext .= "</select>";
+			$rettext .= "<a href='#' onclick='remov_uczen_from_select();'> -&gt;</a>";
+			$rettext .= "<a href='#' onclick='add_uczen_to_select();'> &lt;</a>";
+			$rettext .= "<select multiple='multiple' id='$uczniowie_select_id'>";
+			$rettext .= "</select>";
+			//--------------------
+			$this->javascript_select_uczniowie="<script>
+																var selected_option = new Array();
+																var available_option = new Array();
+																$selected_uczniowie
+																$uczniowie
+																function reload_selected_option()
+																{
+																	var select_field=document.getElementById(\"$selected_uczniowie_select_id\");
+																	for(i = (select_field.options.length - 1); i >= 0; i--) select_field.remove(i);
+																	for(i = 0; i < selected_option.length; i++)
+																	{
+																		select_field.options[select_field.options.length] = new Option(selected_option[i][1],selected_option[i][0]);
+																	}
+																};
+																function reload_available_option()
+																{
+																	var select_field=document.getElementById(\"$uczniowie_select_id\");
+																	for(i = (select_field.options.length - 1); i >= 0; i--) select_field.remove(i);
+																	for(i = 0; i < available_option.length; i++)
+																	{
+																		select_field.options[select_field.options.length] = new Option(available_option[i][1],available_option[i][0]);
+																	}
+																};
+																function add_uczen_to_select()
+																{
+																	var uczniowie=document.getElementById(\"$uczniowie_select_id\");
+																	if ( uczniowie.selectedIndex >= 0 )
+																	{
+																		for ( var i = 0; i < uczniowie.options.length; i++ )
+																		{
+																			if ( uczniowie.options[ i ].selected )
+																			{
+																				var option_value = uczniowie.options[i].value;
+																				selected_option.push(available_option.splice(available_option_find_position(option_value),1)[0]);
+																			}
+																		}
+																	}
+																	reload_available_option();
+																	reload_selected_option();
+																};
+																function remov_uczen_from_select()
+																{
+																	var selected_uczniowie=document.getElementById(\"$selected_uczniowie_select_id\");
+																	if ( selected_uczniowie.selectedIndex >= 0 )
+																	{
+																		for ( var i = 0; i < selected_uczniowie.options.length; i++ )
+																		{
+																			if ( selected_uczniowie.options[ i ].selected )
+																			{
+																				var option_value = selected_uczniowie.options[i].value;
+																				available_option.push(selected_option.splice(selected_option_find_position(option_value),1)[0]);
+																			}
+																		}
+																	}
+																	reload_available_option();
+																	reload_selected_option();
+																};
+																function selectAll()
+																{
+																	var selected_uczniowie=document.getElementById(\"$selected_uczniowie_select_id\");
+																	for ( i=0; i<selected_uczniowie.options.length; i++)
+																	{
+																		selected_uczniowie.options[i].selected = 'true';
+																	}
+																};
+																function available_option_find_position(id)
+																{
+																	for(i = 0; i < available_option.length; i++)
+																	{
+																		if(available_option[i][0] == id) return i;
+																	}
+																	return -1;
+																}
+																function selected_option_find_position(id)
+																{
+																	for(i = 0; i < selected_option.length; i++)
+																	{
+																		if(selected_option[i][0] == id) return i;
+																	}
+																	return -1;
+																}
+																reload_selected_option();
+																reload_available_option();
+															</script>";
+			/*$rettext = "<select name='idu'>";
+			$uczniowie_array = $this->page_obj->uczniowie->get_list();
+			foreach($uczniowie_array as $idu)
+			{
+				$rettext .= "<option name='$idu[0]'>".$this->page_obj->uczniowie->get_imie_uczniowie_nazwisko_uczniowie($idu[0])."</option>";
+			}
+			$rettext .= "</select>";*/
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_select_field_for_oddzial
+		private function create_select_field_for_oddzial($select_id)
+		{
+			$rettext = "<select onchange='document.getElementById(\"$select_id\").innerHTML = update_$select_id(this.value);document.getElementById(\"$select_id\").selectedIndex = 0; document.getElementById(\"$select_id\").dispatchEvent(new Event(\"change\"));'>";
+			$this->update_select_field_from_oddzialy_js_script = "<script>";
+			$this->update_select_field_from_oddzialy_js_script .= "function update_$select_id(idod){var opcje='';";
+			$this->update_select_field_from_oddzialy_js_script .= "switch(idod){";
+			$this->update_select_field_from_oddzialy_js_script .= "case '0':";
+			$this->update_select_field_from_oddzialy_js_script .= "opcje=opcje+'<option value=\"0\" >wszystkie</option>';";
+			foreach($this->page_obj->klasa->get_list() as $kval)
+			{
+				$this->update_select_field_from_oddzialy_js_script .= "opcje=opcje+'<option value=\"$kval[0]\" >$kval[2]</option>';";
+			}
+			$this->update_select_field_from_oddzialy_js_script .= "break;";
+			//-----
+			$rettext .= "<option value='0'>wszystkie</option>";
+			//-----
+			$lista_oddzialow = $this->page_obj->oddzialy->get_list();
+			foreach($lista_oddzialow as $val)
+			{
+				$rettext .= "<option value='{$val[0]}'>{$val[1]}</option>";
+				//-----
+				$this->update_select_field_from_oddzialy_js_script .= "case '$val[0]':";
+				foreach($this->page_obj->klasa->get_list_for_idod($val[0]) as $kval)
+				{
+					$this->update_select_field_from_oddzialy_js_script .= "opcje=opcje+'<option value=\"$kval[0]\" >$kval[2]</option>';";
+				}
+				$this->update_select_field_from_oddzialy_js_script .= "break;";
+			}
+			//-----
+			$this->update_select_field_from_oddzialy_js_script .= "};";
+			$this->update_select_field_from_oddzialy_js_script .= "return opcje;};</script>";
+			//-----
+			$rettext .= "</select>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region create_select_field_for_klasa
+		private function create_select_field_for_klasa($select_id,$uczniowie_select_id,$selected_uczniowie_select_id)
+		{
+			$this->update_select_field_from_klasa_js_script = "";
+			$this->update_select_field_from_klasa_js_script = "<script>";
+			$this->update_select_field_from_klasa_js_script .= "function update_$uczniowie_select_id(idkl){var opcje='';available_option.splice(0,available_option.length);";
+			$this->update_select_field_from_klasa_js_script .= "switch(idkl){";
+			$this->update_select_field_from_klasa_js_script .= "case '0':";
+			
+			//for all uczniowie
+			foreach($this->page_obj->uczniowie->get_list() as $val)
+			{
+				$this->update_select_field_from_klasa_js_script .= "if(selected_option_find_position({$val[0]}) == -1) available_option.push([{$val[0]},'{$val[1]}']);\n";
+			}
+			$this->update_select_field_from_klasa_js_script .= "break;";
+			
+			//for selected klasa
+			foreach($this->page_obj->klasa->get_list() as $val)
+			{
+				$this->update_select_field_from_klasa_js_script .= "case '{$val[0]}':";
+				foreach($this->page_obj->uczniowie->get_list_for_klasa($val[0]) as $val2)
+				{
+					$this->update_select_field_from_klasa_js_script .= "if(selected_option_find_position({$val2[0]}) == -1) available_option.push([{$val2[0]},'{$val2[1]}']);\n";
+				}
+				$this->update_select_field_from_klasa_js_script .= "break;";
+			}
+
+			$this->update_select_field_from_klasa_js_script .= "};";
+			$this->update_select_field_from_klasa_js_script .= "reload_selected_option();
+			reload_available_option();};</script>";
+			//--------------------
+			$rettext = "<select id='$select_id' onchange='update_$uczniowie_select_id(this.value);'>";
+			$rettext .= "<option value='0'>wszystkie</option>";
+			$lista_oddzialow = $this->page_obj->klasa->get_list();
+			foreach($lista_oddzialow as $val)
+			{
+				$rettext .= "<option value='{$val[0]}'>{$val[2]}</option>";
+			}
+			$rettext .= "<select>";
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

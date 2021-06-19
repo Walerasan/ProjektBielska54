@@ -412,9 +412,8 @@ if(!class_exists('oplaty'))
 						<input type='hidden' name='idop' value='$idop' />
 					</form>
 					{$this->update_select_field_from_oddzialy_js_script}
-					{$this->update_select_field_from_klasa_js_script}";
-			//--------------------
-			$rettext.=$this->javascript_select_uczniowie;
+					{$this->update_select_field_from_klasa_js_script}
+					{$this->javascript_select_uczniowie}";
 			//--------------------
 			return $rettext;
 		}
