@@ -252,7 +252,7 @@ if(!class_exists('uczniowie'))
 							$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
 						}
 					}
-					$rettext.="Zapisane $idu,$ido,$iduo<br />";
+					$rettext.="Zapisane $idu,$ido<br />";
 					$rettext.=$this->lista();
 				}
 				else
