@@ -559,12 +559,152 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			// Raport 1 na podstawie kalendarza od daty do daty wybiera się zakres raportu: suma wpłat
-			// Raport 2 zapisanie do formatu csv/xls/pdf jw.
-			// Raport 3 suma wpłat dla nrreferencyjnego
-			// Raport 4 wpłaty z danego rachunku + imie i nazwieko osoby wpłacającej (po przypisaniu rachunku do os wpłacajacej)
+			// Raporty------------
+			$rettext.="
+			<script src=\"./media/wyszukiwarka/jQuery/jquery.min.js\"></script>
+        	<link rel=\"stylesheet\" href=\"./media/wyszukiwarka/jQuery/jquery-ui.css\">
+    		<script src=\"./media/wyszukiwarka/jQuery/jquery-ui.min.js\"></script>
+    		<script>
+				$(function() {
+					$(\"#nrkonta_szukaj\").autocomplete({
+						source: \"./media/wyszukiwarka/szukaj.php\",
+					});
+				});
+    		</script>
+			";
 
-			$rettext="RAPORTY";
+			$rettext.="
+			<style>
+			.formraport input{
+				font-size: inherit;
+				padding: 0.3em;
+				margin: 0.2em 0.4em;
+				-moz-box-sizing: content-box;
+				-webkit-box-sizing: content-box;
+				box-sizing: content-box;
+			}
+			</style>
+			";
+			$rettext.="<h3>RAPORTY WYCIĄGÓW</h3><hr>";
+			$rettext.="<h3>
+			<form action='".get_class($this).",{$this->page_obj->template},raporty' method='post' class='formraport'>
+				Szukaj wg. nr konta: <input type='text' name='nrkonta' id='nrkonta_szukaj' placeholder='znajdź nr konta...' style='width:230px;'/>
+				<input type='submit' name='submitnrkonta' value='POKAŻ RAPORT'>
+				</form>
+			</h3><hr>";
+			$rettext.="<form action='".get_class($this).",{$this->page_obj->template},raporty' method='post' class='formraport'>
+			Data od: <input type='date' name='dataod'> 
+			Data do: <input type='date' name='datado'> 
+			<input type='submit' name='submitdata' value='POKAŻ RAPORT' class='formsubmit'>
+			</form><br>";
+
+			if(isset($_POST['submitdata'])){
+				if(!empty($_POST['dataod']) && !empty($_POST['datado'])){
+					$rettext.="Data od: {$_POST['dataod']} Data do: {$_POST['datado']}";
+					$od = $_POST['dataod'];
+					$do = $_POST['datado'];
+					
+					$raport1=$this->page_obj->database_obj->get_data("SELECT sum(kwota) FROM wyciagi WHERE dataoperacji >= '$od' AND dataoperacji <= '$do';");
+					if($raport1)
+					{
+						list($suma_wplat)=$raport1->fetch_row();
+						if($suma_wplat > 0){
+							$rettext.="<h4>Suma wpłat: $suma_wplat zł <button><a href='".get_class($this).",{$this->page_obj->template},raporty,$od,$do,$suma_wplat' style='text-decoration:none;color:black;'>LISTA</a></button></h4><hr>";
+						} else {
+							$rettext.="<h4>Suma wpłat: 0 zł </h4><hr>";
+						}
+					
+					} else {
+						echo "błąd raportu";
+					}
+				}
+			}
+
+			//lista dla zakresu daty od do---------------------------------------------
+			if(isset($_GET['par1']) && isset($_GET['par2']) && isset($_GET['par3'])){
+				
+				$od = $_GET['par1']; $do = $_GET['par2']; $kw = $_GET['par3'];
+				$rettext.="<h4>Suma wpłat: <span style='color:blue'>$kw zł</span>, Od $od - Do $do 
+				<br><br>
+				<form action='./media/pdf/tworzpdf.php' method='post'>
+					<input type='hidden' name='od' value='$od'>
+					<input type='hidden' name='do' value='$do'>
+					<input type='hidden' name='kwota' value='$kw'> 
+					<input type='submit' value='DO PDF' name='submitpdf'>
+				</form> <br>
+				
+				<form action='./media/csv/csv.php' method='post'>
+					<input type='hidden' name='od' value='$od'>
+					<input type='hidden' name='do' value='$do'> 
+					<input type='submit' value='DO CSV' name='submitcsv'>
+				</form> <br>";
+
+				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
+				$rettext.="<tr style='font-weight:bold;'>";
+					$rettext.="<td>Lp.</td><td>Wpływ</td><td>Tytuł</td><td>Data</td><td>Typ</td>";
+				$rettext.="</tr>";
+				$raport2=$this->page_obj->database_obj->get_data("SELECT kwota,tytul,dataoperacji,typ FROM wyciagi WHERE dataoperacji >= '$od' AND dataoperacji <= '$do' ORDER BY dataoperacji ASC;");
+					if($raport2)
+					{
+						$lp=1;
+						while(list($kwota,$tytul,$dataoperacji,$typ)=$raport2->fetch_row()){
+							$data = date("Y-m-d",strtotime($dataoperacji));  
+							$rettext.="<tr>";
+								$rettext.="<td>$lp</td><td>$kwota</td><td>$tytul</td><td>$data</td><td>$typ</td>";
+							$rettext.="</tr>";
+							$lp++;
+						}
+					}
+				$rettext.="<tbody></table>";
+			}
+
+			//wyszukiwarka po nr konta----------------------
+			if(isset($_POST['submitnrkonta'])){
+				if(!empty($_POST['nrkonta'])){
+					$nrkonta = $_POST['nrkonta'];
+					
+
+					$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
+					$rettext.="<tr style='font-weight:bold;'>";
+						$rettext.="<td>Lp.</td><td>NR KONTA</td><td>Tytuł</td><td>Data</td><td>Kwota</td>";
+					$rettext.="</tr>";
+
+
+					$raport1=$this->page_obj->database_obj->get_data("SELECT idw, rachuneknadawcy, tytul, dataoperacji, kwota,typ  FROM wyciagi WHERE rachuneknadawcy = '$nrkonta';");
+					if($raport1)
+					{
+						$lp=1;
+						while(list($idw, $rachuneknadawcy, $tytul, $dataoperacji, $kwota,$typ)=$raport1->fetch_row()){
+							$data = date("Y-m-d",strtotime($dataoperacji));  
+							$rettext.="<tr>";
+								$rettext.="<td>$lp</td><td>$kwota zł</td><td>$tytul</td><td>$data</td><td>$typ</td>";
+							$rettext.="</tr>";
+							$lp++;
+						}
+					} else {
+						echo "brak danych dla nr konta";
+					}
+					$rettext.="<tbody></table>";
+
+					$raport2=$this->page_obj->database_obj->get_data("SELECT sum(kwota) FROM wyciagi WHERE rachuneknadawcy='$nrkonta';");
+					if($raport2)
+					{
+						list($suma_wplat)=$raport2->fetch_row();
+						if($suma_wplat > 0){
+							$rettext.="<h4>Suma wpłat: $suma_wplat zł </h4><hr>";
+						} else {
+							$rettext.="<h4>Suma wpłat: 0 zł </h4><hr>";
+						}
+					
+					} else {
+						echo "błąd raportu";
+					}
+
+
+
+
+				}
+			}
 
 			return $rettext;
 		}
