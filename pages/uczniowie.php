@@ -50,7 +50,7 @@ if(!class_exists('uczniowie'))
 				foreach($idu_array as $idu)
 				{
 					$rettext .= "<div style='padding-bottom:20px;'>";
-					$rettext .= $this->get_imie_uczniowie_nazwisko_uczniowie($idu)."<br />";
+					$rettext .= "<h3>".$this->get_imie_uczniowie_nazwisko_uczniowie($idu)."</h3><br />";
 					$rettext .= $this->szczegoly_dla_ucznia($idu);
 					$rettext .= "</div>";
 				}
