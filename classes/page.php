@@ -268,7 +268,10 @@ if(!class_exists('page'))
 					<title>".(isset($this->{$this->page}) && (is_object($this->{$this->page}) && method_exists($this->{$this->page},"title"))?$this->{$this->page}->title($this->zmk):((is_object($this->language_obj) && method_exists($this->language_obj,"pobierz"))?$this->language_obj->pobierz("title",false,false):""))."</title>
 						
 					<link rel='Stylesheet' type='text/css' href='./css/strona.css' />
-					<link rel='Stylesheet' type='text/css' href='./css/lightbox.css' />";
+					<link rel='Stylesheet' type='text/css' href='./css/lightbox.css' />
+
+					<link rel='Stylesheet' type='text/css' href='./media/wyszukiwarka/jQuery/jquery-ui.css'>
+					";
 					
 				//--------------------
 				// favcicon
@@ -288,6 +291,7 @@ if(!class_exists('page'))
 				$rettext.="<script type='text/javascript' src='./js/lightbox/jquery-1.7.2.min.js'></script>";
 				$rettext.="<script type='text/javascript' src='./js/lightbox/lightbox.js'></script>";
 				$rettext.="\n".$this->ladujjs("./js");
+
 				//~~~~~~~~~~~~~~~~~~~~
 					
 				$rettext.="</head>";
