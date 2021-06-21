@@ -37,11 +37,14 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "processing":
+						$content_text .= $this->processing();
+						break
 					case "assign_write":
-						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
-						$idu=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$idw = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$selected_uczniowie = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
 						$aktualnailosc=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
-						$content_text .= $this->assign_select_idu_write($idw,$idu,$aktualnailosc);
+						$content_text .= $this->assign_select_idu_write($idw,$selected_uczniowie,$aktualnailosc);
 						break;
 					case "assign_select_idu":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
@@ -628,7 +631,7 @@ if(!class_exists('wyciagi'))
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
-									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
+									<input type='submit' name='' title='Zapisz' value='Zapisz' onclick='selectAll();'/>&#160;&#160;&#160;&#160;
 									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista,$aktualnailosc\"'>Anuluj</button>
 								</div>
 							</div>
@@ -645,9 +648,28 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region assign_select_idu_write
-		private function assign_select_idu_write($idw,$idu,$aktualnailosc)
+		private function assign_select_idu_write($idw,$selected_uczniowie,$aktualnailosc)
 		{
 			$rettext = "Save account number to student.";
+			//get rachunek_nadawcy from wyciagi
+			$rachunek_nadawcy = $this->get_rachunek_nadawcy($idw);
+			//get idk or insert new from konta_bankowe where numer_konta == rachunek_nadawcy
+			$idk = $this->page_obj->konta_bankowe->get_idk_konta($rachunek_nadawcy);
+			if($idk > -1)
+			{
+				//synchronize uczniowie_konta_bankowe for idu and idk
+				if(isset($selected_uczniowie) && is_array($selected_uczniowie))
+				{
+					foreach($selected_uczniowie as $idu)
+					{
+						$this->page_obj->uczniowie_konta_bankowe->synchronize($idk,$idu);
+					}
+				}
+				else
+				{
+					$rettext = "selected_uczniowie is not an array";
+				}
+			}
 			return $rettext;
 		}
 		#endregion
@@ -852,6 +874,30 @@ if(!class_exists('wyciagi'))
 				$rettext .= "<option value='{$val[0]}'>{$val[2]}</option>";
 			}
 			$rettext .= "<select>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function get_rachunek_nadawcy($idw)
+		{
+			$rachuneknadawcy = "";
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select rachuneknadawcy from ".get_class($this)." where idw=$idw;");
+			if($wynik) list($rachuneknadawcy)=$wynik->fetch_row();
+			//--------------------
+			return $rachuneknadawcy;
+		}
+		//----------------------------------------------------------------------------------------------------
+		#region processing
+		private function processing()
+		{
+			$rettext = "Auto processing system <br />";
+			//--------------------
+			// znajdz numery kont przypisane do uczniów
+			// znajdz nie przypisane wyciągi 
+			// przypisz wyciag do ucznia
+			
 			//--------------------
 			return $rettext;
 		}

@@ -171,7 +171,7 @@ if(!class_exists('konta_bankowe'))
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(numer_konta)values('$numer_konta')";//nowy wpis
+				$zapytanie = "insert into ".get_class($this)."(numer_konta)values('$numer_konta')";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -268,7 +268,7 @@ if(!class_exists('konta_bankowe'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region get_name
+		#region get_numer_konta
 		public function get_numer_konta($idk)
 		{
 			$numer_konta='';
@@ -281,6 +281,29 @@ if(!class_exists('konta_bankowe'))
 				}
 			}
 			return $numer_konta;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_idk_konta
+		public function get_idk_konta($numer_konta)
+		{
+			$idk = -1;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idk from ".get_class($this)." where numer_konta='$numer_konta';");
+			if($wynik)
+			{
+				list($idk)=$wynik->fetch_row();
+			}
+			else
+			{
+				if($this->page_obj->database_obj->execute_query("insert into ".get_class($this)."(numer_konta)values('$numer_konta');"))
+				{
+					$idk = $this->page_obj->database_obj->last_id();
+				}
+				
+			}
+			//--------------------
+			return $idk;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
