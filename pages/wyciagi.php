@@ -39,7 +39,7 @@ if(!class_exists('wyciagi'))
 				{
 					case "processing":
 						$content_text .= $this->processing();
-						break
+						break;
 					case "assign_write":
 						$idw = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$selected_uczniowie = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
@@ -116,7 +116,8 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
 			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button><br />";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button> ";
+			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
 			//--------------------
 			if($aktualnailosc=="")$aktualnailosc=0;
 			$this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where usuniety='nie'");
@@ -1035,9 +1036,41 @@ if(!class_exists('wyciagi'))
 			$rettext = "Auto processing system <br />";
 			//--------------------
 			// znajdz numery kont przypisane do uczniów
-			// znajdz nie przypisane wyciągi 
-			// przypisz wyciag do ucznia
+			foreach($this->page_obj->uczniowie_konta_bankowe->get_list_of_nr_konta() as $row)
+			{
+				$rettext .= $row[0]." | ".$row[2]."<br />";
+				// znajdz wyciągi dla danego konta
+				$idw_list = $this->get_wyciagi_for_nr_konta_and_ucznia($row[2],$row[0]);
+				if(is_array($idw_list))
+				{
+					foreach($idw_list as $idw)
+					{
+						$rettext .= "____ ".$idw[0]."<br />";
+						// przypisz wyciag do ucznia
+						$this->page_obj->wyciagi_uczniowie->synchronize($row[0],$idw[0],true);
+					}
+				}
+			}
 			
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get wyciagi for nr konta
+		public function get_wyciagi_for_nr_konta_and_ucznia($nr_konta,$idu)
+		{
+			$rettext = array();
+			//--------------------
+			//$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie' and idw not in (select idw from wyciagi_uczniowie where idu=$idu and usuniety = 'nie');");
+			if($wynik)
+			{
+				while(list($idw)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idw);
+				}
+			}
 			//--------------------
 			return $rettext;
 		}

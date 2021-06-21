@@ -48,6 +48,60 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region synchronize
+		public function synchronize($idu,$idw,$set_automatic)
+		{
+			#region safe
+			if( (!isset($idw)) || ($idw == "") ) $idw = 0;
+			if( (!isset($idu)) || ($idu == "") ) $idu = 0;
+			$deleted = "empty";
+			$sql_query = "";
+			$rettext = "";
+			$sync_type = ($set_automatic) ? "auto" : "manual";			
+			#endregion
+
+			#region select
+			$wynik=$this->page_obj->database_obj->get_data("select idwu,usuniety from ".get_class($this)." where idw=$idw and idu=$idu;");
+			if($wynik)
+			{
+				list($idwu,$deleted)=$wynik->fetch_row();
+			}
+			#endregion
+
+			#region switch
+			switch($deleted)
+			{
+				case "empty":
+					$sql_query = "insert into ".get_class($this)."(idw,idu,status)values($idw,$idu,'$sync_type')";
+					break;
+				case "tak":
+					$sql_query = "update ".get_class($this)." set usuniety='nie',status='$sync_type' where idw=$idw and idu=$idu;";//poprawa wpisu
+					break;
+				case "nie":
+					// nothing to do here
+					break;
+			}
+			#endregion
+
+			#region execute
+			if($sql_query != "")
+			{
+				if($this->page_obj->database_obj->execute_query($sql_query))
+				{
+					//$rettext.=$sql_query."<br />";
+				}
+				else
+				{
+					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					//$rettext.=$sql_query."<br />";
+				}
+			}
+			#endregion
+
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
