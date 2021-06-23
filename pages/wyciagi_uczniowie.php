@@ -102,6 +102,34 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region is_assigned
+		public function is_assigned_wyciagi($idw)
+		{
+			$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idw=$idw and usuniety='nie';");
+			if( $this->page_obj->database_obj->result_count() > 0 ) return true;
+			//--------------------
+			return false;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_liste_wyciagow_dla_ucznia
+		public function get_liste_wyciagow_dla_ucznia($idu)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu=$idu and usuniety='nie';");
+			if($wynik)
+			{
+				while(list($idw)=$wynik->fetch_row())
+				{
+					$rettext[] = (int)$idw;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{

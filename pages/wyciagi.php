@@ -139,10 +139,13 @@ if(!class_exists('wyciagi'))
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
 				while(list($idw,$tytul,$data,$typ,$usuniety)=$wynik->fetch_row())
 				{
+					$is_assigned = $this->page_obj->wyciagi_uczniowie->is_assigned_wyciagi($idw) ? "*" : "";
+					//--------------------
 					$lp++;
 					//--------------------
 					if($usuniety=='nie')
@@ -160,6 +163,7 @@ if(!class_exists('wyciagi'))
 							<td>$tytul</td>
 							<td>".substr($data,0,10)."</td>
 							<td>$typ</td>
+							<td style='text-align:center;'>$is_assigned</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'>A</a></td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>

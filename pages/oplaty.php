@@ -51,21 +51,21 @@ if(!class_exists('oplaty'))
 						//$content_text=$this->add($idop,$idto,$nazwa,$kwota);
 						$content_text.="Blokada"; //delete this line to unlock
 					break;
-					case "zapisz_ucznen":
+					case "zapisz_uczen":
 						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
 						$nazwa = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text.=$this->zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$content_text.=$this->zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 					break;
-					case "formularz_ucznen":
+					case "formularz_uczen":
 						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
 						$nazwa = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['nazwa'])?$_POST['nazwa']:"");
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text.=$this->formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$content_text.=$this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 						break;
 					break;
 					case "lista":
@@ -84,7 +84,7 @@ if(!class_exists('oplaty'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button class='test' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_ucznen\"'>Dodaj nowy</button>&#160;";
+			$rettext.="<button class='test' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_uczen\"'>Dodaj nowy</button>&#160;";
 			$rettext.="<br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
@@ -122,7 +122,7 @@ if(!class_exists('oplaty'))
 							<td>$nazwa</td>
 							<td>$kwota</td>
 							<td>{$this->page_obj->typy_oplat->get_name($idto)}</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_ucznen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_uczen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
@@ -362,8 +362,8 @@ if(!class_exists('oplaty'))
 		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
-		#region formularz_ucznen
-		private function formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
+		#region formularz_uczen
+		private function formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
 		{
 			$rettext="";
 			//--------------------
@@ -388,7 +388,7 @@ if(!class_exists('oplaty'))
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
 					$rettext.="
-					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_ucznen'>
+					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_uczen'>
 						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Typ opłaty: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
@@ -419,8 +419,8 @@ if(!class_exists('oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region zapisz_ucznen
-		private function zapisz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
+		#region zapisz_uczen
+		private function zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
 		{
 			$rettext = "";
 			//--------------------
@@ -464,7 +464,7 @@ if(!class_exists('oplaty'))
 				else
 				{
 					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$this->formularz_ucznen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+					$rettext.=$this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
 				}
 			}
 			else

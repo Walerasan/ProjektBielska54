@@ -264,7 +264,7 @@ if(!class_exists('uczniowie_oplaty'))
 		{
 			//don't delete with status == oplacone
 			#region execute
-			return $this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where $idop=$idop and status<>'oplacone';");
+			return $this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idop=$idop and status<>'oplacone';");
 			#endregion
 		}
 		#endregion
@@ -333,6 +333,24 @@ if(!class_exists('uczniowie_oplaty'))
 				while(list($idu)=$wynik->fetch_row())
 				{
 					$rettext[] = (int)$idu;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_liste_oplat_dla_ucznia
+		public function get_liste_oplat_dla_ucznia($idu)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idop,rabat_kwota,rabat_nazwa from ".get_class($this)." where idu=$idu and usuniety='nie';");
+			if($wynik)
+			{
+				while(list($idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$idop, $rabat_kwota, $rabat_nazwa);
 				}
 			}
 			//--------------------

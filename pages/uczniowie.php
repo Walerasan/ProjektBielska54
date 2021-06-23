@@ -30,6 +30,10 @@ if(!class_exists('uczniowie'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "szczegoly":
+						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$content_text.=$this->szczegoly($idu);
+						break;
 					case "przywroc":
 						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
@@ -100,6 +104,7 @@ if(!class_exists('uczniowie'))
 						
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
 				while(list($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$usuniety)=$wynik->fetch_row())
@@ -116,15 +121,17 @@ if(!class_exists('uczniowie'))
 					}
 					//--------------------
 					$rettext.="
-						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\" onclick=\"uczniowie.open($idu);\">
-							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
-							<td>$imie_uczniowie, $nazwisko_uczniowie</td>
-							<td>{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
+						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
+							<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
+							<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
+							<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 							
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
-					$rettext.="<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>dane opisowe</td></tr>";
+					$szczagoly = "to do";
+					$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
 				}
 				$rettext.="</table>";
 			}
@@ -440,6 +447,42 @@ if(!class_exists('uczniowie'))
 				$rettext.="opiekunowie.create_block($val[0]);";
 			}
 			$rettext.="</script>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region szczegoly
+		private function szczegoly($idu)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<b>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</b><br /><br />";
+			//-----
+			$rettext .= "Pobrać listę opłat <br />";
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			if(is_array($oplaty_list))
+			{
+				$suma = 0;
+				foreach($oplaty_list as $row)
+				{
+					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[0]);
+					$rettext .= "idop = $oplata_nazwa, {$row[0]} - {$row[1]} - {$row[2]} <br />";
+					$suma += suma
+				}
+			}
+			//-----
+			$rettext .= "Pobrać listę wyciągów <br />";
+			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
+			if(is_array($wyciagi_list))
+			{
+				foreach($wyciagi_list as $idw)
+				{
+					$rettext .= "idw = $idw <br />";
+				}
+			}
+			//-----
+			$rettext .= "Zrobić sumy <br />";
 			//--------------------
 			return $rettext;
 		}
