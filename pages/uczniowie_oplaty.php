@@ -41,9 +41,10 @@ if(!class_exists('uczniowie_oplaty'))
 					break;
 					case "zapisz":
 						$iduop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['iduop'])?$_POST['iduop']:0);
-						$rabat_kwota=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['rabat_kwota'])?$_POST['rabat_kwota']:"");
-						$rabat_nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['rabat_nazwa'])?$_POST['rabat_nazwa']:"");
-						$content_text=$this->add($iduop,$rabat_kwota,$rabat_nazwa);
+						$idu=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$rabat_kwota=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['rabat_kwota'])?$_POST['rabat_kwota']:"");
+						$rabat_nazwa=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['rabat_nazwa'])?$_POST['rabat_nazwa']:"");
+						$content_text=$this->add($iduop,$idu,$rabat_kwota,$rabat_nazwa);
 					break;
 					case "formularz":
 						$iduop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['iduop'])?$_POST['iduop']:0);
@@ -126,11 +127,11 @@ if(!class_exists('uczniowie_oplaty'))
 			//--------------------
 			if($iduop!="" && is_numeric($iduop) && $iduop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select rabat_kwota,rabat_nazwa from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
+				$wynik=$this->page_obj->database_obj->get_data("select idu,rabat_kwota,rabat_nazwa from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
 				if($wynik)
 				{
 					$rettext.="OK";
-					list($rabat_kwota,$rabat_nazwa)=$wynik->fetch_row();
+					list($idu,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row();
 				}
 			}
 			//--------------------
@@ -152,11 +153,12 @@ if(!class_exists('uczniowie_oplaty'))
 							<div class='formularzkom1'>&#160;</div>
 							<div class='formularzkom2'>
 								<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-								<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+								<button title='Anuluj' type='button' onclick='window.location=\"uczniowie,{$this->page_obj->template},szczegoly,$idu\"'>Anuluj</button>
 							</div>
 						</div>
 					</div>
 					<input type='hidden' name='iduop' value='$iduop' />
+					<input type='hidden' name='idu' value='$idu' />
 				</form>";
 			//--------------------
 			return $rettext;
@@ -187,8 +189,10 @@ if(!class_exists('uczniowie_oplaty'))
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
 					$_SESSION['antyrefresh']=true;
-					$rettext.="Zapisane<br />";
-					$rettext.=$this->lista();
+					//$rettext.="Zapisane<br />";
+					//$rettext.=$this->lista();
+					$rettext .= "<script>window.location='uczniowie,{$this->page_obj->template},szczegoly,$idu';</script>";
+					//go to uczniowie,index,szczegoly,1
 				}
 				else
 				{
@@ -199,7 +203,9 @@ if(!class_exists('uczniowie_oplaty'))
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				//$rettext.=$this->lista();
+				//go to uczniowie,index,szczegoly,1
+				$rettext .= "<script>window.location='uczniowie,{$this->page_obj->template},szczegoly,$idu';</script>";
 			}
 			return $rettext;
 		}
@@ -345,12 +351,12 @@ if(!class_exists('uczniowie_oplaty'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idop,rabat_kwota,rabat_nazwa from ".get_class($this)." where idu=$idu and usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select iduop,idop,rabat_kwota,rabat_nazwa from ".get_class($this)." where idu=$idu and usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
+				while(list($iduop,$idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idop, $rabat_kwota, $rabat_nazwa);
+					$rettext[] = array((int)$iduop,(int)$idop, $rabat_kwota, $rabat_nazwa);
 				}
 			}
 			//--------------------

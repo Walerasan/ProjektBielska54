@@ -130,6 +130,43 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_kwota
+		public function get_kwota($idw)
+		{
+			// kwota jest podzielona na wszystkich przypisanych uczniów po równo
+			// jeżeli nie chcemy by była dzielona to trzeba usunąc jakiegoś ucznia z tego wyciągu.
+
+			//pobieram kwotę dla idw
+			$kwota = $this->page_obj->wyciagi->get_kwota($idw);
+			if(is_nan($kwota))
+			{
+				return NAN;
+			}
+
+			//pobieram ilość idu dla tego idw
+			$wynik=$this->page_obj->database_obj->get_data("select count(idu) from ".get_class($this)." where idw=$idw and usuniety='nie';");
+			if($wynik)
+			{
+				list($count) = $wynik->fetch_row();
+			}
+			else
+			{
+				return NAN;
+			}
+			
+			//dzielę kwotę przez ilość idu
+			if($count != 0)
+			{
+				return $kwota / $count;
+			}
+			else
+			{
+				return NAN;
+			}
+			return NAN;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{

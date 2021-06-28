@@ -1024,6 +1024,7 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_rachunek_nadawcy
 		private function get_rachunek_nadawcy($idw)
 		{
 			$rachuneknadawcy = "";
@@ -1033,6 +1034,7 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			return $rachuneknadawcy;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region processing
 		private function processing()
@@ -1074,6 +1076,21 @@ if(!class_exists('wyciagi'))
 				{
 					$rettext[] = array((int)$idw);
 				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_kwota
+		public function get_kwota($idw)
+		{
+			$rettext = NAN;
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select kwota from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				list($rettext)=$wynik->fetch_row();
 			}
 			//--------------------
 			return $rettext;

@@ -463,26 +463,48 @@ if(!class_exists('uczniowie'))
 			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
 			if(is_array($oplaty_list))
 			{
-				$suma = 0;
+				$suma_do_rozliczenia = 0;
 				foreach($oplaty_list as $row)
 				{
-					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[0]);
-					$rettext .= "idop = $oplata_nazwa, {$row[0]} - {$row[1]} - {$row[2]} <br />";
-					$suma += suma
+					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[1]);
+					$oplata_kwota = $this->page_obj->oplaty->get_kwota($row[1]);
+					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
+					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a>";
+					$rettext .= "idop = $oplata_nazwa, {$row[1]} - rabat: {$row[2]} - {$row[3]} - $oplata_kwota - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";
+					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
 				}
+				$rettext .= "<b>Do zapłaty w sumie: $suma_do_rozliczenia </b><br /><br />";
 			}
 			//-----
 			$rettext .= "Pobrać listę wyciągów <br />";
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
 			if(is_array($wyciagi_list))
 			{
+				$suma_rozliczen = 0;
 				foreach($wyciagi_list as $idw)
 				{
-					$rettext .= "idw = $idw <br />";
+					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
+					$rettext .= "idw = $idw - $kwota <br />";
+					if(!is_nan($kwota))
+					{
+						$suma_rozliczen += $kwota;
+					}
 				}
+				$rettext .= "<b>Rozliczono w sumie: $suma_rozliczen </b><br /><br />";
 			}
 			//-----
-			$rettext .= "Zrobić sumy <br />";
+			if($suma_rozliczen > $suma_do_rozliczenia)
+			{
+				$rettext .= "<b>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
+			}
+			else if($suma_rozliczen < $suma_do_rozliczenia)
+			{
+				$rettext .= "<b>Niedopłata:".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+			}
+			else
+			{
+				$rettext .= "<b>Rozliczone</b><br />";
+			}
 			//--------------------
 			return $rettext;
 		}
