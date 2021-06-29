@@ -83,7 +83,7 @@ if(!class_exists('staticpages'))
 		#region default_target
 		private function default_target()
 		{
-			return "Tutaj przypiść stronę główna - plik staticpages - linia kodu 55";
+			return "Witam";
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

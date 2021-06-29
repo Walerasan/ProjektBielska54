@@ -459,22 +459,55 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			$rettext .= "<b>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</b><br /><br />";
 			//-----
-			$rettext .= "Pobrać listę opłat <br />";
+			$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+			$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext.="
+					<tr style='font-weight:bold;'>
+						<td style='width:25px;'>Lp.</td>
+						<td>nazwa</td>
+						<td>kwota</td>
+						<td>rabat nazwa</td>
+						<td>rabat kwota</td>
+						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
+					</tr>";
 			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
+				$suma_oplat = 0;
+				$oplata_counter = 1;
 				foreach($oplaty_list as $row)
 				{
 					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[1]);
 					$oplata_kwota = $this->page_obj->oplaty->get_kwota($row[1]);
 					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
-					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a>";
-					$rettext .= "idop = $oplata_nazwa, {$row[1]} - rabat: {$row[2]} - {$row[3]} - $oplata_kwota - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";
+					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$oplata_nazwa</td>
+										<td>$oplata_kwota</td>
+										<td>{$row[3]}</td>
+										<td>{$row[2]}</td>
+										<td></td>
+										<td>$edytuj_oplate_link</td>
+									</tr>";
+									//	idop = $oplata_nazwa, {$row[1]} - rabat:  - {$row[3]} -  - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";
+					$oplata_counter++;
 				}
+				$rettext .= "<tr>
+										<td></td>
+										<td></td>
+										<td>$oplata_kwota</td>
+										<td>{$row[3]}</td>
+										<td>{$row[2]}</td>
+										<td></td>
+										<td>$edytuj_oplate_link</td>
+									</tr>";
 				$rettext .= "<b>Do zapłaty w sumie: $suma_do_rozliczenia </b><br /><br />";
 			}
+			$rettext.="</table>";
 			//-----
 			$rettext .= "Pobrać listę wyciągów <br />";
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
