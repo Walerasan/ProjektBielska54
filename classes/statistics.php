@@ -1,10 +1,10 @@
 <?php
 if(!class_exists('statistics'))
 {
-    class statistics
+	class statistics
 	{
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct($page_obj)
+		public function __construct($page_obj)
 		{
 			$this->definicjabazy($page_obj);
 		}
@@ -27,11 +27,13 @@ if(!class_exists('statistics'))
 			//--------------------
 			$wynik=$page_obj->database_obj->get_data("select idsa from ".get_class($this)."_a where ip='$ip' and adr='$adr'",0,0);
 			if($wynik)
-			    list($idsa)=$wynik->fetch_row();
+			{
+				list($idsa)=$wynik->fetch_row();
+			}
 			else
 			{
-			    $page_obj->database_obj->execute_query("insert into ".get_class($this)."_a (ip,adr)values('$ip','$adr');",0,0);
-			    $idsa=$page_obj->database_obj->last_id();
+				$page_obj->database_obj->execute_query("insert into ".get_class($this)."_a (ip,adr)values('$ip','$adr');",0,0);
+				$idsa=$page_obj->database_obj->last_id();
 			};
 			
 			//--------------------
@@ -40,11 +42,13 @@ if(!class_exists('statistics'))
 			$link=substr($_SERVER['REQUEST_URI'],1);
 			$wynik=$page_obj->database_obj->get_data("select idsm from ".get_class($this)."_m where link='$link'",0,0);
 			if($wynik)
-			    list($idsm)=$wynik->fetch_row();
+			{
+				list($idsm)=$wynik->fetch_row();
+			}
 			else
 			{
-			    $page_obj->database_obj->execute_query("insert into ".get_class($this)."_m (link)values('$link');",0,0);
-			    $idsm=$page_obj->database_obj->last_id();
+				$page_obj->database_obj->execute_query("insert into ".get_class($this)."_m (link)values('$link');",0,0);
+				$idsm=$page_obj->database_obj->last_id();
 			};
 			
 			//--------------------
@@ -54,17 +58,19 @@ if(!class_exists('statistics'))
 			if(isset($_SERVER['SCRIPT_URI']) && strlen($_SERVER['SCRIPT_URI'])>0)
 			{
 				$adresserwera=substr($_SERVER['SCRIPT_URI'],7,strpos($_SERVER['SCRIPT_URI'],'/',8)-7);
-				if(isset($_SERVER['HTTP_REFERER']) && !eregi($adresserwera,$_SERVER['HTTP_REFERER']))
+				if(isset($_SERVER['HTTP_REFERER']) && !preg_match("/".$adresserwera."/i",$_SERVER['HTTP_REFERER']))
 					$link=$_SERVER['HTTP_REFERER'];
 			}
 			
 			$wynik=$page_obj->database_obj->get_data("select idsl from ".get_class($this)."_l where link='$link'",0,0);
 			if($wynik)
-			    list($idsl)=$wynik->fetch_row();
+			{
+				list($idsl)=$wynik->fetch_row();
+			}
 			else
 			{
-			    $page_obj->database_obj->execute_query("insert into ".get_class($this)."_l (link)values('$link');");
-			    $idsl=$page_obj->database_obj->last_id();
+				$page_obj->database_obj->execute_query("insert into ".get_class($this)."_l (link)values('$link');");
+				$idsl=$page_obj->database_obj->last_id();
 			};
 			
 			//--------------------
@@ -80,21 +86,25 @@ if(!class_exists('statistics'))
 			}
 			$wynik=$page_obj->database_obj->get_data("select idsp from ".get_class($this)."_p where nazwa='$nazwap'",0,0);
 			if($wynik)
-			    list($idsp)=$wynik->fetch_row();
+			{
+				list($idsp)=$wynik->fetch_row();
+			}
 			else
 			{
-			    $page_obj->database_obj->execute_query("insert into ".get_class($this)."_p (nazwa)values('$nazwap');",0,0);
-			    $idsp=$page_obj->database_obj->last_id();
+				$page_obj->database_obj->execute_query("insert into ".get_class($this)."_p (nazwa)values('$nazwap');",0,0);
+				$idsp=$page_obj->database_obj->last_id();
 			};
 			
 			//dodaje wpis
 			$wynik=$page_obj->database_obj->get_data("select idsj from ".get_class($this)."_j where idsa=$idsa and idsm=$idsm and idsl=$idsl and idsp=$idsp ",0,0);
 			if($wynik)
-			    list($idsj)=$wynik->fetch_row();
+			{
+				list($idsj)=$wynik->fetch_row();
+			}
 			else
 			{
-			    $page_obj->database_obj->execute_query("insert into ".get_class($this)."_j(idsa,idsm,idsl,idsp)values($idsa,$idsm,$idsl,$idsp)",0,0);
-			    $idsj=$page_obj->database_obj->last_id();
+				$page_obj->database_obj->execute_query("insert into ".get_class($this)."_j(idsa,idsm,idsl,idsp)values($idsa,$idsm,$idsl,$idsp)",0,0);
+				$idsj=$page_obj->database_obj->last_id();
 			};
 			
 			$page_obj->database_obj->execute_query("insert into ".get_class($this)."_d(data,idsj)values(now(),$idsj)",0,0);
@@ -278,8 +288,8 @@ if(!class_exists('statistics'))
 			//----------------------------------------------------------------------------------------------------						
 		}
 		//----------------------------------------------------------------------------------------------------
-    }//end class
+	}//end class
 }//end if
 else
-    die("Class exists: ".__FILE__);
+	die("Class exists: ".__FILE__);
 ?>

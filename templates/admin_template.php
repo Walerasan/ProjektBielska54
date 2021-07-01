@@ -57,7 +57,7 @@ if(!class_exists('admin_template'))
 				$menupozome.="<a href='users,admin,logout'>Logout</a><br />";
 				$komunikat="";
 				//--------------------
-				$rettext.="<body>
+				$rettext.="
 								<link rel='Stylesheet' type='text/css' href='./css/admin.css' />
 								<!-- ################################################## -->
 								<div class='header'>
@@ -71,7 +71,7 @@ if(!class_exists('admin_template'))
 									</tr>
 								</table>
 								<!-- ################################################## -->
-							</body>";
+							";
 			}
 			return $rettext;
 		}

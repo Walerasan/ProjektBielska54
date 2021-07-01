@@ -1097,6 +1097,51 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_tytul
+		public function get_tytul($idw)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select tytul from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				list($rettext)=$wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_date
+		public function get_date($idw)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select dataoperacji from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				list($rettext)=$wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_nadawce
+		public function get_nadawce($idw)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select nazwanadawcy from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				list($rettext)=$wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{

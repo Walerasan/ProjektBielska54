@@ -130,7 +130,22 @@ if(!class_exists('uczniowie'))
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
-					$szczagoly = "to do";
+					$oplaty_array = $this->get_kwota_do_zaplaty($idu);
+					$rozliczenia = $this->get_kwota_rozliczona($idu);
+					$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
+					if($pozostalo_do_zaplaty < 0)
+					{
+						$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
+					}
+					else if($pozostalo_do_zaplaty > 0)
+					{
+						$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
+					}
+					else
+					{
+						$pozostalo_do_zaplaty = "rozliczone";
+					}
+					$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
 					$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
 				}
 				$rettext.="</table>";
@@ -259,7 +274,7 @@ if(!class_exists('uczniowie'))
 							$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
 						}
 					}
-					$rettext.="Zapisane $idu,$ido<br />";
+					$rettext.="Zapisane $idu<br />";
 					$rettext.=$this->lista();
 				}
 				else
@@ -457,17 +472,18 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
-			$rettext .= "<b>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</b><br /><br />";
+			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
-			$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-			$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0'>";
-			$rettext.="
+			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+			$rettext .= "<b style='font-size:16px;'><u>OPŁATY</u></b><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
 					<tr style='font-weight:bold;'>
-						<td style='width:25px;'>Lp.</td>
+						<td style='width:35px;'>Lp.</td>
 						<td>nazwa</td>
-						<td>kwota</td>
+						<td style='width:100px;'>kwota</td>
 						<td>rabat nazwa</td>
-						<td>rabat kwota</td>
+						<td style='width:100px;'>rabat kwota</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
@@ -476,12 +492,15 @@ if(!class_exists('uczniowie'))
 			{
 				$suma_do_rozliczenia = 0;
 				$suma_oplat = 0;
+				$suma_rabat = 0;
 				$oplata_counter = 1;
 				foreach($oplaty_list as $row)
 				{
 					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[1]);
 					$oplata_kwota = $this->page_obj->oplaty->get_kwota($row[1]);
+					$suma_oplat += $oplata_kwota;
 					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
+					$suma_rabat += $oplata_rabat;
 					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
 					$rettext .= "<tr>
@@ -497,19 +516,131 @@ if(!class_exists('uczniowie'))
 					$oplata_counter++;
 				}
 				$rettext .= "<tr>
-										<td></td>
-										<td></td>
-										<td>$oplata_kwota</td>
-										<td>{$row[3]}</td>
-										<td>{$row[2]}</td>
+									<td></td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_oplat</td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_rabat</td>
+									<td></td>
+									<td></td>
+								</tr>";
+				$rettext .= "<tr>
+									<td colspan='7'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
+								</tr>";
+			}
+			$rettext.="</table><br /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext.="<hr /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>tytuł</td>
+						<td>nadawca</td>
+						<td style='width:250px;'>data</td>
+						<td style='width:100px;'>kwota</td>
+						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
+					</tr>";
+			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
+			if(is_array($wyciagi_list))
+			{
+				$suma_rozliczen = 0;
+				$oplata_counter = 1;
+				foreach($wyciagi_list as $idw)
+				{
+					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
+					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
+					$data = $this->page_obj->wyciagi->get_date($idw);
+					$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					if(!is_nan($kwota))
+					{
+						$suma_rozliczen += $kwota;
+					}
+					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$tytul</td>
+										<td>$nadawca</td>
+										<td>$data</td>
+										<td>$kwota</td>
 										<td></td>
 										<td>$edytuj_oplate_link</td>
 									</tr>";
-				$rettext .= "<b>Do zapłaty w sumie: $suma_do_rozliczenia </b><br /><br />";
+					$oplata_counter++;
+				}
 			}
-			$rettext.="</table>";
-			//-----
-			$rettext .= "Pobrać listę wyciągów <br />";
+			$rettext .= "<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_rozliczen</td>
+									<td></td>
+									<td></td>
+								</tr>";
+			$rettext .= "<tr>
+									<td colspan='7'><b>Rozliczono w sumie: $suma_rozliczen </b></td>
+								</tr>";
+			$rettext.="</table><br /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext.="<hr /><br />";
+			//----------------------------------------------------------------------------------------------------
+			if($suma_rozliczen > $suma_do_rozliczenia)
+			{
+				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
+			}
+			else if($suma_rozliczen < $suma_do_rozliczenia)
+			{
+				$rettext .= "<b style='font-size:16px;'>Niedopłata:".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+			}
+			else
+			{
+				$rettext .= "<b style='font-size:16px;'>Rozliczone</b><br />";
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_kwota_do_zaplaty
+		private function get_kwota_do_zaplaty($idu)
+		{
+			$rettext = array();
+			$rettext[0] = 0;//suma_rabat
+			$rettext[1] = 0;//suma_oplat
+			$rettext[2] = 0;//suma_do_rozliczenia
+			//--------------------
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			if(is_array($oplaty_list))
+			{
+				$suma_do_rozliczenia = 0;
+				$suma_oplat = 0;
+				$suma_rabat = 0;
+				foreach($oplaty_list as $row)
+				{
+					$oplata_kwota = $this->page_obj->oplaty->get_kwota($row[1]);
+					$suma_oplat += $oplata_kwota;
+					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
+					$suma_rabat += $oplata_rabat;
+					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+				}
+				$rettext[0] = $suma_oplat;//suma_rabat
+				$rettext[1] = $suma_rabat;//suma_oplat
+				$rettext[2] = $suma_do_rozliczenia;//suma_do_rozliczenia
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_kwota_rozliczona
+		private function get_kwota_rozliczona($idu)
+		{
+			$rettext = 0;
+			//--------------------
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
 			if(is_array($wyciagi_list))
 			{
@@ -517,26 +648,12 @@ if(!class_exists('uczniowie'))
 				foreach($wyciagi_list as $idw)
 				{
 					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
-					$rettext .= "idw = $idw - $kwota <br />";
 					if(!is_nan($kwota))
 					{
 						$suma_rozliczen += $kwota;
 					}
 				}
-				$rettext .= "<b>Rozliczono w sumie: $suma_rozliczen </b><br /><br />";
-			}
-			//-----
-			if($suma_rozliczen > $suma_do_rozliczenia)
-			{
-				$rettext .= "<b>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
-			}
-			else if($suma_rozliczen < $suma_do_rozliczenia)
-			{
-				$rettext .= "<b>Niedopłata:".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
-			}
-			else
-			{
-				$rettext .= "<b>Rozliczone</b><br />";
+				$rettext = $suma_rozliczen;
 			}
 			//--------------------
 			return $rettext;
@@ -606,7 +723,7 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-	}
+	}//end class
 }//end if
 else
 	die("Class exists: ".__FILE__);
