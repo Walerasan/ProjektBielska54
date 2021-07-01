@@ -64,13 +64,15 @@ if(!class_exists('uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region szczegoly_dla_ucznia
 		private function szczegoly_dla_ucznia($idu)
 		{
 			$rettext = "";
 			//--------------------
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
 			
-			$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
+			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");			
+			$wynik = $this->page_obj->database_obj->get_data("select uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
 			if($wynik)
 			{
 				$rettext.="
@@ -120,16 +122,22 @@ if(!class_exists('uczniowie'))
 						<th>Lp.</th>
 						<th>nazwa</th>
 						<th>kwota</th>
+						<th>rabat</th>
+						<th>kwota</th>
+						<th>do zapłaty</th>
 						<th>Opłaty</th>
 					</tr>";
 				$lp=1;
-				while(list($idop,$nazwa,$kwota)=$wynik->fetch_row())
+				while(list($idop,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota)=$wynik->fetch_row())
 				{
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
 							<td>$nazwa</td>
 							<td>$kwota zł</td>
+							<td>$rabat_nazwa</td>
+							<td>$rabat_kwota zł</td>
+							<td>".($kwota - $rabat_kwota)."</td>
 							<td><button class='oplac'>OPŁAĆ</button></td>
 						</tr>";
 					$lp++;
@@ -139,6 +147,7 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			return $rettext;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_list_for_klasa
 		public function get_list_for_klasa($idkl)
