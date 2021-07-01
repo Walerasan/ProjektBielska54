@@ -802,6 +802,10 @@ if(!class_exists('wyciagi'))
 			$idk = $this->page_obj->konta_bankowe->get_idk_konta($rachunek_nadawcy);
 			if($idk > -1)
 			{
+				#region mark deleted
+				$this->page_obj->uczniowie_konta_bankowe->mark_delete_for_konto($idk);
+				#endregion
+
 				//synchronize uczniowie_konta_bankowe for idu and idk
 				if(isset($selected_uczniowie) && is_array($selected_uczniowie))
 				{
@@ -824,9 +828,10 @@ if(!class_exists('wyciagi'))
 		{
 			$selected_uczniowie = "";
 			$uczniowie = "";
-			//todo
+			
 			$lista_uczniow = $this->page_obj->uczniowie->get_list();
-			$lista_idu_w_wyciagach = $this->page_obj->wyciagi_uczniowie->get_idu_list_for_idw($idw);
+			//$lista_idu_w_wyciagach = $this->page_obj->wyciagi_uczniowie->get_idu_list_for_idw($idw);
+			$lista_idu_w_wyciagach = $this->page_obj->uczniowie_konta_bankowe->get_idu_list_for_idw($idw);
 			foreach($lista_uczniow as $val)
 			{
 				if(in_array($val[0], $lista_idu_w_wyciagach))

@@ -97,6 +97,31 @@ if(!class_exists('uczniowie_konta_bankowe'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region mark_delete_for_konto
+		public function mark_delete_for_konto($idk)
+		{
+			$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idk=$idk;");
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_idu_list_for_idw
+		public function get_idu_list_for_idw($idk)
+		{
+			$rettext=array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idk = $idk and usuniety = 'nie';");
+			if($wynik)
+			{
+				while(list($idu)=$wynik->fetch_row())
+				{
+					$rettext[] = (int)$idu;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
