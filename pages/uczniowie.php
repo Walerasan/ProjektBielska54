@@ -90,69 +90,172 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this).";");
-			if($wynik)
-			{
-				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
-				$rettext.="
-					<tr style='font-weight:bold;'>
-						<td style='width:25px;'>Lp.</td>
-						<td>Imie, nazwisko</td>
-						<td>klasa</td>
-						
-						<td style='width:18px;'></td>
-						<td style='width:18px;'></td>
-						<td style='width:18px;'></td>
-					</tr>";
-				$lp=0;
-				while(list($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$usuniety)=$wynik->fetch_row())
-				{
-					$lp++;
-					//--------------------
-					if($usuniety=='nie')
-					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idu,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
-					}
-					else
-					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
-					}
-					//--------------------
-					$rettext.="
-						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
-							<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
-							<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
-							<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
-							
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
-							<td style='text-align:center;'>$operacja</td>
-						</tr>";
-					$oplaty_array = $this->get_kwota_do_zaplaty($idu);
-					$rozliczenia = $this->get_kwota_rozliczona($idu);
-					$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
-					if($pozostalo_do_zaplaty < 0)
-					{
-						$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
-					}
-					else if($pozostalo_do_zaplaty > 0)
-					{
-						$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
-					}
-					else
-					{
-						$pozostalo_do_zaplaty = "rozliczone";
-					}
-					$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
-					$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
+			
+			if(isset($_POST['submit_szukaj'])){
+
+				if(isset($_POST['imie']) && !empty($_POST['imie'])){
+
+					$szukajimie =$_POST['imie'];
+					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%';");
+
+				}else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko'])){
+
+					$szukajnazwisko = $_POST['nazwisko'];
+					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%';");
+
+				} else {
+					
+					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this).";");	
+
 				}
-				$rettext.="</table>";
-			}
-			else
-			{
-				$rettext.="<br />Brak wpisów<br />";
+
+				if($wynik)
+				{
+					$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+					$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+					$rettext.="<fieldset style='border:1px solid black;width:500px;'>";
+					$rettext.="<legend>Szukaj ucznia:</legend>";
+					$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+					$rettext.="<input type='text' name='imie' placeholder='wg. imienia'>&nbsp;&nbsp";
+					$rettext.="<input type='text' name='nazwisko' placeholder='wg. nazwiska'>&nbsp;&nbsp";
+					$rettext.="<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+					$rettext.="</form>";
+					$rettext.="</fieldset><br><br>";
+					$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
+					$rettext.="
+						<tr style='font-weight:bold;'>
+							<td style='width:25px;'>Lp.</td>
+							<td>Imie, nazwisko</td>
+							<td>klasa</td>
+							
+							<td style='width:18px;'></td>
+							<td style='width:18px;'></td>
+							<td style='width:18px;'></td>
+						</tr>";
+					$lp=0;
+					while(list($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$usuniety)=$wynik->fetch_row())
+					{
+						$lp++;
+						//--------------------
+						if($usuniety=='nie')
+						{
+							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idu,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						}
+						else
+						{
+							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						}
+						//--------------------
+						$rettext.="
+							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
+								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
+								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
+								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
+								
+								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
+								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+								<td style='text-align:center;'>$operacja</td>
+							</tr>";
+						$oplaty_array = $this->get_kwota_do_zaplaty($idu);
+						$rozliczenia = $this->get_kwota_rozliczona($idu);
+						$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
+						if($pozostalo_do_zaplaty < 0)
+						{
+							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
+						}
+						else if($pozostalo_do_zaplaty > 0)
+						{
+							$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
+						}
+						else
+						{
+							$pozostalo_do_zaplaty = "rozliczone";
+						}
+						$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
+						$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
+					}
+					$rettext.="</table>";
+				}
+				else
+				{
+					$rettext.="<br />Brak wpisów<br />";
+				}
+
+
+			} else {
+
+				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this).";");
+				if($wynik)
+				{
+					$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+					$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+					$rettext.="<fieldset style='border:1px solid black;width:500px;'>";
+					$rettext.="<legend>Szukaj ucznia:</legend>";
+					$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+					$rettext.="<input type='text' name='imie' placeholder='wg. imienia'>&nbsp;&nbsp";
+					$rettext.="<input type='text' name='nazwisko' placeholder='wg. nazwiska'>&nbsp;&nbsp";
+					$rettext.="<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+					$rettext.="</form>";
+					$rettext.="</fieldset><br><br>";
+					$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
+					$rettext.="
+						<tr style='font-weight:bold;'>
+							<td style='width:25px;'>Lp.</td>
+							<td>Imie, nazwisko</td>
+							<td>klasa</td>
+							
+							<td style='width:18px;'></td>
+							<td style='width:18px;'></td>
+							<td style='width:18px;'></td>
+						</tr>";
+					$lp=0;
+					while(list($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$usuniety)=$wynik->fetch_row())
+					{
+						$lp++;
+						//--------------------
+						if($usuniety=='nie')
+						{
+							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idu,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						}
+						else
+						{
+							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						}
+						//--------------------
+						$rettext.="
+							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
+								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
+								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
+								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
+								
+								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
+								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+								<td style='text-align:center;'>$operacja</td>
+							</tr>";
+						$oplaty_array = $this->get_kwota_do_zaplaty($idu);
+						$rozliczenia = $this->get_kwota_rozliczona($idu);
+						$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
+						if($pozostalo_do_zaplaty < 0)
+						{
+							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
+						}
+						else if($pozostalo_do_zaplaty > 0)
+						{
+							$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
+						}
+						else
+						{
+							$pozostalo_do_zaplaty = "rozliczone";
+						}
+						$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
+						$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
+					}
+					$rettext.="</table>";
+				}
+				else
+				{
+					$rettext.="<br />Brak wpisów<br />";
+				}
 			}
 			//--------------------
 			return $rettext;
