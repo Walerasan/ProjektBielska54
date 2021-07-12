@@ -247,16 +247,6 @@ if(!class_exists('wyciagi'))
 							<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>Data: </div><div class='formularzkom2'><input type='text' name='data' value='$data' style='width:800px;'/></div></div>
 							<div class='wiersz'>
-								<div class='formularzkom1'>Typ: </div>
-								<div class='formularzkom2'>
-									<select name='typ' value='$typ' style='width:800px;'>
-										<option value='bankowy'>bankowy</option>
-										<option value='reczny'>ręczny</option>
-										<option value='inny'>inny</option>
-									</select>
-								</div>
-							</div>
-							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
 									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
@@ -265,6 +255,8 @@ if(!class_exists('wyciagi'))
 							</div>
 						</div>
 						<input type='hidden' name='idw' value='$idw' />
+						<input type='hidden' name='typ' value='reczny' />
+						
 					</form>";
 			//--------------------
 			return $rettext;
