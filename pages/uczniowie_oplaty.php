@@ -130,7 +130,6 @@ if(!class_exists('uczniowie_oplaty'))
 				$wynik=$this->page_obj->database_obj->get_data("select idu,rabat_kwota,rabat_nazwa from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
 				if($wynik)
 				{
-					$rettext .= "OK";
 					list($idu,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row();
 				}
 			}
