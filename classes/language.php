@@ -151,7 +151,7 @@ if(!class_exists('language'))
 				//jeżeli nie ma w słowniku do dopisuje
 			    $this->ini_obj->addvalue(get_class($this),$nr,"$class,$function,$line,$nr");
 			    $this->ini_obj->zapiszplikini("./configs/".$_SESSION['language'].".ini");
-				$rettext.="Brak w słowniku";
+				$rettext .= "Brak w słowniku";
 			}
 			else
 				$rettext.=$inival;

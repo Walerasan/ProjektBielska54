@@ -70,13 +70,13 @@ if(!class_exists('users'))
 			$rettext="";
 			//--------------------
 			if(!$this->is_login())
-				$rettext.="<form method='post' action='".get_class($this).",".$this->silnik->szablon.",zaloguj'>
+				$rettext .= "<form method='post' action='".get_class($this).",".$this->silnik->szablon.",zaloguj'>
 										<input type='text' name='r_login' value='login' class='polelogin' onclick='this.value==\"login\"?this.value=\"\":null'/>&#160;&#160;&#160;
 										<input type='password' name='r_haslo' value='hasło' class='polehasla' onclick='this.value==\"hasło\"?this.value=\"\":null'/>&#160;&#160;&#160; 
 										<input type='submit' name='' value='zaloguj' class='przyciskzaloguj'/>
 									</form>";
 			else
-				$rettext.="<button title='Wyloguj' type='button' onclick='window.location=\"admin,".$this->silnik->szablon.",wyloguj\"' class='przyciskwyloguj' >Wyloguj</button>";
+				$rettext .= "<button title='Wyloguj' type='button' onclick='window.location=\"admin,".$this->silnik->szablon.",wyloguj\"' class='przyciskwyloguj' >Wyloguj</button>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -209,13 +209,13 @@ if(!class_exists('users'))
 		private function formchangepassword()
 		{
 			//TODO: dorobić przypomnienia hasła - formularz i cały system
-			$outtext.="<form action='index.php' method='post'>";
-			$outtext.="<input type='hidden' name='login' value='".$this->uzytkownicy_idu()."' />";
-			$outtext.="<input type='hidden' name='zmk' value='chpassword' />";
-			$outtext.="Hasło: <input type='password' name='haslo' /><br />";
-			$outtext.="Powtórz: <input type='password' name='haslo2' /><br />";
-			$outtext.="<input type='submit' value='Zapisz' />";
-			$outtext.="</form>";
+			$outtext .= "<form action='index.php' method='post'>";
+			$outtext .= "<input type='hidden' name='login' value='".$this->uzytkownicy_idu()."' />";
+			$outtext .= "<input type='hidden' name='zmk' value='chpassword' />";
+			$outtext .= "Hasło: <input type='password' name='haslo' /><br />";
+			$outtext .= "Powtórz: <input type='password' name='haslo2' /><br />";
+			$outtext .= "<input type='submit' value='Zapisz' />";
+			$outtext .= "</form>";
 			return $outtext;
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -224,13 +224,13 @@ if(!class_exists('users'))
 		  if($haslo1==$haslo2)
 		  {
 		      if($this->silnik->baza->execute_query("update ".get_class($this)." set haslo=PASSWORD('$haslo1'),datarozpoczeciapracy=datarozpoczeciapracy where idu=$idu;"))
-		    	$rettext.="Hasło zostało zapisane.<br />";
+		    	$rettext .= "Hasło zostało zapisane.<br />";
 		    else
-		    	$rettext.="Błąd zmniany hasła<br />";
+		    	$rettext .= "Błąd zmniany hasła<br />";
 		  }
 		  else
 		  {
-		  	$rettext.="Niezgodność haseł.<br />Proszę spróbować jeszcze raz.<br />";
+		  	$rettext .= "Niezgodność haseł.<br />Proszę spróbować jeszcze raz.<br />";
 		  	$rettext.=$this->formchangepassword();
 		  }
 		  return $rettext;
@@ -254,15 +254,15 @@ if(!class_exists('users'))
         {
             $rettext="";
             //--------------------
-            $rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+            $rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
             //--------------------
             $wynik=$this->page_obj->database_obj->get_data("select idu,imie,nazwisko,usuniety from ".get_class($this).";");
             if($wynik)
             {
-                $rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-                $rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";                
-                $rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
-                $rettext.="
+                $rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+                $rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";                
+                $rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+                $rettext .= "
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>						
 						<td>nazwa</td>
@@ -283,7 +283,7 @@ if(!class_exists('users'))
                         $operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
                     }
                     //--------------------
-                    $rettext.="
+                    $rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
 							<td>$lp</td>							
 							<td>$imie,$nazwisko</td>
@@ -292,11 +292,11 @@ if(!class_exists('users'))
 						</tr>
 					";
                 }
-                $rettext.="</table>";                
+                $rettext .= "</table>";                
             }
             else
             {
-                $rettext.="<br />Brak wpisów<br />";
+                $rettext .= "<br />Brak wpisów<br />";
             }
             //--------------------
             return $rettext;
@@ -330,7 +330,7 @@ if(!class_exists('users'))
                         div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
-            $rettext.="
+            $rettext .= "
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>							
 							<div class='wiersz'><div class='formularzkom1'>Imię: </div><div class='formularzkom2'><input type='text' name='imie' value='$imie' style='width:800px;'/></div></div>
@@ -360,12 +360,12 @@ if(!class_exists('users'))
 							<div class='wiersz'>
                                 <div class='formularzkom1'>&#160;</div>
                                 <div class='formularzkom2'>
-                                    <input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+                                    <input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+                                    <button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"' style='font-size:20px;float:right;'>Anuluj</button>
                                 </div>
                             </div>
 						</div>
-						<input type='hidden' name='idu' value='$idu' />						
+						<input type='hidden' name='idu' value='$idu' />
 					</form>";
             //--------------------
             return $rettext;
@@ -400,12 +400,12 @@ if(!class_exists('users'))
                 if($this->page_obj->database_obj->execute_query($zapytanie))
                 {
                     $_SESSION['antyrefresh']=true;
-                    $rettext.="Zapisane<br />";
+                    $rettext .= "Zapisane<br />";
                     $rettext.=$this->lista();
                 }
                 else
               {
-                    $rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+                    $rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$zapytanie."<br />";
                     $rettext.=$this->formularz($idu,$imie,$nazwisko,$login,$haslo,$poziom,$usuniety);
                 }
@@ -425,18 +425,18 @@ if(!class_exists('users'))
             {
                 if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idu=$idu;"))
                 {
-                    //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+                    //$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
                     $rettext.=$this->lista();
                 }
                 else
                 {
-                    $rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+                    $rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
                     $rettext.=$this->lista();
                 }
             }
             else
            {
-                $rettext.="This operation need confirm.";
+                $rettext .= "This operation need confirm.";
             }
             //--------------------
             return $rettext;
@@ -450,18 +450,18 @@ if(!class_exists('users'))
             {
                 if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idu=$idu;"))
                 {
-                    //$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+                    //$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
                     $rettext.=$this->lista();
                 }
                 else
                 {
-                    $rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+                    $rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
                     $rettext.=$this->lista();
                 }
             }
             else
             {
-                $rettext.="This operation need confirm.";
+                $rettext .= "This operation need confirm.";
             }
             //--------------------
             return $rettext;

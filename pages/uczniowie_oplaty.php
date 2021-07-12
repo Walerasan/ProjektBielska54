@@ -68,15 +68,15 @@ if(!class_exists('uczniowie_oplaty'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select iduop,rabat_kwota,rabat_nazwa,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
-				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
-				$rettext.="
+				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext .= "
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
 						<td>rabat nazwa</td>
@@ -98,7 +98,7 @@ if(!class_exists('uczniowie_oplaty'))
 						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$iduop,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
 					}
 					//--------------------
-					$rettext.="
+					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$iduop' onmouseover=\"setopticalwhite50('wiersz$iduop')\" onmouseout=\"setoptical0('wiersz$iduop')\">
 							<td>$lp</td>
 							<td>$rabat_nazwa</td>
@@ -107,11 +107,11 @@ if(!class_exists('uczniowie_oplaty'))
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
-				$rettext.="</table>";
+				$rettext .= "</table>";
 			}
 			else
 			{
-				$rettext.="<br />Brak wpisów<br />";
+				$rettext .= "<br />Brak wpisów<br />";
 			}
 			//--------------------
 			return $rettext;
@@ -130,7 +130,7 @@ if(!class_exists('uczniowie_oplaty'))
 				$wynik=$this->page_obj->database_obj->get_data("select idu,rabat_kwota,rabat_nazwa from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
 				if($wynik)
 				{
-					$rettext.="OK";
+					$rettext .= "OK";
 					list($idu,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row();
 				}
 			}
@@ -138,13 +138,13 @@ if(!class_exists('uczniowie_oplaty'))
 			$rabat_kwota=$this->page_obj->text_obj->doedycji($rabat_kwota);
 			$rabat_nazwa=$this->page_obj->text_obj->doedycji($rabat_nazwa);
 			//--------------------
-			$rettext.="
+			$rettext .= "
 				<style>
 					div.wiersz{float:left;clear:left;}
 					div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 					div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 				</style>";
-			$rettext.="
+			$rettext .= "
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>rabat nazwa: </div><div class='formularzkom2'><input type='text' name='rabat_nazwa' value='$rabat_nazwa' style='width:800px;'/></div></div>
@@ -152,8 +152,8 @@ if(!class_exists('uczniowie_oplaty'))
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 							<div class='formularzkom2'>
-								<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-								<button title='Anuluj' type='button' onclick='window.location=\"uczniowie,{$this->page_obj->template},szczegoly,$idu\"'>Anuluj</button>
+								<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+								<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"uczniowie,{$this->page_obj->template},szczegoly,$idu\"'>Anuluj</button>
 							</div>
 						</div>
 					</div>
@@ -189,14 +189,14 @@ if(!class_exists('uczniowie_oplaty'))
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
 					$_SESSION['antyrefresh']=true;
-					//$rettext.="Zapisane<br />";
+					//$rettext .= "Zapisane<br />";
 					//$rettext.=$this->lista();
 					$rettext .= "<script>window.location='uczniowie,{$this->page_obj->template},szczegoly,$idu';</script>";
 					//go to uczniowie,index,szczegoly,1
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$zapytanie."<br />";
 					$rettext.=$this->form($iduop,$rabat_kwota,$rabat_nazwa);
 				}
@@ -220,18 +220,18 @@ if(!class_exists('uczniowie_oplaty'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where iduop=$iduop;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -247,18 +247,18 @@ if(!class_exists('uczniowie_oplaty'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where iduop=$iduop;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -318,7 +318,7 @@ if(!class_exists('uczniowie_oplaty'))
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					//$rettext.=$sql_query."<br />";
 				}
 			}

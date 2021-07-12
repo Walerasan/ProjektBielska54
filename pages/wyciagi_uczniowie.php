@@ -92,7 +92,7 @@ if(!class_exists('wyciagi_uczniowie'))
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					//$rettext.=$sql_query."<br />";
 				}
 			}

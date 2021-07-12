@@ -68,15 +68,15 @@ if(!class_exists('nr_konta'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idkl,idod,nazwa,usuniety from ".get_class($this).";");
 			if($wynik)
 			{
-				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
-				$rettext.="
+				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext .= "
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
 						<td>nazwa</td>
@@ -98,7 +98,7 @@ if(!class_exists('nr_konta'))
 						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idkl,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
 					}
 					//--------------------
-					$rettext.="
+					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idkl' onmouseover=\"setopticalwhite50('wiersz$idkl')\" onmouseout=\"setoptical0('wiersz$idkl')\">
 							<td>$lp</td>
 							<td>$nazwa</td>
@@ -107,11 +107,11 @@ if(!class_exists('nr_konta'))
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
-				$rettext.="</table>";
+				$rettext .= "</table>";
 			}
 			else
 			{
-				$rettext.="<br />Brak wpisów<br />";
+				$rettext .= "<br />Brak wpisów<br />";
 			}
 			//--------------------
 			return $rettext;
@@ -142,7 +142,7 @@ if(!class_exists('nr_konta'))
 						div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
-			$rettext.="
+			$rettext .= "
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>							
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
@@ -150,8 +150,8 @@ if(!class_exists('nr_konta'))
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
-									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
 								</div>
 							</div>
 						</div>
@@ -185,12 +185,12 @@ if(!class_exists('nr_konta'))
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
 					$_SESSION['antyrefresh']=true;
-					$rettext.="Zapisane<br />";
+					$rettext .= "Zapisane<br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$this->form($idkl,$idod,$nazwa);
 				}
 			}
@@ -211,18 +211,18 @@ if(!class_exists('nr_konta'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idkl=$idkl;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -238,18 +238,18 @@ if(!class_exists('nr_konta'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idkl=$idkl;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -331,10 +331,10 @@ if(!class_exists('nr_konta'))
 			//--------------------
 			foreach($this->page_obj->oddzialy->get_list() as $val)
 			{
-				$rettext.="<option value='$val[0]' ".($val[0]=="$idod"?"selected='selected'":"").">$val[1]</option>";
+				$rettext .= "<option value='$val[0]' ".($val[0]=="$idod"?"selected='selected'":"").">$val[1]</option>";
 			}
 			//--------------------
-			$rettext.="</select>";
+			$rettext .= "</select>";
 			//--------------------
 			return $rettext;
 		}

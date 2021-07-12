@@ -106,7 +106,7 @@ if(!class_exists('media_browser'))
 			$page_obj->database_obj->get_data("select idtbz,typpliku,podpis,nazwa from ".get_class($this)." where usuniety='nie' $filtr order by idtbz desc");
 			$iloscwszystkich=$page_obj->database_obj->results_count();
 			//--------------------
-			$rettext.="	<hr style='width:650px;border-color:gray;' />
+			$rettext .= "	<hr style='width:650px;border-color:gray;' />
 									<form target='uploadPhotoIframe' onsubmit='return true;' method='post' enctype='multipart/form-data' action='mediabrowser,raw,savepicture' style='margin-top:5px;'>
 										Plik: <input type='file' name='zdjecie[]' style='color:white;' multiple='multiple'/>
 										<!--<input type='checkbox' name='nalozlogo' style='color:white;' checked='checked'/> nałóż logo, -->
@@ -144,7 +144,7 @@ if(!class_exists('media_browser'))
 						$ikona=$this->ikonapliku($typpliku);
 					}
 					
-					$rettext.="<div style='vertical-align:top;display:inline-block;position:relative;overflow:hidden;margin:10px;width:140px;'>
+					$rettext .= "<div style='vertical-align:top;display:inline-block;position:relative;overflow:hidden;margin:10px;width:140px;'>
 											<img src='./media/mediabrowser/tlozdjecia01.gif' alt='' style='display:block;'/>
 											<div style='background:url(./media/mediabrowser/tlozdjecia02.gif);text-align:center;'>
 												<div style='margin:auto;width:124px;overflow:hidden;'>
@@ -165,19 +165,19 @@ if(!class_exists('media_browser'))
 						if(file_exists($this->katalogmini."/".$idtbz.".".$typpliku))
 							$rettext.=$idtbz.".".$typpliku.$this->rozdzielacz.$podpis.$this->rozdzielacz.$nazwa.$this->rozdzielacz.$idtbz.$this->rozdzielacz2;
 						else
-							$rettext.="zaslona.png".$this->rozdzielacz.$podpis.$this->rozdzielacz.$nazwa.$this->rozdzielacz.$idtbz.$this->rozdzielacz2;
+							$rettext .= "zaslona.png".$this->rozdzielacz.$podpis.$this->rozdzielacz.$nazwa.$this->rozdzielacz.$idtbz.$this->rozdzielacz2;
 					}
 					else
 					{
 						$rettext.=$this->ikonapliku($typpliku).$this->rozdzielacz.$podpis.$this->rozdzielacz.$nazwa.$this->rozdzielacz.$idtbz.$this->rozdzielacz2;
 					}*/
 				}
-			$rettext.="<br /><br />";
+			$rettext .= "<br /><br />";
 			if($aktualnailosc>=$iloscnastronie)
-				$rettext.="<a href='javascript:parent.$ref.wykonajakcje(\"pictureslist\",\"$trescdowyszukania\",\"".($aktualnailosc-$iloscnastronie)."\")'><img src='./media/mediabrowser/left.png' alt='' /></a> ";
-			$rettext.="<a href='javascript:$ref.anulujzaciemnienie()' style='color:white;font-size:10pt;font-weight:bold;'><img src='./media/mediabrowser/center.png' alt='' /></a>";
+				$rettext .= "<a href='javascript:parent.$ref.wykonajakcje(\"pictureslist\",\"$trescdowyszukania\",\"".($aktualnailosc-$iloscnastronie)."\")'><img src='./media/mediabrowser/left.png' alt='' /></a> ";
+			$rettext .= "<a href='javascript:$ref.anulujzaciemnienie()' style='color:white;font-size:10pt;font-weight:bold;'><img src='./media/mediabrowser/center.png' alt='' /></a>";
 			if($aktualnailosc<=$iloscwszystkich-$iloscnastronie)
-				$rettext.="<a href='javascript:parent.$ref.wykonajakcje(\"pictureslist\",\"$trescdowyszukania\",\"".($aktualnailosc+$iloscnastronie)."\")'><img src='./media/mediabrowser/right.png' alt='' /></a>";
+				$rettext .= "<a href='javascript:parent.$ref.wykonajakcje(\"pictureslist\",\"$trescdowyszukania\",\"".($aktualnailosc+$iloscnastronie)."\")'><img src='./media/mediabrowser/right.png' alt='' /></a>";
 			//--------------------
 			
 			return ($rettext);
@@ -283,7 +283,7 @@ if(!class_exists('media_browser'))
 				}
 			}
 			
-			$rettext.="<script type='text/javascript'>parent.$ref.wykonajakcje('pictureslist');</script>";
+			$rettext .= "<script type='text/javascript'>parent.$ref.wykonajakcje('pictureslist');</script>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ if(!class_exists('media_browser'))
 			$ref=$_POST['ref'];
 			//--------------------
 			$szukajzdjecia=$_POST['szukajzdjecia'];
-			//$rettext.="<script type='text/javascript'>parent.mediabrowser.odswierz('".$szukajzdjecia."');</script>";
+			//$rettext .= "<script type='text/javascript'>parent.mediabrowser.odswierz('".$szukajzdjecia."');</script>";
 			$rettext="<script type='text/javascript'>parent.$ref.wykonajakcje('pictureslist','".$szukajzdjecia."');</script>";
 			return $rettext;
 		}

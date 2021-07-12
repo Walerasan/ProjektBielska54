@@ -24,7 +24,7 @@ if(!class_exists('admin_template'))
 				$menupozome="";
 				$komunikat="Prosze się zalogować";
 				//--------------------
-				$rettext.="<body>
+				$rettext .= "<body>
 								<link rel='Stylesheet' type='text/css' href='./css/admin.css' />
 								<div class='loginodstepgorny'></div>
 								<div class='center'>
@@ -57,7 +57,7 @@ if(!class_exists('admin_template'))
 				$menupozome.="<a href='users,admin,logout'>Logout</a><br />";
 				$komunikat="";
 				//--------------------
-				$rettext.="
+				$rettext .= "
 								<link rel='Stylesheet' type='text/css' href='./css/admin.css' />
 								<!-- ################################################## -->
 								<div class='header'>

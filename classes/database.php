@@ -85,8 +85,8 @@ if(!class_exists('database'))
 		{
 			$rettext="";
 			if( (!$this->connection_handel) && ($this->show_query_with_error) )
-			    $rettext.="<div style='clear:both;'>Brak połączenia z bazą: ".$this->connection_state_message."</div>";
-				$rettext.="<div style='clear:both;'>".$this->report_message."</div>";
+			    $rettext .= "<div style='clear:both;'>Brak połączenia z bazą: ".$this->connection_state_message."</div>";
+				$rettext .= "<div style='clear:both;'>".$this->report_message."</div>";
 			return $rettext;
 		}
 		//--------------------------------------------------------
@@ -360,7 +360,7 @@ if(!class_exists('database'))
 		private function save_log($zapytanie,$checkpoint,$znacznik=false)
 		{
 			//--------------------
-			$checkpoint.=" [$this->event_number] operationtime:[".substr($_SESSION['database']['operationtime'],0,8)."ms]";
+			$checkpoint .= " [$this->event_number] operationtime:[".substr($_SESSION['database']['operationtime'],0,8)."ms]";
 			$jestkatalognalogi=true;
 			if(!file_exists($this->RootPath()."/logs"))
 				if(!mkdir($this->RootPath()."/logs"))

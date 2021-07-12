@@ -95,7 +95,7 @@ if(!class_exists('staticpages'))
 			$generators_obj=new generators($this->page_obj);
 			$rettext.=$generators_obj->makenumberfield($this->page_obj->server_cfg_obj->convert,$this->page_obj->server_cfg_obj->identify);
 			
-			$rettext.="To jest sprawdzian klasy data <br />";
+			$rettext .= "To jest sprawdzian klasy data <br />";
 			$data_obj=new data();
 			$rettext.=$data_obj->formatnazwamcgodzina(date("Y-m-d H:i:s"))."<br />";
 			$rettext.=$data_obj->formatdatagodzina(date("Y-m-d H:i:s"))."<br />";

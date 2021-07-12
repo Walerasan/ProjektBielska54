@@ -89,8 +89,11 @@ if(!class_exists('wyciagi'))
 					break;
 					case "lista":
 					default:
-						$aktualnailosc=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
-						$content_text .= $this->lista($aktualnailosc);
+						$aktualnailosc = isset($_GET['par1']) ? $_GET['par1'] : (isset($_POST['aktualnailosc']) ? $_POST['aktualnailosc'] : 0);
+						$action = isset($_POST['action']) ? $_POST['action'] : "";
+						$hidde_ready = isset($_POST['hidde_ready']) ? $_POST['hidde_ready'] : "";
+						
+						$content_text .= $this->lista($aktualnailosc,$action,$hidde_ready);
 						break;
 				}
 			}
@@ -110,27 +113,60 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista($aktualnailosc)
+		public function lista($aktualnailosc,$action,$hidde_ready)
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button> ";
-			$rettext.="<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			if($action == "filtruj")
+			{
+				$_SESSION[get_class($this)."_filtruj"] = $hidde_ready == "on";
+			}
+			$hidde_assigned = $_SESSION[get_class($this)."_filtruj"];
+			//--------------------
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button> ";
+			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			//--------------------
+			$rettext .= "<br />";
+			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+			$rettext .= "<input type='checkbox' name='hidde_ready' onclick='this.form.submit();' ".($hidde_assigned?"checked='checked'":"")."> Ukryj przypisane";
+			$rettext .= "<input type='hidden' name='action' value='filtruj'>";
+			$rettext .= "</form>";
+			$rettext .= "</fieldset><br><br>";
 			//--------------------
 			if($aktualnailosc=="")$aktualnailosc=0;
-			$this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where usuniety='nie'");
+
+			if($hidde_assigned)
+			{
+				//$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w, wyciagi_uczniowie wu where w.usuniety='nie' and w.idw = wu.idw");
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where w.usuniety='nie' and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie');");
+			}
+			else
+			{
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where w.usuniety='nie'");
+			}
+			
+
 			$iloscwszystkich=$this->page_obj->database_obj->result_count();
-			$iloscnastronie=25;
+			$iloscnastronie = 15;
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
+			if($hidde_assigned)
+			{
+				//$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where w.usuniety='nie' limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where w.usuniety='nie' and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie')  limit $aktualnailosc,$iloscnastronie;");
+			}
+			else
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select w.idw,w.tytul,w.dataoperacji,w.typ,w.usuniety from ".get_class($this)." w where w.usuniety='nie' limit $aktualnailosc,$iloscnastronie;");
+			}
 			if($wynik)
 			{
-				$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
-				$rettext.="
+				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0'>";
+				$rettext .= "
 					<tr style='font-weight:bold;'>
 						<td style='width:25px;'>Lp.</td>
 						<td>Tytuł</td>
@@ -150,31 +186,31 @@ if(!class_exists('wyciagi'))
 					//--------------------
 					if($usuniety=='nie')
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
 					}
 					else
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:15px;'/></a>";
+						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 					}
 					//--------------------
-					$rettext.="
+					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
-							<td>".($aktualnailosc + $lp)."</td>
+							<td style='text-align:right;padding-right:5px;'>".($aktualnailosc + $lp).".</td>
 							<td>$tytul</td>
 							<td>".substr($data,0,10)."</td>
 							<td>$typ</td>
 							<td style='text-align:center;'>$is_assigned</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'>A</a></td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:15px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'><img src='./media/ikony/niegotowe.png' alt='' style='height:30px;'/></a></td>
+							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
-				$rettext.="</table>";
-				$rettext.="<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
+				$rettext .= "</table>";
+				$rettext .= "<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 			}
 			else
 			{
-				$rettext.="<br />Brak wpisów<br />";
+				$rettext .= "<br />Brak wpisów<br />";
 			}
 			//--------------------
 			return $rettext;
@@ -205,7 +241,7 @@ if(!class_exists('wyciagi'))
 						div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
-			$rettext.="
+			$rettext .= "
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:800px;'/></div></div>
@@ -223,8 +259,8 @@ if(!class_exists('wyciagi'))
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
-									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
 								</div>
 							</div>
 						</div>
@@ -258,12 +294,12 @@ if(!class_exists('wyciagi'))
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
 					$_SESSION['antyrefresh']=true;
-					$rettext.="Zapisane<br />";
+					$rettext .= "Zapisane<br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$this->form($idw,$tytul,$data,$typ);
 				}
 			}
@@ -284,18 +320,18 @@ if(!class_exists('wyciagi'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idw=$idw;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -311,18 +347,18 @@ if(!class_exists('wyciagi'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idw=$idw;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -334,11 +370,11 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<h3>Przetwarzanie pliku HTML</h3><br>";
-			$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},dodajplik' enctype='multipart/form-data'>";
-			$rettext.="Pobierz HTML: <input type='file' name='filehtml'>";
-			$rettext.="<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
-			$rettext.="</form>";
+			$rettext .= "<h3>Przetwarzanie pliku HTML</h3><br>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},dodajplik' enctype='multipart/form-data'>";
+			$rettext .= "Pobierz HTML: <input type='file' name='filehtml'>";
+			$rettext .= "<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
+			$rettext .= "</form>";
 			//--------------------
 			return $rettext;
 		}
@@ -348,8 +384,8 @@ if(!class_exists('wyciagi'))
 		public function przetwarzanie_htmlToSql($file)
 		{
 			$rettext="";
-			$rettext.="<hr>";
-        	$rettext.="<br>pobieram nazwę pliku: ".$file."<br>";
+			$rettext .= "<hr>";
+        	$rettext .= "<br>pobieram nazwę pliku: ".$file."<br>";
 			/**
 			* dokument przetwarza plik html i zapisuje do bazy
 			* Hydrotrade Polska Rafał Płatkowski, Arkadiusz Waliczek
@@ -544,37 +580,37 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			$target_dir = "./media/filehtml/";
 			$target_file = $target_dir . basename($file["name"]);
-			$rettext.="<hr>Nazwa dokumentu: ".basename($file["name"])."<hr>";
+			$rettext .= "<hr>Nazwa dokumentu: ".basename($file["name"])."<hr>";
 
 			$uploadOk = 1;
 			$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));     
 			// Sprawdzam czy istnieje już plik o tej samej nazwie
 			if (file_exists($target_file)) {
-				$rettext.="<h5 class='warnigs'>Plik istnieje o podanej nazwie.</h5>";
+				$rettext .= "<h5 class='warnigs'>Plik istnieje o podanej nazwie.</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam rozmiar pliku
 			if ($file["size"] > 500000) {
-				$rettext.="<h5 class='warnigs'>Plik jest za duży......</h5>";
+				$rettext .= "<h5 class='warnigs'>Plik jest za duży......</h5>";
 				$uploadOk = 0;
 			}
 			// Przetwarzam tylko pliki o rozszerzeniu html
 			if($FileType != "html") {
-				$rettext.="<h5 class='warnigs'>Przetwarzanie tylko dla plików o rozszerzeniu html.....</h5>";
+				$rettext .= "<h5 class='warnigs'>Przetwarzanie tylko dla plików o rozszerzeniu html.....</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam jeżeli $uploadOk 1 to ok a jeżeli 0 to error
 			if ($uploadOk == 0) {
-				$rettext.="<h5 class='warnigs'>Nie można przesłać pliku.</h5>";
+				$rettext .= "<h5 class='warnigs'>Nie można przesłać pliku.</h5>";
 			} else {
 				if (move_uploaded_file($file["tmp_name"], $target_file)) {
-					$rettext.="Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
+					$rettext .= "Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
 					$plik = htmlspecialchars( basename( $file["name"]));
 					//uruchamiam funkcje do przetwarzania skryptu
 					$this->przetwarzanie_htmlToSql($plik);
 				//--------------------------------------------------------------------
 				} else {
-					$rettext.="<h5 class='warnigs'>błąd przesłania pliku na serwer.</h5>";
+					$rettext .= "<h5 class='warnigs'>błąd przesłania pliku na serwer.</h5>";
 				}
 			}
 			//--------------------
@@ -588,7 +624,7 @@ if(!class_exists('wyciagi'))
 			$rettext="";
 			//--------------------
 			// Raporty------------
-			$rettext.="
+			$rettext .= "
 			<script src=\"./media/wyszukiwarka/jQuery/jquery.min.js\"></script>
         	<link rel=\"stylesheet\" href=\"./media/wyszukiwarka/jQuery/jquery-ui.css\">
     		<script src=\"./media/wyszukiwarka/jQuery/jquery-ui.min.js\"></script>
@@ -601,7 +637,7 @@ if(!class_exists('wyciagi'))
     		</script>
 			";
 
-			$rettext.="
+			$rettext .= "
 			<style>
 			.formraport input{
 				font-size: inherit;
@@ -613,14 +649,14 @@ if(!class_exists('wyciagi'))
 			}
 			</style>
 			";
-			$rettext.="<h3>RAPORTY WYCIĄGÓW</h3><hr>";
-			$rettext.="<h3>
+			$rettext .= "<h3>RAPORTY WYCIĄGÓW</h3><hr>";
+			$rettext .= "<h3>
 			<form action='".get_class($this).",{$this->page_obj->template},raporty' method='post' class='formraport'>
 				Szukaj wg. nr konta: <input type='text' name='nrkonta' id='nrkonta_szukaj' placeholder='znajdź nr konta...' style='width:230px;'/>
 				<input type='submit' name='submitnrkonta' value='POKAŻ RAPORT'>
 				</form>
 			</h3><hr>";
-			$rettext.="<form action='".get_class($this).",{$this->page_obj->template},raporty' method='post' class='formraport'>
+			$rettext .= "<form action='".get_class($this).",{$this->page_obj->template},raporty' method='post' class='formraport'>
 			Data od: <input type='date' name='dataod'> 
 			Data do: <input type='date' name='datado'> 
 			<input type='submit' name='submitdata' value='POKAŻ RAPORT' class='formsubmit'>
@@ -628,7 +664,7 @@ if(!class_exists('wyciagi'))
 
 			if(isset($_POST['submitdata'])){
 				if(!empty($_POST['dataod']) && !empty($_POST['datado'])){
-					$rettext.="Data od: {$_POST['dataod']} Data do: {$_POST['datado']}";
+					$rettext .= "Data od: {$_POST['dataod']} Data do: {$_POST['datado']}";
 					$od = $_POST['dataod'];
 					$do = $_POST['datado'];
 					
@@ -637,9 +673,9 @@ if(!class_exists('wyciagi'))
 					{
 						list($suma_wplat)=$raport1->fetch_row();
 						if($suma_wplat > 0){
-							$rettext.="<h4>Suma wpłat: $suma_wplat zł <button><a href='".get_class($this).",{$this->page_obj->template},raporty,$od,$do,$suma_wplat' style='text-decoration:none;color:black;'>LISTA</a></button></h4><hr>";
+							$rettext .= "<h4>Suma wpłat: $suma_wplat zł <button><a href='".get_class($this).",{$this->page_obj->template},raporty,$od,$do,$suma_wplat' style='text-decoration:none;color:black;'>LISTA</a></button></h4><hr>";
 						} else {
-							$rettext.="<h4>Suma wpłat: 0 zł </h4><hr>";
+							$rettext .= "<h4>Suma wpłat: 0 zł </h4><hr>";
 						}
 					
 					} else {
@@ -652,7 +688,7 @@ if(!class_exists('wyciagi'))
 			if(isset($_GET['par1']) && isset($_GET['par2']) && isset($_GET['par3'])){
 				
 				$od = $_GET['par1']; $do = $_GET['par2']; $kw = $_GET['par3'];
-				$rettext.="<h4>Suma wpłat: <span style='color:blue'>$kw zł</span>, Od $od - Do $do 
+				$rettext .= "<h4>Suma wpłat: <span style='color:blue'>$kw zł</span>, Od $od - Do $do 
 				<br><br>
 				<form action='./media/pdf/tworzpdf.php' method='post'>
 					<input type='hidden' name='od' value='$od'>
@@ -667,23 +703,23 @@ if(!class_exists('wyciagi'))
 					<input type='submit' value='DO CSV' name='submitcsv'>
 				</form> <br>";
 
-				$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
-				$rettext.="<tr style='font-weight:bold;'>";
-					$rettext.="<td>Lp.</td><td>Wpływ</td><td>Tytuł</td><td>Data</td><td>Typ</td>";
-				$rettext.="</tr>";
+				$rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
+				$rettext .= "<tr style='font-weight:bold;'>";
+					$rettext .= "<td>Lp.</td><td>Wpływ</td><td>Tytuł</td><td>Data</td><td>Typ</td>";
+				$rettext .= "</tr>";
 				$raport2=$this->page_obj->database_obj->get_data("SELECT kwota,tytul,dataoperacji,typ FROM wyciagi WHERE dataoperacji >= '$od' AND dataoperacji <= '$do' ORDER BY dataoperacji ASC;");
 					if($raport2)
 					{
 						$lp=1;
 						while(list($kwota,$tytul,$dataoperacji,$typ)=$raport2->fetch_row()){
 							$data = date("Y-m-d",strtotime($dataoperacji));  
-							$rettext.="<tr>";
-								$rettext.="<td>$lp</td><td>$kwota</td><td>$tytul</td><td>$data</td><td>$typ</td>";
-							$rettext.="</tr>";
+							$rettext .= "<tr>";
+								$rettext .= "<td>$lp</td><td>$kwota</td><td>$tytul</td><td>$data</td><td>$typ</td>";
+							$rettext .= "</tr>";
 							$lp++;
 						}
 					}
-				$rettext.="<tbody></table>";
+				$rettext .= "<tbody></table>";
 			}
 
 			//wyszukiwarka po nr konta----------------------
@@ -692,10 +728,10 @@ if(!class_exists('wyciagi'))
 					$nrkonta = $_POST['nrkonta'];
 					
 
-					$rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
-					$rettext.="<tr style='font-weight:bold;'>";
-						$rettext.="<td>Lp.</td><td>NR KONTA</td><td>Tytuł</td><td>Data</td><td>Kwota</td>";
-					$rettext.="</tr>";
+					$rettext .= "<table style='width:100%;font-size:10pt;' cellspacing='0' border='1'><tbody>";
+					$rettext .= "<tr style='font-weight:bold;'>";
+						$rettext .= "<td>Lp.</td><td>NR KONTA</td><td>Tytuł</td><td>Data</td><td>Kwota</td>";
+					$rettext .= "</tr>";
 
 
 					$raport1=$this->page_obj->database_obj->get_data("SELECT idw, rachuneknadawcy, tytul, dataoperacji, kwota,typ  FROM wyciagi WHERE rachuneknadawcy = '$nrkonta';");
@@ -704,24 +740,24 @@ if(!class_exists('wyciagi'))
 						$lp=1;
 						while(list($idw, $rachuneknadawcy, $tytul, $dataoperacji, $kwota,$typ)=$raport1->fetch_row()){
 							$data = date("Y-m-d",strtotime($dataoperacji));  
-							$rettext.="<tr>";
-								$rettext.="<td>$lp</td><td>$kwota zł</td><td>$tytul</td><td>$data</td><td>$typ</td>";
-							$rettext.="</tr>";
+							$rettext .= "<tr>";
+								$rettext .= "<td>$lp</td><td>$kwota zł</td><td>$tytul</td><td>$data</td><td>$typ</td>";
+							$rettext .= "</tr>";
 							$lp++;
 						}
 					} else {
 						echo "brak danych dla nr konta";
 					}
-					$rettext.="<tbody></table>";
+					$rettext .= "<tbody></table>";
 
 					$raport2=$this->page_obj->database_obj->get_data("SELECT sum(kwota) FROM wyciagi WHERE rachuneknadawcy='$nrkonta';");
 					if($raport2)
 					{
 						list($suma_wplat)=$raport2->fetch_row();
 						if($suma_wplat > 0){
-							$rettext.="<h4>Suma wpłat: $suma_wplat zł </h4><hr>";
+							$rettext .= "<h4>Suma wpłat: $suma_wplat zł </h4><hr>";
 						} else {
-							$rettext.="<h4>Suma wpłat: 0 zł </h4><hr>";
+							$rettext .= "<h4>Suma wpłat: 0 zł </h4><hr>";
 						}
 					
 					} else {
@@ -759,7 +795,7 @@ if(!class_exists('wyciagi'))
 						div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 						div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 					</style>";
-			$rettext.="
+			$rettext .= "
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},assign_write'>
 						<div style='overflow:hidden;'>
 							Tu jeszcze wyświetlić szczegóły opłaty <br />
@@ -776,8 +812,8 @@ if(!class_exists('wyciagi'))
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
-									<input type='submit' name='' title='Zapisz' value='Zapisz' onclick='selectAll();'/>&#160;&#160;&#160;&#160;
-									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista,$aktualnailosc\"'>Anuluj</button>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' onclick='selectAll();' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista,$aktualnailosc\"'>Anuluj</button>
 								</div>
 							</div>
 						</div>

@@ -39,11 +39,11 @@ if(!class_exists('powiadomienia'))
 			//--------------------
 			if($this->page_obj->database_obj->execute_query($zapytanie))
 			{
-				$rettext.="Zapisane<br />";
+				$rettext .= "Zapisane<br />";
 			}
 			else
 			{
-				$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+				$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 			}
 			return $rettext;
 		}

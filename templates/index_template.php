@@ -50,8 +50,8 @@ if(!class_exists('index_template'))
 		private function index_template_user_is_login($trescstrony)
 		{
 			$rettext="<link rel='Stylesheet' type='text/css' href='./css/index_login.css' />";
-			$rettext.="<div style='width:100%;'>";
-			$rettext.="<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
+			$rettext .= "<div style='width:100%;'>";
+			$rettext .= "<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
 			$rettext .= "<div class='button_spacing'></div>";
 			$rettext .= $this->button("Uczniowie","uczniowie,index,lista");
 			$rettext .= "<div class='button_spacing'></div>";
@@ -66,11 +66,11 @@ if(!class_exists('index_template'))
 			$rettext .= $this->button("Opiekunowie","opiekunowie,index,lista");
 			$rettext .= "<div class='button_spacing_x4'></div>";
 			$rettext .= $this->button("Wyloguj","staticpages,index,logout");
-			$rettext.="</div>";
-			$rettext.="<div style='overflow:hidden;padding:20px;'>";
+			$rettext .= "</div>";
+			$rettext .= "<div style='overflow:hidden;padding:20px;'>";
 			$rettext.=$trescstrony;
-			$rettext.="</div>";
-			$rettext.="</div>";
+			$rettext .= "</div>";
+			$rettext .= "</div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -86,10 +86,10 @@ if(!class_exists('index_template'))
 		private function login_form()
 		{
 			$rettext="<form method='post' action='staticpages,index,login' class='login_form'>";
-			$rettext.="<input type='text' class='login_form_input' name='r_login' placeholder='e-mail' /> <br />";
-			$rettext.="<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
-			$rettext.="<input type='submit' class='login_form_submit' value='zaloguj' />";
-			$rettext.="</form>";
+			$rettext .= "<input type='text' class='login_form_input' name='r_login' placeholder='e-mail' /> <br />";
+			$rettext .= "<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
+			$rettext .= "<input type='submit' class='login_form_submit' value='zaloguj' />";
+			$rettext .= "</form>";
 			//--------------------
 			return $rettext;
 		}

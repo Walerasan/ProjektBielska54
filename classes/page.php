@@ -250,7 +250,7 @@ if(!class_exists('page'))
 				//--------------------
 				// head
 				//--------------------
-				$rettext.="
+				$rettext .= "
 				<head>
 					$contenttype
 					<meta http-equiv='Content-Language' content='pl' />
@@ -278,7 +278,7 @@ if(!class_exists('page'))
 				//--------------------
 				if(file_exists($this->server_cfg_obj->pathtofavcicon))
 				{
-					$rettext.="
+					$rettext .= "
 					<link rel='icon' href='".$this->server_cfg_obj->pathtofavcicon."' type='image/x-icon' />
 					<link rel='shortcut icon' href='".$this->server_cfg_obj->pathtofavcicon."' type='image/x-icon' />";
 				}
@@ -287,30 +287,30 @@ if(!class_exists('page'))
 				//--------------------
 				//load js files
 				//--------------------
-				$rettext.="<script type='text/javascript' src='./js/tinymce/tinymce.min.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/lightbox/jquery-1.7.2.min.js'></script>";
-				$rettext.="<script type='text/javascript' src='./js/lightbox/lightbox.js'></script>";
-				$rettext.="\n".$this->ladujjs("./js");
+				$rettext .= "<script type='text/javascript' src='./js/tinymce/tinymce.min.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/lightbox/jquery-1.7.2.min.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/lightbox/lightbox.js'></script>";
+				$rettext .= "\n".$this->ladujjs("./js");
 
 				//~~~~~~~~~~~~~~~~~~~~
 					
-				$rettext.="</head>";
+				$rettext .= "</head>";
 				//~~~~~~~~~~~~~~~~~~~~
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
 			// page_content
 			//--------------------
-			$rettext.="\r\n<body>\r\n";
+			$rettext .= "\r\n<body>\r\n";
 			$rettext.=$page_content;
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
 			// raports
 			//--------------------
-			/*$rettext.="<div class='raporty'>";
+			/*$rettext .= "<div class='raporty'>";
 			if($this->server_cfg_obj->showerror)
-				$rettext.="<p class='phperrorblock'>{$this->parent->bledy}</p>";
+				$rettext .= "<p class='phperrorblock'>{$this->parent->bledy}</p>";
 				//--------------------
 				$rettext.=$this->baza->show_report_message();
 				if(!$this->isxhtml)
@@ -326,13 +326,13 @@ if(!class_exists('page'))
 					}
 					if($this->server_cfg_obj->showerror)
 					{
-							$rettext.="Błąd składni xhtml: $xmlerrorcode line: $xmlerrorline offset: $xmlerrorbyte <b style='color:red;'>&lArr;&otimes;</b>";
+							$rettext .= "Błąd składni xhtml: $xmlerrorcode line: $xmlerrorline offset: $xmlerrorbyte <b style='color:red;'>&lArr;&otimes;</b>";
 							$rettext.=$this->showcode($zawartosc,$xmlerrorbyte);
 					}
 				}
-				$rettext.="</div>";//koniec div dla raporty*/
+				$rettext .= "</div>";//koniec div dla raporty*/
 				//--------------------
-			$rettext.="\r\n</body>\r\n</html>";
+			$rettext .= "\r\n</body>\r\n</html>";
 			//~~~~~~~~~~~~~~~~~~~~
 			//--------------------
 			// return text to display
@@ -376,7 +376,7 @@ if(!class_exists('page'))
 							//bo nie które pliki się powielają lub mają być ładowane tylko w wyjątkowych sytuacjach.
 						}
 						else
-							$rettext.="<script type='text/javascript' src='$kat/$entry'></script>\n";
+							$rettext .= "<script type='text/javascript' src='$kat/$entry'></script>\n";
 					}
 				}
 			}

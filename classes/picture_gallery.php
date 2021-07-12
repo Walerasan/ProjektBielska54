@@ -72,7 +72,7 @@ if(!class_exists('picture_gallery'))
 		//----------------------------------------------------------------------------------------------------
 		private function listagaleriadmin($page_obj,$jsobiect)
 		{
-			$rettext.="<button title='dodaj nową' type='button' onclick='$jsobiect.pobierzgalerie(\"dodaj\")'>dodaj nową</button><br />";
+			$rettext .= "<button title='dodaj nową' type='button' onclick='$jsobiect.pobierzgalerie(\"dodaj\")'>dodaj nową</button><br />";
 			$wynik=$page_obj->database_obj->get_data("select idg,tytul from ".get_class($this)." where usuniety='nie'");
 			if($wynik)
 			{
@@ -99,7 +99,7 @@ if(!class_exists('picture_gallery'))
 		//----------------------------------------------------------------------------------------------------
 		private function formularzgalerii($jsobiect,$idg)
 		{
-			$rettext.="
+			$rettext .= "
 			<div style='background:white;overflow:hidden;width:300px;margin:auto;margin-top:50px;color:black;'>
 				<form method='post' onsubmit='$jsobiect.pobierzgalerie(\"zapisz\",$jsobiect.formtorawpost(this));return false;' name='formularzname' enctype='multipart/form-data'>
 					<input type='hidden' name='MAX_FILE_SIZE' value='5242880' />

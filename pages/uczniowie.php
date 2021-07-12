@@ -74,7 +74,7 @@ if(!class_exists('uczniowie'))
 					break;
 					case "lista":
 					default:
-						$aktualnailosc=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$aktualnailosc = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
 						$content_text .= $this->lista($aktualnailosc);
 					break;
 				}
@@ -89,47 +89,46 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext .= "<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			
-			if($aktualnailosc=="")$aktualnailosc=0;
+			if($aktualnailosc == "") $aktualnailosc=0;
 			$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where usuniety='nie'");
 			$iloscwszystkich=$this->page_obj->database_obj->result_count();
-			$iloscnastronie=10;
+			$iloscnastronie = 15;
 
 
-			if(isset($_POST['submit_szukaj'])){
-
-				if(isset($_POST['imie']) && !empty($_POST['imie'])){
-
+			if(isset($_POST['submit_szukaj']))
+			{
+				if(isset($_POST['imie']) && !empty($_POST['imie']))
+				{
 					$szukajimie =$_POST['imie'];
 					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%';");
-
-				}else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko'])){
-
+				}
+				else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko']))
+				{
 					$szukajnazwisko = $_POST['nazwisko'];
 					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%';");
-
-				} else {
-					
+				}
+				else
+				{
 					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");	
-
 				}
 
 				if($wynik)
 				{
-					$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-					$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-					$rettext.="<fieldset style='border:1px solid black;width:500px;'>";
-					$rettext.="<legend>Szukaj ucznia:</legend>";
-					$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
-					$rettext.="<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
-					$rettext.="<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
-					$rettext.="<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
-					$rettext.="</form>";
-					$rettext.="</fieldset><br><br>";
-					$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
-					$rettext.="
+					$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+					$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+					$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
+					$rettext .= "<legend>Szukaj ucznia:</legend>";
+					$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+					$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
+					$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
+					$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+					$rettext .= "</form>";
+					$rettext .= "</fieldset><br><br>";
+					$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
+					$rettext .= "
 						<tr style='font-weight:bold;'>
 							<td style='width:25px;'>Lp.</td>
 							<td>Imie, nazwisko</td>
@@ -153,7 +152,7 @@ if(!class_exists('uczniowie'))
 							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 						}
 						//--------------------
-						$rettext.="
+						$rettext .= "
 							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
 								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
 								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
@@ -181,33 +180,35 @@ if(!class_exists('uczniowie'))
 						$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
 						$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
 					}
-					$rettext.="</table>";
-					$rettext.="<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
+					$rettext .= "</table>";
+					$rettext .= "<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 					
 				}
 				else
 				{
-					$rettext.="<br />Brak wpisów<br />";
+					$rettext .= "<br />Brak wpisów<br />";
 				}
+			}
+			else
+			{
+				$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this).";");
+				$iloscwszystkich = $this->page_obj->database_obj->result_count();
 
-
-			} else {
-
-				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");				
 				if($wynik)
 				{
-					$rettext.="<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-					$rettext.="<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-					$rettext.="<fieldset style='border:1px solid black;width:500px;'>";
-					$rettext.="<legend>Szukaj ucznia:</legend>";
-					$rettext.="<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
-					$rettext.="<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
-					$rettext.="<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
-					$rettext.="<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
-					$rettext.="</form>";
-					$rettext.="</fieldset><br><br>";
-					$rettext.="<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
-					$rettext.="
+					$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+					$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+					$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
+					$rettext .= "<legend>Szukaj ucznia:</legend>";
+					$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+					$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
+					$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
+					$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+					$rettext .= "</form>";
+					$rettext .= "</fieldset><br><br>";
+					$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
+					$rettext .= "
 						<tr style='font-weight:bold;'>
 							<td style='width:25px;'>Lp.</td>
 							<td>Imie, nazwisko</td>
@@ -231,9 +232,9 @@ if(!class_exists('uczniowie'))
 							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 						}
 						//--------------------
-						$rettext.="
+						$rettext .= "
 							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
-								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
+								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">".($aktualnailosc + $lp).".</td>
 								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
 								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 								
@@ -259,14 +260,12 @@ if(!class_exists('uczniowie'))
 						$szczagoly = "Suma opłat: ".$oplaty_array[0].",&#160;&#160; suma rabatów: ".$oplaty_array[1].",&#160;&#160; do rozliczenia: ".$oplaty_array[2].",&#160;&#160; rozliczono: ".$rozliczenia.",&#160;&#160; $pozostalo_do_zaplaty";
 						$rettext .= "<tr id='wiersz{$idu}_szczagoly' style='display:none;' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\"><td >&#160;</td><td colspan='1000' style='vertical-align:top;padding-bottom:20px;font-size:14px;'>$szczagoly</td></tr>";
 					}
-					$rettext.="</table><br>";
-					$iloscwszystkich = 3;
-					$iloscnastronie = 1;
-					$rettext.="<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
+					$rettext .= "</table><br>";
+					$rettext .= "<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 				}
 				else
 				{
-					$rettext.="<br />Brak wpisów<br />";
+					$rettext .= "<br />Brak wpisów<br />";
 				}
 			}
 			//--------------------
@@ -301,13 +300,13 @@ if(!class_exists('uczniowie'))
 			$nazwisko_uczniowie=$this->page_obj->text_obj->doedycji($nazwisko_uczniowie);
 			$numer_indeksu=$this->page_obj->text_obj->doedycji($numer_indeksu);
 			//--------------------
-			$rettext.="
+			$rettext .= "
 				<style>
 					div.wiersz{float:left;clear:left;}
 					div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 					div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 				</style>";
-			$rettext.="
+			$rettext .= "
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>imie_uczniowie: </div><div class='formularzkom2'><input type='text' name='imie_uczniowie' value='$imie_uczniowie' style='width:800px;'/></div></div>
@@ -321,8 +320,8 @@ if(!class_exists('uczniowie'))
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
-									<input type='submit' name='' title='Zapisz' value='Zapisz' />&#160;&#160;&#160;&#160;
-									<button title='Anuluj' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},lista\"'>Anuluj</button>
 								</div>
 							</div>
 						</div>
@@ -347,7 +346,7 @@ if(!class_exists('uczniowie'))
 					if($ido[$key] == -1)
 					{
 						$ido[$key] = $this->page_obj->opiekunowie->insert($imie_opiekun[$key],$nazwisko_opiekun[$key],$telefon_opiekun[$key],$email_opiekun[$key],$haslo[$key],$haslo_confirm[$key]);
-						$rettext.="Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
+						$rettext .= "Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
 					}
 				}
 			}
@@ -368,7 +367,7 @@ if(!class_exists('uczniowie'))
 			{
 				$zapytanie="insert into ".get_class($this)."(imie_uczniowie,nazwisko_uczniowie,numer_indeksu,idkl)values('$imie_uczniowie','$nazwisko_uczniowie','$numer_indeksu',$idkl)";//nowy wpis
 			}
-			$rettext.="";
+			$rettext .= "";
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
 			{
@@ -385,16 +384,16 @@ if(!class_exists('uczniowie'))
 					{
 						if($val > 0)
 						{
-							$rettext.="Zapisano opiekuna {$idu} , {$ido[$key]},<br />";
+							$rettext .= "Zapisano opiekuna {$idu} , {$ido[$key]},<br />";
 							$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
 						}
 					}
-					$rettext.="Zapisane $idu<br />";
+					$rettext .= "Zapisane $idu<br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$this->form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 				}
 			}
@@ -415,18 +414,18 @@ if(!class_exists('uczniowie'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idu=$idu;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -442,18 +441,18 @@ if(!class_exists('uczniowie'))
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idu=$idu;"))
 				{
-					//$rettext.="<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
 				else
 				{
-					$rettext.="<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
 					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.="This operation need confirm.";
+				$rettext .= "This operation need confirm.";
 			}
 			//--------------------
 			return $rettext;
@@ -519,10 +518,10 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			foreach($this->page_obj->klasa->get_list() as $val)
 			{
-				$rettext.="<option value='$val[0]' ".($val[0]=="$idkl"?"selected='selected'":"").">{$this->page_obj->oddzialy->get_name($val[1])} - $val[2]</option>";
+				$rettext .= "<option value='$val[0]' ".($val[0]=="$idkl"?"selected='selected'":"").">{$this->page_obj->oddzialy->get_name($val[1])} - $val[2]</option>";
 			}
 			//--------------------
-			$rettext.="</select>";
+			$rettext .= "</select>";
 			//--------------------
 			return $rettext;
 		}
@@ -534,23 +533,23 @@ if(!class_exists('uczniowie'))
 			$this->update_select_field_from_oddzialy_js_script="";
 			$rettext="<select name='idod_tmp' onchange='document.getElementById(\"$select_id\").innerHTML = update_$select_id(this.value);'>";
 			//--------------------
-			$this->update_select_field_from_oddzialy_js_script.="<script>";
-			$this->update_select_field_from_oddzialy_js_script.="function update_$select_id(idod){var opcje='';";
-			$this->update_select_field_from_oddzialy_js_script.="switch(idod){";
+			$this->update_select_field_from_oddzialy_js_script .= "<script>";
+			$this->update_select_field_from_oddzialy_js_script .= "function update_$select_id(idod){var opcje='';";
+			$this->update_select_field_from_oddzialy_js_script .= "switch(idod){";
 			foreach($this->page_obj->oddzialy->get_list() as $val)
 			{
-				$rettext.="<option value='$val[0]' ".($val[0]==$idod?"selected='selected'":"").">{$val[1]}</option>";
-				$this->update_select_field_from_oddzialy_js_script.="case '$val[0]':";
+				$rettext .= "<option value='$val[0]' ".($val[0]==$idod?"selected='selected'":"").">{$val[1]}</option>";
+				$this->update_select_field_from_oddzialy_js_script .= "case '$val[0]':";
 				foreach($this->page_obj->klasa->get_list_for_idod($val[0]) as $kval)
 				{
-					$this->update_select_field_from_oddzialy_js_script.="opcje=opcje+'<option value=\"$kval[0]\" ".($kval[0]==$idkl?"selected=\"selected\"":"").">$kval[2]</option>';";
+					$this->update_select_field_from_oddzialy_js_script .= "opcje=opcje+'<option value=\"$kval[0]\" ".($kval[0]==$idkl?"selected=\"selected\"":"").">$kval[2]</option>';";
 				}
-				$this->update_select_field_from_oddzialy_js_script.="break;";
+				$this->update_select_field_from_oddzialy_js_script .= "break;";
 			};
-			$this->update_select_field_from_oddzialy_js_script.="};";
-			$this->update_select_field_from_oddzialy_js_script.="return opcje;};document.getElementById('$select_id').innerHTML = update_$select_id('$idod');</script>";
+			$this->update_select_field_from_oddzialy_js_script .= "};";
+			$this->update_select_field_from_oddzialy_js_script .= "return opcje;};document.getElementById('$select_id').innerHTML = update_$select_id('$idod');</script>";
 			//--------------------
-			$rettext.="</select>";
+			$rettext .= "</select>";
 			
 			//--------------------
 			return $rettext;
@@ -562,7 +561,7 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext.="<input type='button' value='+' onclick='opiekunowie.create_block();'/>";
+			$rettext .= "<input type='button' value='+' onclick='opiekunowie.create_block();'/>";
 			//--------------------
 			$opcje_wyboru = "";
 			foreach($this->page_obj->opiekunowie->get_list() as $val)
@@ -570,13 +569,13 @@ if(!class_exists('uczniowie'))
 				$opcje_wyboru .= "opiekunowie.select_opiekunowie_options.push([{$val[0]},'{$val[1]}']);\n";
 			}
 			//--------------------
-			$rettext.="<script>";
+			$rettext .= "<script>";
 			$rettext.=$opcje_wyboru;
 			foreach($opiekunowie_array as $val)
 			{
-				$rettext.="opiekunowie.create_block($val[0]);";
+				$rettext .= "opiekunowie.create_block($val[0]);";
 			}
-			$rettext.="</script>";
+			$rettext .= "</script>";
 			//--------------------
 			return $rettext;
 		}
@@ -643,9 +642,9 @@ if(!class_exists('uczniowie'))
 									<td colspan='7'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
 								</tr>";
 			}
-			$rettext.="</table><br /><br />";
+			$rettext .= "</table><br /><br />";
 			//----------------------------------------------------------------------------------------------------
-			$rettext.="<hr /><br />";
+			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
 			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br />";
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
@@ -699,9 +698,9 @@ if(!class_exists('uczniowie'))
 			$rettext .= "<tr>
 									<td colspan='7'><b>Rozliczono w sumie: $suma_rozliczen </b></td>
 								</tr>";
-			$rettext.="</table><br /><br />";
+			$rettext .= "</table><br /><br />";
 			//----------------------------------------------------------------------------------------------------
-			$rettext.="<hr /><br />";
+			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
 			if($suma_rozliczen > $suma_do_rozliczenia)
 			{
