@@ -589,7 +589,7 @@ if(!class_exists('uczniowie'))
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-			$rettext .= "<b style='font-size:16px;'><u>OPŁATY</u></b><br />";
+			$rettext .= "<b style='font-size:16px;'><u>OPŁATY</u></b><br /><br />";
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 			$rettext .= "
 					<tr style='font-weight:bold;'>
@@ -646,7 +646,7 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
-			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br />";
+			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br /><br />";
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 			$rettext .= "
 					<tr style='font-weight:bold;'>
@@ -708,7 +708,7 @@ if(!class_exists('uczniowie'))
 			}
 			else if($suma_rozliczen < $suma_do_rozliczenia)
 			{
-				$rettext .= "<b style='font-size:16px;'>Niedopłata:".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
 			}
 			else
 			{
