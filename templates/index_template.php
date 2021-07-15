@@ -36,8 +36,8 @@ if(!class_exists('index_template'))
 				<div class='pasekgorny'><div class='center'><img src='./media/desktop/pasekgorny.gif' alt='' class='pasekgorny'/></div></div>
 				<div class='tlo'>
 					<div class='center'>
-						<img src='./media/desktop/tytul.png' alt='' class='tytul'/>
-						<img src='./media/desktop/tytul2.png' alt='' class='tytul2'/>
+						<img src='./media/desktop/nowe_logo.png' alt='' class='nowe_logo'/>
+						<!--<img src='./media/desktop/tytul2.png' alt='' class='tytul2'/>-->
 						{$this->login_form()}
 						<div class='info'>
 							<img src='./media/desktop/ikonadomku.gif' alt='' style='vertical-align:middle;' /> Bielska 54, 43-200 Pszczyna <img src='./media/desktop/ikonatelefonu.gif' alt='' style='vertical-align:middle;'/>  502 243 181 <img src='./media/desktop/ikonakoperty.gif' alt='' style='vertical-align:middle;' /> <a href='mailto:biuro@nzpe.pl' style='color:inherit;text-decoration:none;'>biuro@nzpe.pl</a> <img src='./media/desktop/ikonamapy.gif' alt='' style='vertical-align:middle;' /> <a href='https://goo.gl/maps/bmHnVLcNAhYVxGy8A' onclick='window.open(\"https://goo.gl/maps/bmHnVLcNAhYVxGy8A\",\"chaild\");return false;' style='color:inherit;text-decoration:none;'> mapa</a> 
