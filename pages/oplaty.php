@@ -166,8 +166,8 @@ if(!class_exists('oplaty'))
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
-							<div class='wiersz'><div class='formularzkom1'>Typ opłaty: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
-							<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>typ: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -391,12 +391,12 @@ if(!class_exists('oplaty'))
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_uczen'>
 						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
-							<div class='wiersz'><div class='formularzkom1'>Typ opłaty: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
-							<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
-							<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_for_oddzial('klasa_select')}</div></div>
-							<div class='wiersz'><div class='formularzkom1'>Klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>typ: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>oddział: </div><div class='formularzkom2'>{$this->create_select_field_for_oddzial('klasa_select')}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
 							<div class='wiersz'>
-								<div class='formularzkom1'>Uczniowie: </div>
+								<div class='formularzkom1'>uczniowie: </div>
 								<div class='formularzkom2'>
 									<br />
 									{$this->create_select_field_from_uczniowie($idop,'uczniowie_select','selected_uczniowie')}
@@ -497,15 +497,15 @@ if(!class_exists('oplaty'))
 				}
 			}
 			//--------------------
-			$rettext .= "	<div style='float:left;'>
+			$rettext .= "<div style='float:left;'>
 								<label for='selected_uczniowie' style='display:block;'>Wybrani uczniowie:</label>
 								<select multiple='multiple' id='$selected_uczniowie_select_id' name='selected_uczniowie[]' style='display:block;width:200px;height:250px;'></select>
 							</div>";
-			$rettext .= "	<div style='float:left;width:50px;text-align:center;height:250px;position: relative;'>
+			$rettext .= "<div style='float:left;width:50px;text-align:center;height:250px;position: relative;'>
 								<div style='display:block;position: absolute;top:25px;text-align:center;width:100%;'><a href='#' onclick='add_uczen_to_select();' style='font-size:30px;font-weight:bold;text-decoration:none;color:black;'> &lt;-</a></div>
 								<div style='display:block;position: absolute;bottom:0px;text-align:center;width:100%;'><a href='#' onclick='remov_uczen_from_select();' style='font-size:30px;font-weight:bold;text-decoration:none;color:black;'> -&gt;</a></div>
 							</div>";
-			$rettext .= "	<div style='float:left;'>
+			$rettext .= "<div style='float:left;'>
 								<label for='selected_uczniowie' style='display:block;'>uczniowie:</label>
 								<select multiple='multiple' id='$uczniowie_select_id' style='display:block;width:200px;height:250px;'></select>
 							</div>";

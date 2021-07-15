@@ -30,7 +30,7 @@ if(!class_exists('wyciagi'))
 		#region get_content
 		public function get_content()
 		{
-			$content_text="";
+			$content_text="<p class='title'>WYCIĄGI</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
@@ -121,12 +121,13 @@ if(!class_exists('wyciagi'))
 			{
 				$_SESSION[get_class($this)."_filtruj"] = $hidde_ready == "on";
 			}
+			if(!isset($_SESSION[get_class($this)."_filtruj"])) $_SESSION[get_class($this)."_filtruj"] = "on";
 			$hidde_assigned = $_SESSION[get_class($this)."_filtruj"];
 			//--------------------
-			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
-			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
-			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>RAPORTY WYCIAGÓW</button> ";
-			$rettext .= "<button title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			//$rettext .= "<button title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
+			$rettext .= "<button title='Wgraj plik eksportu' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
+			$rettext .= "<button title='Raport wyciągów' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>Raport wyciągów</button> ";
+			$rettext .= "<button title='Processing' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
 			//--------------------
 			$rettext .= "<br />";
 			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
@@ -180,7 +181,7 @@ if(!class_exists('wyciagi'))
 				$lp=0;
 				while(list($idw,$tytul,$data,$typ,$usuniety)=$wynik->fetch_row())
 				{
-					$is_assigned = $this->page_obj->wyciagi_uczniowie->is_assigned_wyciagi($idw) ? "*" : "";
+					$is_assigned = $this->page_obj->wyciagi_uczniowie->is_assigned_wyciagi($idw) ? "<img src='./media/ikony/users.png' alt='' style='height:30px;'/>" : "";
 					//--------------------
 					$lp++;
 					//--------------------
@@ -790,13 +791,20 @@ if(!class_exists('wyciagi'))
 			$rettext .= "
 					<form method='post' action='".get_class($this).",{$this->page_obj->template},assign_write'>
 						<div style='overflow:hidden;'>
-							Tu jeszcze wyświetlić szczegóły opłaty <br />
+							
+							<div style = 'font-size:18px;'>
+								Przypisz uczniów do wyciągu: <br />
+								<p style='text-indent:20px;font-weight:bold;'>{$this->get_nadawce($idw)} <span style='font-size:26px;'>|</span> {$this->get_tytul($idw)} <span style='font-size:26px;'>|</span> {$this->get_date($idw)} <span style='font-size:26px;'>|</span> {$this->get_kwota($idw)} zł</p>
+							</div>
+
+							<br /><br />
 							<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_for_oddzial('klasa_select')}</div></div>
-							<div class='wiersz'><div class='formularzkom1'>Klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
+							<div class='wiersz'><div class='formularzkom1'>klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
 						
 							<div class='wiersz'>
-								<div class='formularzkom1'>Uczeń: </div>
+								<div class='formularzkom1'>uczniowie: </div>
 								<div class='formularzkom2'>
+									<br />
 									".$this->create_uczniowie_select_field($idw,'uczniowie_select','selected_uczniowie')."
 								</div>
 							</div>
@@ -872,12 +880,19 @@ if(!class_exists('wyciagi'))
 				}
 			}
 			//--------------------
-			$rettext = "<select multiple='multiple' id='$selected_uczniowie_select_id' name='selected_uczniowie[]'>";
-			$rettext .= "</select>";
-			$rettext .= "<a href='#' onclick='remov_uczen_from_select();'> -&gt;</a>";
-			$rettext .= "<a href='#' onclick='add_uczen_to_select();'> &lt;</a>";
-			$rettext .= "<select multiple='multiple' id='$uczniowie_select_id'>";
-			$rettext .= "</select>";
+			$rettext = "<div style='float:left;'>
+								<label for='selected_uczniowie' style='display:block;'>Wybrani uczniowie:</label>
+								<select multiple='multiple' id='$selected_uczniowie_select_id' name='selected_uczniowie[]' style='display:block;width:200px;height:250px;'></select>
+							</div>";
+		
+			$rettext .= "<div style='float:left;width:50px;text-align:center;height:250px;position: relative;'>
+								<div style='display:block;position: absolute;top:25px;text-align:center;width:100%;'><a href='#' onclick='remov_uczen_from_select();' style='font-size:30px;font-weight:bold;text-decoration:none;color:black;'> -&gt;</a></div>
+								<div style='display:block;position: absolute;bottom:0px;text-align:center;width:100%;'><a href='#' onclick='add_uczen_to_select();' style='font-size:30px;font-weight:bold;text-decoration:none;color:black;'> &lt;-</a></div>
+							</div>";
+			$rettext .= "<div style='float:left;'>
+								<label for='selected_uczniowie' style='display:block;'>uczniowie:</label>
+								<select multiple='multiple' id='$uczniowie_select_id' style='display:block;width:200px;height:250px;'></select>
+								</div>";
 			//--------------------
 			$this->javascript_select_uczniowie="<script>
 																var selected_option = new Array();
@@ -1153,10 +1168,10 @@ if(!class_exists('wyciagi'))
 			$wynik = $this->page_obj->database_obj->get_data("select dataoperacji from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
 			if($wynik)
 			{
-				list($rettext)=$wynik->fetch_row();
+				list($rettext) = $wynik->fetch_row();
 			}
 			//--------------------
-			return $rettext;
+			return substr($rettext,0,10);
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

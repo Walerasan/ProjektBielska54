@@ -41,7 +41,7 @@ LabNode.opiekunowie.prototype.create_block=function(ido)
 	var  additional_fields_input_imie_opiekun = document.createElement("input");
 	additional_fields_input_imie_opiekun.type = "text";
 	additional_fields_input_imie_opiekun.name = "imie_opiekun["+this.blocks_count.toString()+"]";
-	this.create_wiersz2("additional_fields"+this.blocks_count.toString(),"imię:",additional_fields_input_imie_opiekun,null);
+	this.create_wiersz2("additional_fields"+this.blocks_count.toString(),"Imię:",additional_fields_input_imie_opiekun,null);
 
 	//dodaje nowe pola nazwisko
 	var  additional_fields_input_imie_opiekun = document.createElement("input");

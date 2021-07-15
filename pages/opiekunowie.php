@@ -357,12 +357,12 @@ if(!class_exists('opiekunowie'))
 		public function pola_formularza($imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo)
 		{
 			$rettext="
-						<div class='wiersz'><div class='formularzkom1'>imie: </div><div class='formularzkom2'><input type='text' name='imie_opiekun' value='$imie_opiekun' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_opiekun' value='$nazwisko_opiekun' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>telefon: </div><div class='formularzkom2'><input type='text' name='telefon_opiekun' value='$telefon_opiekun' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>hasło: </div><div class='formularzkom2'><input type='password' name='haslo' value='$haslo' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>potwierdzenie hasła: </div><div class='formularzkom2'><input type='password' name='haslo_confirm' value='$haslo' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>Imię: </div><div class='formularzkom2'><input type='text' name='imie_opiekun' value='$imie_opiekun' style='width:250px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_opiekun' value='$nazwisko_opiekun' style='width:450px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>telefon: </div><div class='formularzkom2'><input type='text' name='telefon_opiekun' value='$telefon_opiekun' style='width:250px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>e-mail: </div><div class='formularzkom2'><input type='text' name='email_opiekun' value='$email_opiekun' style='width:450px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>hasło: </div><div class='formularzkom2'><input type='password' name='haslo' value='$haslo' style='width:250px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>potwierdzenie hasła: </div><div class='formularzkom2'><input type='password' name='haslo_confirm' value='$haslo' style='width:250px;'/></div></div>
 					";
 			//--------------------
 			return $rettext;

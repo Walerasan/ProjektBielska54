@@ -309,11 +309,11 @@ if(!class_exists('uczniowie'))
 			$rettext .= "
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
-						<div class='wiersz'><div class='formularzkom1'>imie_uczniowie: </div><div class='formularzkom2'><input type='text' name='imie_uczniowie' value='$imie_uczniowie' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>nazwisko_uczniowie: </div><div class='formularzkom2'><input type='text' name='nazwisko_uczniowie' value='$nazwisko_uczniowie' style='width:800px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>Oddział: </div><div class='formularzkom2'>{$this->create_select_field_from_oddzial($idod,'idkl',$idkl)}</div></div>
-						<div class='wiersz'><div class='formularzkom1'>Klasa: </div><div class='formularzkom2'>{$this->create_select_field_from_klasa($idkl)}</div></div>
-						<div class='wiersz'><div class='formularzkom1'>numer_indeksu: </div><div class='formularzkom2'><input type='text' name='numer_indeksu' value='$numer_indeksu' style='width:800px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>Imię: </div><div class='formularzkom2'><input type='text' name='imie_uczniowie' value='$imie_uczniowie' style='width:450px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>nazwisko: </div><div class='formularzkom2'><input type='text' name='nazwisko_uczniowie' value='$nazwisko_uczniowie' style='width:450px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>oddział: </div><div class='formularzkom2'>{$this->create_select_field_from_oddzial($idod,'idkl',$idkl)}</div></div>
+						<div class='wiersz'><div class='formularzkom1'>klasa: </div><div class='formularzkom2'>{$this->create_select_field_from_klasa($idkl)}</div></div>
+						<div class='wiersz'><div class='formularzkom1'>numer indeksu: </div><div class='formularzkom2'><input type='text' name='numer_indeksu' value='$numer_indeksu' style='width:150px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>&#160;</div><div class='formularzkom2'>&#160;</div></div>
 						
 						<div class='wiersz' id='opiekunowie_blocks'><div class='formularzkom1'>Opiekun:</div><div class='formularzkom2'>{$this->create_block_opiekunowie($ido_array)}</div></div>
@@ -328,6 +328,7 @@ if(!class_exists('uczniowie'))
 					</div>
 					<input type='hidden' name='idu' value='$idu' />
 				</form>";
+			$rettext .= $this->update_select_field_from_oddzialy_js_script;
 			//--------------------
 			return $rettext;
 		}

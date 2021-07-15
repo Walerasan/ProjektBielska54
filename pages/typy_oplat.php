@@ -140,7 +140,7 @@ if(!class_exists('typy_oplat'))
 			$rettext .= "
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz'>
 					<div style='overflow:hidden;'>
-						<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>								    
+						<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:450px;'/></div></div>
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 							<div class='formularzkom2'>
