@@ -71,6 +71,7 @@ if(!class_exists('uczniowie_opiekunowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region mark_usuniety
 		public function mark_usuniety($idu,$confirm)
 		{
 			$rettext = false;
@@ -85,6 +86,7 @@ if(!class_exists('uczniowie_opiekunowie'))
 			//--------------------
 			return $rettext;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region get_usuniety
 		public function get_usuniety($iduo)

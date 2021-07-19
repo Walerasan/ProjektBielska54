@@ -1,7 +1,9 @@
 <?php
 	$response = file_get_contents('http://localhost/005_ProjektBielska54/ksiegowosc.nzpe.pl/wyciagi,raw,refresh');
-	
+	$response2 = file_get_contents('http://localhost/005_ProjektBielska54/ksiegowosc.nzpe.pl/powiadomienia,raw,refresh');
+
 	$jestkatalognalogi = true;
+
 	if(!file_exists(RootPath()."/logs"))
 	{
 		if(!mkdir(RootPath()."/logs"))
@@ -22,6 +24,8 @@
 		fwrite($plik, "// ".date("Y-m-d H:i:s")."\n");
 		fwrite($plik, "//--------------------------------------------------------------------------------\n");
 		fwrite($plik, $response."\n");
+		fwrite($plik, "//################################################################################\n");
+		fwrite($plik, $response2."\n");
 		fwrite($plik, "//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n");
 		fclose($plik);
 	}

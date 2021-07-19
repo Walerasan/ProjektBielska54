@@ -11,6 +11,7 @@ include_once("./classes/graphic.php");
 include_once("./classes/imagemagic.php");
 include_once("./classes/admin.php");
 include_once("./classes/subpages.php");
+include_once("./classes/sendmail.php");
 //----------------------------------------------------------------------------------------------------
 if(!class_exists('page'))
 {
@@ -28,6 +29,7 @@ if(!class_exists('page'))
 		var $imagemagic_obj;
 		var $admin;
 		var $subpage;
+		var $sendmail_obj;
 		
 		var $page;
 		var $template;
@@ -58,7 +60,7 @@ if(!class_exists('page'))
 			
 			//--------------------
 			// connect to database
-			//--------------------				
+			//--------------------
 			$this->database_obj=new database($this->database_cfg_obj,$this->server_cfg_obj->log_type,true,true,true);
 			$this->database_obj->connect();
 			//~~~~~~~~~~~~~~~~~~~~
@@ -81,45 +83,51 @@ if(!class_exists('page'))
 			//--------------------
 			// create language object
 			//--------------------
-			$this->language_obj=new language();
+			$this->language_obj = new language();
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
-			// create keyword obiect
+			// create keyword object
 			//--------------------
-			$this->keywords_obj=new keywords();
+			$this->keywords_obj = new keywords();
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
-			// create users obiect
+			// create users object
 			//--------------------
-			$this->users=new users($this);
+			$this->users = new users($this);
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
-			// create admin obiect
+			// create admin object
 			//--------------------
-			$this->admin=new admin($this);
+			$this->admin = new admin($this);
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
-			// create graphic obiect
+			// create graphic object
 			//--------------------
-			$this->graphic_obj=new graphic();
+			$this->graphic_obj = new graphic();
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------
-			// create imagemagic obiect
+			// create imagemagic object
 			//--------------------
-			$this->imagemagic_obj=new imagemagic();
+			$this->imagemagic_obj = new imagemagic();
 			//~~~~~~~~~~~~~~~~~~~~
 
 			//--------------------
-			// create subpages obiect
+			// create subpages object
 			//--------------------
-			$this->subpages=new subpages();
+			$this->subpages = new subpages();
 			//~~~~~~~~~~~~~~~~~~~~
-			
+
+			//--------------------
+			// create sendmail object
+			//--------------------
+			$this->sendmail_obj = new sendmail();
+			//~~~~~~~~~~~~~~~~~~~~
+
 			//--------------------
 			// create pages object
 			//--------------------

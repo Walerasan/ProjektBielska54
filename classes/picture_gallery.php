@@ -51,7 +51,7 @@ if(!class_exists('picture_gallery'))
 		        switch($page_obj->target)
 		        {
 				    case "zapisz":
-				        $rettext.=$page_obj->$template_class_name->get_content($page_obj,$this->zapisz($page_obj,$_FILES['zdjecie'],$_POST['idg'],$_POST['jsobiect'],$_POST['nalozlogo']));
+				        $rettext.=$page_obj->$template_class_name->get_content($page_obj,$this->zapisz($page_obj,$_FILES['zdjecie'],$_POST['idg'],$_POST['jsobject'],$_POST['nalozlogo']));
                         break;
 					case "dodaj":
 					    $rettext.=$page_obj->$template_class_name->get_content($page_obj,$this->formularzgalerii($_GET['par1'],$_GET['par1']));
@@ -70,9 +70,9 @@ if(!class_exists('picture_gallery'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function listagaleriadmin($page_obj,$jsobiect)
+		private function listagaleriadmin($page_obj,$jsobject)
 		{
-			$rettext .= "<button title='dodaj nową' type='button' onclick='$jsobiect.pobierzgalerie(\"dodaj\")'>dodaj nową</button><br />";
+			$rettext .= "<button title='dodaj nową' type='button' onclick='$jsobject.pobierzgalerie(\"dodaj\")'>dodaj nową</button><br />";
 			$wynik=$page_obj->database_obj->get_data("select idg,tytul from ".get_class($this)." where usuniety='nie'");
 			if($wynik)
 			{
@@ -97,27 +97,27 @@ if(!class_exists('picture_gallery'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function formularzgalerii($jsobiect,$idg)
+		private function formularzgalerii($jsobject,$idg)
 		{
 			$rettext .= "
 			<div style='background:white;overflow:hidden;width:300px;margin:auto;margin-top:50px;color:black;'>
-				<form method='post' onsubmit='$jsobiect.pobierzgalerie(\"zapisz\",$jsobiect.formtorawpost(this));return false;' name='formularzname' enctype='multipart/form-data'>
+				<form method='post' onsubmit='$jsobject.pobierzgalerie(\"zapisz\",$jsobject.formtorawpost(this));return false;' name='formularzname' enctype='multipart/form-data'>
 					<input type='hidden' name='MAX_FILE_SIZE' value='5242880' />
 					<b style='color:red;'>Sumarycznie wielkość plików maksymalnie do ".ini_get('post_max_size')."B ! </b><br />
 					<div id='blokzdjec'>
 						Zdjęcie: <input type='file' name='zdjecie[]' multiple='multiple'/><br />
 					</div>
-					<button title='dodaj kolejne' type='button' onclick='$jsobiect.dodajpolefile($id)'>dodaj kolejne</button><br />
+					<button title='dodaj kolejne' type='button' onclick='$jsobject.dodajpolefile($id)'>dodaj kolejne</button><br />
 					Nałóż logo: <input type='checkbox' name='nalozlogo' checked='checked' />
 					<input type='submit' name='zapisz' value='zapisz' />
 					<input type='hidden' name='idg' value='$idg'/> 
-					<input type='hidden' name='jsobiect' value='$jsobiect'/> 
+					<input type='hidden' name='jsobject' value='$jsobject'/> 
 				</form>
 			</div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function zapisz($page_obj,$pliki,$idg,$jsobiect,$nalozlogo)
+		private function zapisz($page_obj,$pliki,$idg,$jsobject,$nalozlogo)
 		{
 			$tytul="galeria";
 			if($idg!="" && is_numeric($idg) && $idg>0)
@@ -172,11 +172,11 @@ if(!class_exists('picture_gallery'))
 					    $rettext.=$page_obj->formaterror("Błąd zapisu zdjęcia w bazie.");
 				}
 			}
-			$rettext.=$this->listagaleriadmin($page_obj,$jsobiect);
+			$rettext.=$this->listagaleriadmin($page_obj,$jsobject);
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function wstawgalerie($page_obj,$jsobiect,$idg)
+		private function wstawgalerie($page_obj,$jsobject,$idg)
 		{
 		    $wynik2=$page_obj->database_obj->get_data("select z.idgz,z.plik from ".get_class($this)."_z z, ".get_class($this)."_lgz lgz where z.usuniety='nie' and lgz.usuniety='nie' and z.idgz=lgz.idgz and lgz.idg=$idg");
 			if($wynik2)

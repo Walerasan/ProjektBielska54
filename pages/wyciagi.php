@@ -33,7 +33,7 @@ if(!class_exists('wyciagi'))
 			$content_text="<p class='title'>WYCIĄGI</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
+			if( ($this->page_obj->template == "admin") || ($this->page_obj->template == "index") )
 			{
 				switch($this->page_obj->target)
 				{
@@ -97,7 +97,7 @@ if(!class_exists('wyciagi'))
 						break;
 				}
 			}
-			else if ($this->page_obj->template=="raw")
+			else if ($this->page_obj->template == "raw")
 			{
 				switch($this->page_obj->target)
 				{
@@ -771,6 +771,7 @@ if(!class_exists('wyciagi'))
 		private function refresh()
 		{
 			$this->page_obj->syslog(debug_backtrace(),"Execute - ".date("Y-m-d H:i:s"));
+			$this->processing();
 			return "refresh";
 		}
 		#endregion
