@@ -8,7 +8,7 @@ if(!class_exists('raw_template'))
 		//----------------------------------------------------------------------------------------------------
 	    public function __construct($page_obj)
 		{
-			$this->page_obj=$page_obj;
+			$this->page_obj = $page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()

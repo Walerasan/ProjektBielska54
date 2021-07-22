@@ -455,7 +455,9 @@ if(!class_exists('oplaty'))
 						foreach($selected_uczniowie as $val)
 						{
 							$rettext .= "$val <br />";
-							$rettext.=$this->page_obj->uczniowie_oplaty->synchronize($idop,$val);
+							$rettext .= $this->page_obj->uczniowie_oplaty->synchronize($idop,$val);
+							$rettext .= $this->page_obj->powiadomienia->synchronize($idop,$val);
+
 						}
 					}
 					#endregion

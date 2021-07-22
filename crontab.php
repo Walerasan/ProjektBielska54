@@ -37,7 +37,7 @@
 		$path_count = count($path_tab);
 		$path="";
 		for($i=2;$i<count($path_tab);$i++)
-		$path.="../";
+			$path.="../";
 		if($path=="")$path="./";
 		return $path;
 	}

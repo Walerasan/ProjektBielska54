@@ -103,7 +103,7 @@ if(!class_exists('wyciagi'))
 				{
 					case "refresh":
 					default:
-						$content_text .= $this->refresh();
+						$content_text = $this->refresh();
 						break;
 				}
 			}
@@ -1223,7 +1223,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 			
 			$nazwa="tytul";
-			$pola[$nazwa][0]="varchar(50)";
+			$pola[$nazwa][0]="varchar(250)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default

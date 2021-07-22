@@ -131,6 +131,46 @@ if(!class_exists('powiadomienia'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region synchronize_powiadomienia
+		public function synchronize($idop,$idu)
+		{
+			$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE idu = $idu and idop = $idop and usuniety = 'nie';");
+			if( $wynik )
+			{
+				while( list($iduop) = $wynik->fetch_row() )
+				{
+					foreach($this->page_obj->uczniowie_opiekunowie->get_ido($idu) as $ido)
+					{
+						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status = 'usuniety' where iduop = $iduop and status = 'nowy'");
+
+						//check exists
+						$wynik2 = $this->page_obj->database_obj->get_data("select idpo,status from ".get_class($this)." where iduop = $iduop and ido = {$ido[0]};");
+						if($this->page_obj->database_obj->result_count() == 0)
+						{
+							$zapytanie_sql = "insert into ".get_class($this)." (iduop, status, ido) values ($iduop, 'nowe', {$ido[0]})";
+							if( $this->page_obj->database_obj->execute_query($zapytanie_sql) )
+							{
+							}
+							else
+							{
+							}
+						}
+						else
+						{
+							while( list($idpo,$status) = $wynik2->fetch_row() )
+							{
+								if($status == "usuniety")
+								{
+									$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status = 'nowy' where idpo = $idpo");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region processing
 		private function processing()
 		{
@@ -142,7 +182,7 @@ if(!class_exists('powiadomienia'))
 			// SELECT idop,idu FROM `uczniowie_oplaty` WHERE iduop not in (select iduop from powiadomienia) and usuniety = 'nie';
 			// wstawić je do powiadomien ze statusem nowe
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE iduop not in (select iduop from ".get_class($this).") and usuniety = 'nie';");
+			/*$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE iduop not in (select iduop from ".get_class($this).") and usuniety = 'nie';");
 			if( $wynik )
 			{
 				while( list($iduop) = $wynik->fetch_row() )
@@ -168,7 +208,7 @@ if(!class_exists('powiadomienia'))
 						}
 					}
 				}
-			}
+			}*/
 			//--------------------
 
 			//--------------------
@@ -258,7 +298,7 @@ if(!class_exists('powiadomienia'))
 			$pola[$nazwa][5]=$nazwa;
 			
 			$nazwa="status";
-			$pola[$nazwa][0]="enum('nowe','wyslane','error')";
+			$pola[$nazwa][0]="enum('nowe','wyslane','error','usuniety')";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'nowe'";//default
