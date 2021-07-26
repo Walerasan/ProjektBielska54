@@ -131,23 +131,41 @@ if(!class_exists('powiadomienia'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region synchronize_powiadomienia
-		public function synchronize($idop,$idu)
+		#region mark_delete
+		public function mark_delete($idop)
 		{
-			$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE idu = $idu and idop = $idop and usuniety = 'nie';");
+			//don't delete with status == oplacone
+			#region execute
+			$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE idop = $idop;");
 			if( $wynik )
 			{
 				while( list($iduop) = $wynik->fetch_row() )
 				{
+					$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status='usuniety' where iduop=$iduop and status = 'nowe';");
+				}
+			}
+			#endregion
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region synchronize_powiadomienia
+		public function synchronize($idop,$idu)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("SELECT iduop,usuniety FROM uczniowie_oplaty WHERE idu = $idu and idop = $idop;");
+			if( $wynik )
+			{
+				while( list($iduop,$usuniety) = $wynik->fetch_row() )
+				{
 					foreach($this->page_obj->uczniowie_opiekunowie->get_ido($idu) as $ido)
 					{
-						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status = 'usuniety' where iduop = $iduop and status = 'nowy'");
-
 						//check exists
 						$wynik2 = $this->page_obj->database_obj->get_data("select idpo,status from ".get_class($this)." where iduop = $iduop and ido = {$ido[0]};");
 						if($this->page_obj->database_obj->result_count() == 0)
 						{
 							$zapytanie_sql = "insert into ".get_class($this)." (iduop, status, ido) values ($iduop, 'nowe', {$ido[0]})";
+							$rettext .= "insert into ".get_class($this)." (iduop, status, ido) values ($iduop, 'nowe', {$ido[0]})" . "<br />";
 							if( $this->page_obj->database_obj->execute_query($zapytanie_sql) )
 							{
 							}
@@ -157,17 +175,18 @@ if(!class_exists('powiadomienia'))
 						}
 						else
 						{
-							while( list($idpo,$status) = $wynik2->fetch_row() )
+							list($idpo,$status) = $wynik2->fetch_row();
+							if($status == "usuniety")
 							{
-								if($status == "usuniety")
-								{
-									$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status = 'nowy' where idpo = $idpo");
-								}
+								$this->page_obj->database_obj->execute_query("update ".get_class($this)." set status = 'nowe' where idpo = $idpo");
+								$rettext .= "update ".get_class($this)." set status = 'nowe' where idpo = $idpo" . "<br />";
 							}
 						}
 					}
 				}
 			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -177,38 +196,6 @@ if(!class_exists('powiadomienia'))
 			$rettext = "Auto processing system <br />";
 			//--------------------
 			// znajdz opłaty do wysłania i wyślij e-maile.
-			//--------------------
-			// potrzebuje wszystkie idop i idu których nie ma w powiadomieniach.
-			// SELECT idop,idu FROM `uczniowie_oplaty` WHERE iduop not in (select iduop from powiadomienia) and usuniety = 'nie';
-			// wstawić je do powiadomien ze statusem nowe
-			//--------------------
-			/*$wynik = $this->page_obj->database_obj->get_data("SELECT iduop FROM uczniowie_oplaty WHERE iduop not in (select iduop from ".get_class($this).") and usuniety = 'nie';");
-			if( $wynik )
-			{
-				while( list($iduop) = $wynik->fetch_row() )
-				{
-					//pobrać idu i ido
-					$wynik2 = $this->page_obj->database_obj->get_data("SELECT idu,idop FROM uczniowie_oplaty WHERE iduop = $iduop;");
-					if( $wynik2 )
-					{
-						while( list($idu,$idop) = $wynik2->fetch_row() )
-						{
-							//pobrać listę opiekunów dla idu
-							foreach($this->page_obj->uczniowie_opiekunowie->get_ido($idu) as $ido)
-							{
-								$zapytanie_sql = "insert into ".get_class($this)." (iduop,status,ido) values ($iduop,'nowe',$ido)";
-								if( $this->page_obj->database_obj->execute_query($zapytanie_sql) )
-								{
-								}
-								else
-								{
-									$rettext .= "Error: $zapytanie_sql";
-								}
-							}
-						}
-					}
-				}
-			}*/
 			//--------------------
 
 			//--------------------

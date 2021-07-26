@@ -227,6 +227,7 @@ if(!class_exists('oplaty'))
 		#region delete
 		public function delete($idop,$confirm)
 		{
+			dorobić by usuwał też powiadomienia
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
@@ -254,6 +255,7 @@ if(!class_exists('oplaty'))
 		#region restore
 		public function restore($idop,$confirm)
 		{
+			dorobić by przywracał powiadomienia
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
@@ -450,6 +452,7 @@ if(!class_exists('oplaty'))
 						$idop = $this->page_obj->database_obj->last_id();
 					}
 					$this->page_obj->uczniowie_oplaty->mark_delete($idop);
+					$this->page_obj->powiadomienia->mark_delete($idop);
 					if(isset($selected_uczniowie) && is_array($selected_uczniowie))
 					{
 						foreach($selected_uczniowie as $val)
