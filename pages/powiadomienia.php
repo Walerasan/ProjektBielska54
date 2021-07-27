@@ -237,7 +237,7 @@ if(!class_exists('powiadomienia'))
 			//--------------------
 			// SELECT * FROM `powiadomienia` WHERE status = 'nowe';
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("SELECT idpo,iduop,ido FROM ".get_class($this)." WHERE status = 'nowe' and data < now();");
+			$wynik = $this->page_obj->database_obj->get_data("SELECT idpo,iduop,ido FROM ".get_class($this)." WHERE status = 'nowe' and data < now() limit 30;");
 			if( $wynik )
 			{
 				while( list($idpo,$iduop,$ido) = $wynik->fetch_row() )
