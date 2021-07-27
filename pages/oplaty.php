@@ -227,13 +227,13 @@ if(!class_exists('oplaty'))
 		#region delete
 		public function delete($idop,$confirm)
 		{
-			dorobić by usuwał też powiadomienia
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idop=$idop;"))
 				{
+					$this->page_obj->powiadomienia->mark_oplata_usunieta_from_nowe($idop);
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
@@ -255,13 +255,14 @@ if(!class_exists('oplaty'))
 		#region restore
 		public function restore($idop,$confirm)
 		{
-			dorobić by przywracał powiadomienia
+			//dorobić by przywracał powiadomienia
 			$rettext="";
 			//--------------------
 			if($confirm=="yes")
 			{
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idop=$idop;"))
 				{
+					$this->page_obj->powiadomienia->mark_nowe_from_oplata_usunieta($idop);
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
 					$rettext.=$this->lista();
 				}
