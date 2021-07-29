@@ -3,7 +3,6 @@ if(!class_exists('database'))
 {
     /*
     $_SESSION['database']['operationtime'] - function execution time in ms
-	 	
     CREATE DATABASE labnode CHARACTER SET UTF8;
     CREATE USER user1@localhost IDENTIFIED BY 'password1';
     GRANT ALL PRIVILEGES ON *.* TO 'user1'@localhost IDENTIFIED BY 'password1'; 
@@ -11,8 +10,8 @@ if(!class_exists('database'))
     */
     class database
 	{
-	    var $database_cfg_obj;		
-		var $connection_handel;		
+		var $database_cfg_obj;
+		var $connection_handel;
 		var $connection_error;
 		var $show_query_without_error;
 		var $show_query_with_error;
@@ -25,15 +24,15 @@ if(!class_exists('database'))
 		{
 			$start_time=microtime(true);
 			
-			$this->database_cfg_obj=$database_cfg_obj;			
-			$this->log_type=$logtype;//all, error, good 
+			$this->database_cfg_obj = $database_cfg_obj;
+			$this->log_type = $logtype;//all, error, good 
 		
-			$_SESSION['database']['operationtime']=microtime(true)-$start_time;
+			$_SESSION['database']['operationtime'] = microtime(true) - $start_time;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function get_handle()
 		{
-		    return $this->connection_handel;
+			return $this->connection_handel;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function connect()
@@ -45,15 +44,15 @@ if(!class_exists('database'))
 			$old_reporting=error_reporting(0);
 			$this->connection_handel=mysqli_connect($this->database_cfg_obj->get_server(),$this->database_cfg_obj->get_login(),$this->database_cfg_obj->get_password(),$this->database_cfg_obj->get_database_name());
 			if( ($this->connection_handel==null) || ($this->connection_handel==false) || ($this->connection_handel->connect_errno!=0) )
-			{			    
-			    $ret=-1;
-			    $this->connection_handel=null;
+			{
+				$ret=-1;
+				$this->connection_handel=null;
 			}
 			else
 			{
-			    $this->connection_handel->query("SET NAMES utf8");
-			    $ret=1;
-			    $this->save_log('',$this->checkpoint(debug_backtrace()),true);				
+				$this->connection_handel->query("SET NAMES utf8");
+				$ret=1;
+				$this->save_log('',$this->checkpoint(debug_backtrace()),true);
 			}
 			error_reporting($old_reporting);
 			$this->connection_error=$ret;
@@ -61,23 +60,23 @@ if(!class_exists('database'))
 			switch($ret)
 			{
 				case 1:
-				    $this->connection_state_message="Połączenie ok";
+					$this->connection_state_message="Połączenie ok";
 					break;
 				case -2:
-				    $this->connection_state_message="Błąd wyboru bazy danych";
+					$this->connection_state_message="Błąd wyboru bazy danych";
 					break;
 				case -1:
-				    $this->connection_state_message="Błąd połączenia do serwera";
+					$this->connection_state_message="Błąd połączenia do serwera";
 					break;
 			}
 		}
 		//--------------------------------------------------------
 		public function disconnect()
 		{
-		    if($this->connection_handel)
+			if($this->connection_handel)
 			{
-			    $this->connection_handel->close();
-			    $this->connection_handel=null;
+				$this->connection_handel->close();
+				$this->connection_handel=null;
 			}
 		}
 		//----------------------------------------------------------------------------------------------------
@@ -85,22 +84,22 @@ if(!class_exists('database'))
 		{
 			$rettext="";
 			if( (!$this->connection_handel) && ($this->show_query_with_error) )
-			    $rettext .= "<div style='clear:both;'>Brak połączenia z bazą: ".$this->connection_state_message."</div>";
-				$rettext .= "<div style='clear:both;'>".$this->report_message."</div>";
+				$rettext .= "<div style='clear:both;'>Brak połączenia z bazą: ".$this->connection_state_message."</div>";
+			$rettext .= "<div style='clear:both;'>".$this->report_message."</div>";
 			return $rettext;
 		}
 		//--------------------------------------------------------
 		public function get_data($zapytanie,$sql=1,$err=1) 
 		{
-		    $this->generate_event_number();
+			$this->generate_event_number();
 			$przed=microtime(true);
 			if($this->connection_handel)
 			{
-			    $rettext=$this->connection_handel->query($zapytanie);
-			    if($this->connection_handel->affected_rows>0)
+				$rettext=$this->connection_handel->query($zapytanie);
+				if($this->connection_handel->affected_rows>0)
 				{
-				    if($this->show_query_without_error)
-					    $this->message($zapytanie,$sql,$err);
+					if($this->show_query_without_error)
+						$this->message($zapytanie,$sql,$err);
 					$_SESSION['baza']['operationtime']=microtime(true)-$przed;
 					$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
 					return $rettext;
@@ -114,46 +113,47 @@ if(!class_exists('database'))
 		//----------------------------------------------------------------------------------------------------
 		public function execute_query($zapytanie,$sql=1,$err=1) 
 		{
-		    $this->generate_event_number();
+			$this->generate_event_number();
 			$rettext=false;
 			//tak mozna to zapisac do wywolania
 			//echo("Dodaje baner: ".$baza->operacja("insert into banery(link)values('costam');"));
 			$przed=microtime(true);
 			if($this->connection_handel)
 			{
-			    if($this->connection_handel->query($zapytanie))
+				if($this->connection_handel->query($zapytanie))
 				{
-				    if($this->connection_handel->affected_rows>0)
+					if( $this->connection_handel->affected_rows > 0 )
 					{
-					    if($this->show_query_without_error)
-						    $this->message($zapytanie,$sql,$err);
-						$_SESSION['baza']['operationtime']=microtime(true)-$przed;
+						if($this->show_query_without_error)
+							$this->message($zapytanie,$sql,$err);
+						$_SESSION['baza']['operationtime'] = microtime(true)-$przed;
 						$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
-						$rettext=true;
+						$rettext = true;
 					}
-					elseif($this->error()=="")//jezeli nie ma bledu to tez zwracam true
+					elseif( ($this->error() == "") || ($this->error() == "0") )//jezeli nie ma bledu to tez zwracam true
 					{
-					    if($this->show_query_without_error)
-						    $this->message($zapytanie,$sql,$err);
-						$_SESSION['baza']['operationtime']=microtime(true)-$przed;
+						if($this->show_query_without_error)
+							$this->message($zapytanie,$sql,$err);
+						$_SESSION['baza']['operationtime'] = microtime(true)-$przed;
 						$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
-						$rettext=true;
+						$rettext = true;
 					}
 					else
 					{
-					    if($this->show_query_without_error)
-						    $this->message($zapytanie,$sql,$err);
-						$_SESSION['baza']['operationtime']=microtime(true)-$przed;
+						if($this->show_query_with_error)
+							$this->message($zapytanie,$sql,$err);
+						$_SESSION['baza']['operationtime'] = microtime(true)-$przed;
 						$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
-						$rettext=false;
+						$rettext = false;
 					}
 				}
 				else
 				{
-				    $this->message($zapytanie,$sql,$err);
-					$_SESSION['baza']['operationtime']=microtime(true)-$przed;
+					if($this->show_query_with_error)
+						$this->message($zapytanie,$sql,$err);
+					$_SESSION['baza']['operationtime'] = microtime(true)-$przed;
 					$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
-					$rettext=false;
+					$rettext = false;
 				}
 			}
 			return $rettext;
@@ -166,7 +166,7 @@ if(!class_exists('database'))
 			$przed=microtime(true);
 			$wynik=$this->get_data($zapytanie);
 			if($wynik)
-			    list($id)=$wynik->fetch_row();
+				list($id)=$wynik->fetch_row();
 			$_SESSION['baza']['operationtime']=microtime(true)-$przed;
 			$this->save_log($zapytanie,$this->checkpoint(debug_backtrace()));
 			return $id;
@@ -174,10 +174,10 @@ if(!class_exists('database'))
 		//----------------------------------------------------------------------------------------------------
 		public function install($nazwatablicy,$pola,$sql=1,$err=1,$primarykey="")
 		{
-		    if($this->connection_handel)
+			if($this->connection_handel)
 			{
-			    $this->connection_handel->query("describe $nazwatablicy");
-			    if($this->connection_handel->affected_rows<=0)
+				$this->connection_handel->query("describe $nazwatablicy");
+				if($this->connection_handel->affected_rows<=0)
 				{
 					//jezeli nie ma to po prostu zalozyc
 					$regulkatworzaca="create table $nazwatablicy (";
@@ -192,19 +192,19 @@ if(!class_exists('database'))
 					
 					if($this->connection_handel->query("$regulkatworzaca"))
 					{
-					    $this->message($regulkatworzaca,$sql,$err);
+						$this->message($regulkatworzaca,$sql,$err);
 						//echo("Tablica zalożona");
 					}
 					else
-					    $this->message($regulkatworzaca,$sql,$err);
+						$this->message($regulkatworzaca,$sql,$err);
 				}
 				else
 				{
-				    $wynik=$this->connection_handel->query("describe $nazwatablicy;");
-				    if($this->connection_handel->affected_rows>0)
+					$wynik=$this->connection_handel->query("describe $nazwatablicy;");
+					if($this->connection_handel->affected_rows>0)
 					{
 						//pobieram pola z tablicy
-					    while(list($pole,$typ,$puste,$key,$default,$extra)=$wynik->fetch_row())
+						while(list($pole,$typ,$puste,$key,$default,$extra)=$wynik->fetch_row())
 						{
 							if($puste=='NO')$puste='not null';else $puste='';
 							if($key=='PRI')$key='primary key';else $key='';
@@ -231,7 +231,7 @@ if(!class_exists('database'))
 								$regulkatworzaca=$pola[$i][5]." ".$pola[$i][0]." ".$pola[$i][1]." ".$pola[$i][2]." ".$pola[$i][3]." ".$pola[$i][4];
 								if($this->connection_handel->query("alter table $nazwatablicy add $regulkatworzaca;"))
 								{
-								    $this->message("alter table $nazwatablicy add $regulkatworzaca;",$sql,$err);
+									$this->message("alter table $nazwatablicy add $regulkatworzaca;",$sql,$err);
 									//echo("nowa kolumna została dodana<br />");
 								}
 								else
@@ -253,7 +253,7 @@ if(!class_exists('database'))
 										//echo("Kolumna zostala poprawiona");
 									}
 									else
-									    $this->message("alter table $nazwatablicy change ".$tablefields[$i][5]." $regulkatworzaca;",$sql,$err);
+										$this->message("alter table $nazwatablicy change ".$tablefields[$i][5]." $regulkatworzaca;",$sql,$err);
 								}
 							}
 						}
@@ -265,9 +265,9 @@ if(!class_exists('database'))
 								//usuwam pole
 								$regulkatworzaca="alter table $nazwatablicy drop $key;";
 								if($this->connection_handel->query($regulkatworzaca))
-								    $this->message("Kolumna została usunięta $key $nazwatablicy<br />",$sql,$err);
+									$this->message("Kolumna została usunięta $key $nazwatablicy<br />",$sql,$err);
 								else
-								    $this->message($regulkatworzaca,$sql,$err);
+									$this->message($regulkatworzaca,$sql,$err);
 							}
 						}
 					}
@@ -279,12 +279,12 @@ if(!class_exists('database'))
 		//----------------------------------------------------------------------------------------------------
 		public function error() 
 		{
-		    return $this->connection_handel->errno;
+			return $this->connection_handel->errno;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function result_count() 
 		{
-		    return $this->connection_handel->affected_rows;
+			return $this->connection_handel->affected_rows;
 		}
 		//--------------------------------------------------------
 		private function message($zapytanie,$sql,$err)
@@ -297,8 +297,8 @@ if(!class_exists('database'))
 			//--------------------
 			$error=$this->connection_handel->error;
 			if($error=="")
-			    if($this->result_count()>0)
-			        $error=$this->result_count()." wierszy";
+				if($this->result_count()>0)
+					$error=$this->result_count()." wierszy";
 				else
 					$error="0 wierszy";
 			$error=$this->zabezpieczznaki($error);
@@ -306,15 +306,13 @@ if(!class_exists('database'))
 			//zmienna sql i err nadpisuja standardowe ustawienia
 			if(($this->show_query_without_error && $sql) || ($this->show_query_with_error && $err))
 			{
-			    $this->report_message.=("<p style='padding-left:5px;color:black;font-size:8pt;border:1px dashed #aaaaaa;text-align:left;background:white;'>");
-			    $this->report_message.="<b><u>$this->event_number</u></b><br />";
+				$this->report_message.=("<p style='padding-left:5px;color:black;font-size:8pt;border:1px dashed #aaaaaa;text-align:left;background:white;'>");
+				$this->report_message.="<b><u>$this->event_number</u></b><br />";
 				if($this->show_query_without_error && $sql)
-				    $this->report_message.=("» $zapytanie «<br />");
-						
-						if($this->show_query_with_error && $err)
-						    $this->report_message.=("» $error «<br />");
-					
-						    $this->report_message.=("</p>");
+					$this->report_message.=("» $zapytanie «<br />");
+				if($this->show_query_with_error && $err)
+					$this->report_message.=("» $error «<br />");
+				$this->report_message.=("</p>");
 				//echo("<b style='color:red;'>»$nrbledu</b> ");
 			}
 		}
@@ -372,17 +370,17 @@ if(!class_exists('database'))
 			//--------------------
 			if($this->connection_handel)
 			{
-			    $error=mysqli_error($this->connection_handel);
+				$error=mysqli_error($this->connection_handel);
 				if($error=="")
-				    if($this->result_count()>0)
-				        $error=$this->result_count()." wierszy";
+					if($this->result_count()>0)
+						$error=$this->result_count()." wierszy";
 					else
 						$error="0 wierszy";
 			}
 			//--------------------
 			if($jestkatalognalogi)
 			{
-			    $this->clear_logs($this->RootPath()."/logs");
+				$this->clear_logs($this->RootPath()."/logs");
 				//-------------------- loguje długe czasowo zapytania
 				if($_SESSION['database']['operationtime']>1)//1s
 				{
@@ -393,9 +391,9 @@ if(!class_exists('database'))
 				//--------------------
 				if($this->log_type=="all")
 				{
-				    if($this->connection_handel)
+					if($this->connection_handel)
 					{
-					    if(mysqli_error($this->connection_handel)=="")
+						if(mysqli_error($this->connection_handel)=="")
 						{
 							$plik=fopen($sciezkadoplikuzlogamigood,"a+");
 							if($znacznik)
@@ -417,7 +415,7 @@ if(!class_exists('database'))
 				}
 				elseif($this->log_type=="error")
 				{
-				    if(mysqli_error($this->connection_handel)!="")
+					if(mysqli_error($this->connection_handel)!="")
 					{
 						$plik=fopen($sciezkadoplikuzlogamierror,"a+");
 						if($znacznik)
@@ -429,7 +427,7 @@ if(!class_exists('database'))
 				}
 				elseif($this->log_type=="good")
 				{
-				    if(mysqli_error($this->connection_handel)=="")
+					if(mysqli_error($this->connection_handel)=="")
 					{
 						$plik=fopen($sciezkadoplikuzlogamigood,"a+");
 						if($znacznik)
@@ -450,7 +448,7 @@ if(!class_exists('database'))
 				if($entry!="." && $entry!="..")
 				{
 					if((filemtime($katalog."/".$entry)+15552000)<time())//usuwam logi starsze niż 6mc (60*60*24*30*6)(zakladam ze mc ma 30 dni nie bawie sie w 31 czy 28)
-	   				unlink($katalog."/".$entry);
+					unlink($katalog."/".$entry);
 				}
 			}
 		}
@@ -468,7 +466,7 @@ if(!class_exists('database'))
 			//użycie
 			//$this->strona->baza->backup("./logs/kopiabazy.php.".date("Y_m_d_H_i"));
 			//pobieram nazwy tablic
-		    $tablice=$this->get_data("show tables;");
+			$tablice=$this->get_data("show tables;");
 			if($tablice)
 			{
 				$plik=fopen($pathtofile,"w");
@@ -493,7 +491,7 @@ if(!class_exists('database'))
 						$wynik=$this->get_data("select $sklad from $tablica;");
 						if($wynik)
 						{
-						    while($liniawyniku=$wynik->fetch_row())
+							while($liniawyniku=$wynik->fetch_row())
 							{
 								$wartosci="";
 								foreach($liniawyniku as $key=>$wartosc)
@@ -539,8 +537,8 @@ if(!class_exists('database'))
 			return true;
 		}
 		//----------------------------------------------------------------------------------------------------
-    }//end class
+	}//end class
 }//end if
 else
-    die("Class exists: ".__FILE__);
+	die("Class exists: ".__FILE__);
 ?>

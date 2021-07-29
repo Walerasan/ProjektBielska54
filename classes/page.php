@@ -40,9 +40,9 @@ if(!class_exists('page'))
 		public function __construct()
 		{
 			//--------------------
-			$this->server_cfg_obj=new server_cfg;
-			$this->database_cfg_obj=new database_cfg;
-			$this->text_obj=new text;				
+			$this->server_cfg_obj = new server_cfg;
+			$this->database_cfg_obj = new database_cfg;
+			$this->text_obj = new text;
 			
 			//--------------------
 			// get control variables
@@ -61,7 +61,7 @@ if(!class_exists('page'))
 			//--------------------
 			// connect to database
 			//--------------------
-			$this->database_obj=new database($this->database_cfg_obj,$this->server_cfg_obj->log_type,true,true,true);
+			$this->database_obj = new database($this->database_cfg_obj, $this->server_cfg_obj->log_type);
 			$this->database_obj->connect();
 			//~~~~~~~~~~~~~~~~~~~~
 			
