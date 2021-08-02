@@ -201,33 +201,43 @@ if(!class_exists('opiekunowie'))
 				$haslo = "";
 			}
 			//--------------------
-			if( ($ido != "") && is_numeric($ido) && ($ido > 0) )
+			// w tablicy opiekunów email nie może wystąpić dwa razy
+			$wynik = $this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where email_opiekun = '$email_opiekun';");
+			if( $this->page_obj->database_obj->result_count() == 0 )
 			{
-				$zapytanie="update ".get_class($this)." set imie_opiekun='$imie_opiekun',nazwisko_opiekun='$nazwisko_opiekun',telefon_opiekun='$telefon_opiekun',email_opiekun='$email_opiekun'".(($haslo != "")?",haslo=PASSWORD('$haslo')":"")." where ido=$ido;";//poprawa wpisu
-			}
-			else
-			{
-				$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
-			}
-			//--------------------
-			if(!$_SESSION['antyrefresh'])
-			{
-				if($this->page_obj->database_obj->execute_query($zapytanie))
+				if( ($ido != "") && is_numeric($ido) && ($ido > 0) )
 				{
-					$_SESSION['antyrefresh']=true;
-					$rettext .= "Zapisane<br />";
-					$rettext.=$password_message;
-					$rettext.=$this->lista();
+					$zapytanie="update ".get_class($this)." set imie_opiekun='$imie_opiekun',nazwisko_opiekun='$nazwisko_opiekun',telefon_opiekun='$telefon_opiekun',email_opiekun='$email_opiekun'".(($haslo != "")?",haslo=PASSWORD('$haslo')":"")." where ido=$ido;";//poprawa wpisu
 				}
 				else
 				{
-					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
-					$rettext.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo);
+					$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
+				}
+				//--------------------
+				if(!$_SESSION['antyrefresh'])
+				{
+					if($this->page_obj->database_obj->execute_query($zapytanie))
+					{
+						$_SESSION['antyrefresh']=true;
+						$rettext .= "Zapisane<br />";
+						$rettext.=$password_message;
+						$rettext.=$this->lista();
+					}
+					else
+					{
+						$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
+						$rettext.=$this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo);
+					}
+				}
+				else
+				{
+					$rettext.=$this->lista();
 				}
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				$rettext .= "Wybrany adres e-mail jest już używany.<br /><br />";
+				$rettext .= $this->form($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo);
 			}
 			return $rettext;
 		}
@@ -389,10 +399,14 @@ if(!class_exists('opiekunowie'))
 				$haslo = "";
 			}
 			//--------------------
-			$zapytanie="insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
-			if($this->page_obj->database_obj->execute_query($zapytanie))
+			$wynik = $this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where email_opiekun = '$email_opiekun';");
+			if( $this->page_obj->database_obj->result_count() == 0 )
 			{
-				return $this->page_obj->database_obj->last_id();
+				$zapytanie = "insert into ".get_class($this)."(imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,haslo)values('$imie_opiekun','$nazwisko_opiekun','$telefon_opiekun','$email_opiekun',PASSWORD('$haslo'))";//nowy wpis
+				if($this->page_obj->database_obj->execute_query($zapytanie))
+				{
+					return $this->page_obj->database_obj->last_id();
+				}
 			}
 			return 0;
 		}

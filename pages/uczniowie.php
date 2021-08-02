@@ -347,7 +347,14 @@ if(!class_exists('uczniowie'))
 					if($ido[$key] == -1)
 					{
 						$ido[$key] = $this->page_obj->opiekunowie->insert($imie_opiekun[$key],$nazwisko_opiekun[$key],$telefon_opiekun[$key],$email_opiekun[$key],$haslo[$key],$haslo_confirm[$key]);
-						$rettext .= "Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
+						if($ido[$key] > 0)
+						{
+							$rettext .= "Dodano nowego opiekuna {$ido[$key]} {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]},<br />";
+						}
+						else
+						{
+							$rettext .= "Pominięto opiekuna {$imie_opiekun[$key]} {$nazwisko_opiekun[$key]} - e-mail jest już używany,<br />";
+						}
 					}
 				}
 			}
@@ -390,7 +397,7 @@ if(!class_exists('uczniowie'))
 						}
 					}
 					$rettext .= "Zapisane $idu<br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
@@ -400,7 +407,7 @@ if(!class_exists('uczniowie'))
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				$rettext .= $this->lista(0);
 			}
 			return $rettext;
 		}
@@ -416,12 +423,12 @@ if(!class_exists('uczniowie'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idu=$idu;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 			}
 			else
@@ -443,12 +450,12 @@ if(!class_exists('uczniowie'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idu=$idu;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 			}
 			else
