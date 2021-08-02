@@ -51,26 +51,27 @@ if(!class_exists('index_template'))
 		{
 			$rettext="<link rel='Stylesheet' type='text/css' href='./css/index_login.css' />";
 			$rettext .= "<div style='width:100%;'>";
-			$rettext .= "<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Uczniowie","uczniowie,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Opłaty","oplaty,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Wyciągi","wyciagi,index,lista");
-			$rettext .= "<div class='button_spacing_x4'></div>";
-			$rettext .= $this->button("Klasa","klasa,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Typy opłat","typy_oplat,index,lista");
-			$rettext .= "<div class='button_spacing'></div>";
-			$rettext .= $this->button("Opiekunowie","opiekunowie,index,lista");
-			$rettext .= "<div class='button_spacing_x4'></div>";
-			$rettext .= $this->button("Wyloguj","staticpages,index,logout");
+			$rettext .= 	"<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
+			$rettext .= 		"<div class='button_spacing'></div>";
+			$rettext .= 		$this->button("Uczniowie","uczniowie,index,lista");
+			$rettext .= 		"<div class='button_spacing'></div>";
+			$rettext .= 		$this->button("Opłaty","oplaty,index,lista");
+			$rettext .= 		"<div class='button_spacing'></div>";
+			$rettext .= 		$this->button("Wyciągi","wyciagi,index,lista");
+			$rettext .= 		"<div class='button_spacing_x4'></div>";
+			$rettext .= 		$this->button("Klasa","klasa,index,lista");
+			$rettext .= 		"<div class='button_spacing'></div>";
+			$rettext .= 		$this->button("Typy opłat","typy_oplat,index,lista");
+			$rettext .= 		"<div class='button_spacing'></div>";
+			$rettext .= 		$this->button("Opiekunowie","opiekunowie,index,lista");
+			$rettext .= 		"<div class='button_spacing_x4'></div>";
+			$rettext .= 		$this->button("Wyloguj","staticpages,index,logout");
+			$rettext .= 	"</div>";
+			$rettext .= 	"<div style='overflow:hidden;padding:20px;'>";
+			$rettext .= 		$trescstrony;
+			$rettext .= 	"</div>";
 			$rettext .= "</div>";
-			$rettext .= "<div style='overflow:hidden;padding:20px;'>";
-			$rettext.=$trescstrony;
-			$rettext .= "</div>";
-			$rettext .= "</div>";
+			$rettext .= "<div style='width:100%;height:30px;clear:both;text-align:right;position:absolute;bottom:10px;'><p style='padding:10px;'>v 1.0</p></div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
