@@ -89,7 +89,7 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext .= "<button class='test' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
+			$rettext .= "<button class='button_add' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			
 			if($aktualnailosc == "") $aktualnailosc=0;

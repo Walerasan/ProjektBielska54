@@ -33,10 +33,16 @@ if(!class_exists('oplaty'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "formularz_zestawienie":
+						$od = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['od'])?$_POST['od']:date("Y-m-d"));
+						$do = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['do'])?$_POST['do']:date("Y-m-d"));
+						$store_od_do = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['store_od_do'])?$_POST['store_od_do']:"no");
+						$content_text .= $this->formularz_zestawienie($od,$do,$store_od_do);
+						break;
 					case "przywroc":
-						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
-						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text.=$this->restore($idop,$confirm);
+						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
+						$confirm = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
+						$content_text .= $this->restore($idop,$confirm);
 					break;
 					case "usun":
 						$idop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
@@ -57,7 +63,8 @@ if(!class_exists('oplaty'))
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text.=$this->zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$data = isset($_GET['par6'])?$_GET['par6']:(isset($_POST['data'])?$_POST['data']:0);
+						$content_text.=$this->zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data);
 					break;
 					case "formularz_uczen":
 						$idop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idop'])?$_POST['idop']:0);
@@ -65,7 +72,8 @@ if(!class_exists('oplaty'))
 						$kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['kwota'])?$_POST['kwota']:"");
 						$idto = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['idto'])?$_POST['idto']:0);
 						$selected_uczniowie = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
-						$content_text.=$this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+						$data = isset($_GET['par6'])?$_GET['par6']:(isset($_POST['data'])?$_POST['data']:0);
+						$content_text.=$this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data);
 						break;
 					break;
 					case "lista":
@@ -84,7 +92,8 @@ if(!class_exists('oplaty'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext .= "<button class='test' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_uczen\"'>Dodaj nowy</button>&#160;";
+			$rettext .= "<button class='button_add' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_uczen\"'>Dodaj nowy</button>&#160;";
+			$rettext .= "<button class='button_raport' title='Zestawienie' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_zestawienie\"'>Zestawienie</button>&#160;";
 			$rettext .= "<br />";
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
@@ -366,7 +375,7 @@ if(!class_exists('oplaty'))
 		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
 		#region formularz_uczen
-		private function formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
+		private function formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data)
 		{
 			$rettext="";
 			//--------------------
@@ -374,15 +383,16 @@ if(!class_exists('oplaty'))
 			//--------------------
 			if( isset($idop) && ($idop != "") && is_numeric($idop) && ($idop > 0) )
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota,data from ".get_class($this)." where usuniety='nie' and idop=$idop");
 				if($wynik)
 				{
-					list($idto,$nazwa,$kwota)=$wynik->fetch_row();
+					list($idto,$nazwa,$kwota,$data)=$wynik->fetch_row();
 				}
 			}
 			//--------------------
-			$nazwa=$this->page_obj->text_obj->doedycji($nazwa);
-			$kwota=$this->page_obj->text_obj->doedycji($kwota);
+			$nazwa = $this->page_obj->text_obj->doedycji($nazwa);
+			$kwota = $this->page_obj->text_obj->doedycji($kwota);
+			$data = substr($data,0,10);
 			//--------------------
 			$rettext="
 					<style>
@@ -396,6 +406,7 @@ if(!class_exists('oplaty'))
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>typ: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
 							<div class='wiersz'><div class='formularzkom1'>kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>na dzień: </div><div class='formularzkom2'><input type='date' name='data' value='$data' style='width:150px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>oddział: </div><div class='formularzkom2'>{$this->create_select_field_for_oddzial('klasa_select')}</div></div>
 							<div class='wiersz'><div class='formularzkom1'>klasa: </div><div class='formularzkom2'>{$this->create_select_field_for_klasa('klasa_select','uczniowie_select','selected_uczniowie')}</div></div>
 							<div class='wiersz'>
@@ -424,7 +435,7 @@ if(!class_exists('oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region zapisz_uczen
-		private function zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie)
+		private function zapisz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data)
 		{
 			$rettext = "";
 			//--------------------
@@ -435,11 +446,11 @@ if(!class_exists('oplaty'))
 			//--------------------
 			if( ($idop != "") && is_numeric($idop) && ($idop > 0) )
 			{
-				$zapytanie="update ".get_class($this)." set nazwa='$nazwa', kwota=$kwota, idto=$idto where idop=$idop;";//poprawa wpisu
+				$zapytanie="update ".get_class($this)." set nazwa='$nazwa', kwota=$kwota, idto=$idto, data='$data' where idop=$idop;";//poprawa wpisu
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(nazwa,kwota,idto)values('$nazwa',$kwota,$idto)";//nowy wpis
+				$zapytanie="insert into ".get_class($this)."(nazwa,kwota,idto,data)values('$nazwa',$kwota,$idto,'$data')";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -689,6 +700,85 @@ if(!class_exists('oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region formularz_zestawienie
+		private function formularz_zestawienie($od,$do,$store_od_do)
+		{
+			$rettext = "";
+			//--------------------
+			if($store_od_do == "do_store")
+			{
+				if(isset($od))
+					$_SESSION['oplaty_zestawienie_od'] = $od;
+				if(isset($do))
+					$_SESSION['oplaty_zestawienie_do'] = $do;
+			}
+			if(isset($_SESSION['oplaty_zestawienie_od']))
+				$od = $_SESSION['oplaty_zestawienie_od'];
+			if(isset($_SESSION['oplaty_zestawienie_do']))
+				$do = $_SESSION['oplaty_zestawienie_do'];
+			if($od == "") $od = date("Y-m-d");
+			if($do == "") $do = date("Y-m-d");
+			//--------------------
+			$rettext = "<style>
+								div.wiersz{float:left;clear:left;}
+								div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+								div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+							</style>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},formularz_zestawienie'>
+								<div style='overflow:hidden;'>
+									<div class='wiersz'><div class='formularzkom1'>Od: </div><div class='formularzkom2'><input type='date' name='od' value='$od' style='width:150px;'/></div></div>
+									<div class='wiersz'><div class='formularzkom1'>Do: </div><div class='formularzkom2'><input type='date' name='do' value='$do' style='width:150px;'/></div></div>
+									<div class='wiersz'>
+										<div class='formularzkom1'>&#160;</div>
+										<div class='formularzkom2'>
+											<input type='submit' name='' title='Generuj zestawienie' value='Generuj zestawienie' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+										</div>
+									</div>
+									<input type='hidden' name='store_od_do' value='do_store' />
+								</div>
+							</form>";
+			//--------------------
+			//todo: dorobić by uwzględniał date:
+			$rettext .= "<div style='overflow:hidden;'>";
+			$rettext .= "<br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "<tr>
+								<td style='height:30px;'>Data</td>
+								<td>nazwa</td>
+								<td>kwota</td>
+								<td>nazwa rabatu</td>
+								<td>kwota rabatu</td>
+								<td>imie, nazwisko</td>
+							</tr>";
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,o.data,o.nazwa,o.kwota,uo.rabat_nazwa,uo.rabat_kwota,u.imie_uczniowie,u.nazwisko_uczniowie from oplaty o, uczniowie_oplaty uo, uczniowie u where o.idop = uo.idop and u.idu = uo.idu and o.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and data >= '$od' and data <= '$do' order by data;");
+			if($wynik)
+			{
+				$suma = 0;
+				$suma_rabat = 0;
+				while(list($iduop,$data,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
+				{
+					
+					$rettext .= "<tr id='wiersz$iduop' onmouseover=\"setopticalwhite50('wiersz$iduop')\" onmouseout=\"setoptical0('wiersz$iduop')\">
+										<td style='height:30px;'>".substr($data,0,10)."</td>
+										<td>$nazwa</td>
+										<td>$kwota</td>
+										<td>$rabat_nazwa</td>
+										<td>$rabat_kwota</td>
+										<td>$imie_uczniowie $nazwisko_uczniowie</td>
+									</tr>";
+					$suma += $kwota;
+					$suma_rabat += $rabat_kwota;
+				}
+			}
+			$rettext .= "<tr><td><br /></td></tr>";
+			$rettext .= "<tr><td></td><td></td><td>Suma opłat: $suma </td><td></td><td> suma rabatu: $suma_rabat </td><td> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
+			$rettext .= "</table>";
+			$rettext .= "</div>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
@@ -731,6 +821,14 @@ if(!class_exists('oplaty'))
 
 			$nazwa="kwota";
 			$pola[$nazwa][0]="decimal(5,2)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="data";
+			$pola[$nazwa][0]="timestamp";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default

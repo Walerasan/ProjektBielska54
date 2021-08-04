@@ -83,7 +83,7 @@ p.title
 	padding-bottom: 5px;
 	border-bottom: 2px solid #3A7090;
 }
-button.test
+button.button_add
 {
 	border:3px solid #3A7090;
 	background: rgb(197,227,240);
@@ -96,4 +96,20 @@ button.test
 	color: #020202;
 	vertical-align: middle;
 	float:right;
+	margin-right:10px;
+}
+button.button_raport
+{
+	border:3px solid #3A7090;
+	background: rgb(197,227,240);
+	background: linear-gradient(180deg, rgba(197,227,240,1) 0%, rgba(197,227,240,1) 10%, rgba(118,150,163,1) 100%);
+	border-radius: 15px;
+	width:150px;
+	height:30px;
+	font-weight: bold;
+	font-size: 14px;
+	color: #020202;
+	vertical-align: middle;
+	float:right;
+	margin-right:10px;
 }
