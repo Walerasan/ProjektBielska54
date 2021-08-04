@@ -751,10 +751,10 @@ if(!class_exists('oplaty'))
 								<td>imie, nazwisko</td>
 							</tr>";
 			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,o.data,o.nazwa,o.kwota,uo.rabat_nazwa,uo.rabat_kwota,u.imie_uczniowie,u.nazwisko_uczniowie from oplaty o, uczniowie_oplaty uo, uczniowie u where o.idop = uo.idop and u.idu = uo.idu and o.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and data >= '$od' and data <= '$do' order by data;");
+			$suma = 0;
+			$suma_rabat = 0;
 			if($wynik)
 			{
-				$suma = 0;
-				$suma_rabat = 0;
 				while(list($iduop,$data,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
 					
