@@ -113,3 +113,24 @@ button.button_raport
 	float:right;
 	margin-right:10px;
 }
+input[type=submit].button_raport
+{
+	border:3px solid #3A7090;
+	background: rgb(197,227,240);
+	background: linear-gradient(180deg, rgba(197,227,240,1) 0%, rgba(197,227,240,1) 10%, rgba(118,150,163,1) 100%);
+	border-radius: 15px;
+	width:200px;
+	height:30px;
+	font-weight: bold;
+	font-size: 14px;
+	color: #020202;
+	vertical-align: middle;
+	float:right;
+	margin-right:10px;
+	margin-left:10px;
+}
+input[type=date].date_field
+{
+	width:150px;
+	height:26px;
+}

@@ -60,6 +60,16 @@ if(!class_exists('wyciagi'))
 					case "przetwarzanie":
 						$content_text .= $this->processingfile();
 					break;
+					case "ukryj":
+						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
+						$content_text .= $this->ukryj($idw,$confirm);
+						break;
+					case "odkryj":
+						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
+						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
+						$content_text .= $this->odkryj($idw,$confirm);
+						break;
 					case "przywroc":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
@@ -92,8 +102,9 @@ if(!class_exists('wyciagi'))
 						$aktualnailosc = isset($_GET['par1']) ? $_GET['par1'] : (isset($_POST['aktualnailosc']) ? $_POST['aktualnailosc'] : 0);
 						$action = isset($_POST['action']) ? $_POST['action'] : "";
 						$hidde_ready = isset($_POST['hidde_ready']) ? $_POST['hidde_ready'] : "";
+						$show_hidden = isset($_POST['show_hidden']) ? $_POST['show_hidden'] : "";
 						
-						$content_text .= $this->lista($aktualnailosc,$action,$hidde_ready);
+						$content_text .= $this->lista($aktualnailosc,$action,$hidde_ready,$show_hidden);
 						break;
 				}
 			}
@@ -113,16 +124,19 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista($aktualnailosc,$action,$hidde_ready)
+		public function lista($aktualnailosc,$action,$hidde_ready,$show_hidden)
 		{
 			$rettext="";
 			//--------------------
 			if($action == "filtruj")
 			{
 				$_SESSION[get_class($this)."_filtruj"] = $hidde_ready == "on";
+				$_SESSION[get_class($this)."_show_hidden"] = $show_hidden == "on";
 			}
-			if(!isset($_SESSION[get_class($this)."_filtruj"])) $_SESSION[get_class($this)."_filtruj"] = "on";
+			if(!isset($_SESSION[get_class($this)."_filtruj"])) $_SESSION[get_class($this)."_filtruj"] = true;
 			$hidde_assigned = $_SESSION[get_class($this)."_filtruj"];
+			if(!isset($_SESSION[get_class($this)."_show_hidden"])) $_SESSION[get_class($this)."_show_hidden"] = false;
+			$show_hidden = $_SESSION[get_class($this)."_show_hidden"];
 			//--------------------
 			//$rettext .= "<button title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
 			$rettext .= "<button title='Wgraj plik eksportu' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
@@ -133,20 +147,26 @@ if(!class_exists('wyciagi'))
 			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
 			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
 			$rettext .= "<input type='checkbox' name='hidde_ready' onclick='this.form.submit();' ".($hidde_assigned?"checked='checked'":"")."> Ukryj przypisane";
+			$rettext .= "<input type='checkbox' name='show_hidden' onclick='this.form.submit();' ".($show_hidden?"checked='checked'":"")."> Pokaż ukryte";
 			$rettext .= "<input type='hidden' name='action' value='filtruj'>";
 			$rettext .= "</form>";
 			$rettext .= "</fieldset><br><br>";
 			//--------------------
 			if($aktualnailosc=="")$aktualnailosc=0;
 
+			$show_hidden_filtr = "";
+			if($show_hidden)
+			{
+				$show_hidden_filtr = "or w.usuniety = 'ukryty' ";
+			}
 			if($hidde_assigned)
 			{
 				//$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w, wyciagi_uczniowie wu where w.usuniety='nie' and w.idw = wu.idw");
-				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where w.usuniety='nie' and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie');");
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie');");
 			}
 			else
 			{
-				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where w.usuniety='nie'");
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr)");
 			}
 			
 
@@ -156,11 +176,11 @@ if(!class_exists('wyciagi'))
 			if($hidde_assigned)
 			{
 				//$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where w.usuniety='nie' limit $aktualnailosc,$iloscnastronie;");
-				$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where w.usuniety='nie' and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie')  limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie')  limit $aktualnailosc,$iloscnastronie;");
 			}
 			else
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select w.idw,w.tytul,w.dataoperacji,w.typ,w.usuniety from ".get_class($this)." w where w.usuniety='nie' limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select w.idw,w.tytul,w.dataoperacji,w.typ,w.usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) limit $aktualnailosc,$iloscnastronie;");
 			}
 			if($wynik)
 			{
@@ -176,7 +196,8 @@ if(!class_exists('wyciagi'))
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
-						<td style='width:18px;'></td>
+						<!--<td style='width:18px;'></td>-->
+						<!--<td style='width:18px;'></td>-->
 					</tr>";
 				$lp=0;
 				while(list($idw,$tytul,$data,$typ,$usuniety)=$wynik->fetch_row())
@@ -185,14 +206,25 @@ if(!class_exists('wyciagi'))
 					//--------------------
 					$lp++;
 					//--------------------
-					if($usuniety=='nie')
+					if($usuniety == "nie")
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idw,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						$link_ukryj_odkryj = "<a href='javascript:potwierdzenie(\"Czy napewno ukryć wyciąg?\",\"".get_class($this).",{$this->page_obj->template},ukryj,$idw,yes\",window)'><img src='./media/ikony/eye_on.png' alt='' style='height:30px;'/></a>";
 					}
-					else
+					else if($usuniety == "tak")
 					{
-						$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idw,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						$link_ukryj_odkryj = "";
 					}
+					else if($usuniety == "ukryty")
+					{
+						$link_ukryj_odkryj = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić wyciąg?\",\"".get_class($this).",{$this->page_obj->template},odkryj,$idw,yes\",window)'><img src='./media/ikony/eye_off.png' alt='' style='height:30px;'/></a>";
+						$operacja = "";
+					}
+
+					$link_edytuj = "<a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					//blokada linku edytuj
+					$link_edytuj = "";
 					//--------------------
 					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
@@ -201,9 +233,10 @@ if(!class_exists('wyciagi'))
 							<td>".substr($data,0,10)."</td>
 							<td>$typ</td>
 							<td style='text-align:center;'>$is_assigned</td>
+							<td style='text-align:center;'>$link_ukryj_odkryj</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'><img src='./media/ikony/niegotowe.png' alt='' style='height:30px;'/></a></td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
-							<td style='text-align:center;'>$operacja</td>
+							<!--<td style='text-align:center;'>$link_edytuj</td>-->
+							<!--<td style='text-align:center;'>$operacja</td>-->
 						</tr>";
 				}
 				$rettext .= "</table>";
@@ -288,7 +321,7 @@ if(!class_exists('wyciagi'))
 				{
 					$_SESSION['antyrefresh']=true;
 					$rettext .= "Zapisane<br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista("","","","");
 				}
 				else
 				{
@@ -298,7 +331,7 @@ if(!class_exists('wyciagi'))
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				$rettext.=$this->lista("","","","");
 			}
 			return $rettext;
 		}
@@ -314,12 +347,12 @@ if(!class_exists('wyciagi'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idw=$idw;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista("","","","");
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista("","","","");
 				}
 			}
 			else
@@ -341,12 +374,12 @@ if(!class_exists('wyciagi'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idw=$idw;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista("","","","");
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista("","","","");
 				}
 			}
 			else
@@ -1191,6 +1224,56 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		private function ukryj($idw,$confirm)
+		{
+			$rettext = "";
+			//--------------------
+			if($confirm == "yes")
+			{
+				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'ukryty' where idw = $idw and usuniety = 'nie';"))
+				{
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					$rettext .= $this->lista("","","","");
+				}
+				else
+				{
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= $this->lista("","","","");
+				}
+			}
+			else
+			{
+				$rettext .= "This operation need confirm.";
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function odkryj($idw,$confirm)
+		{
+			$rettext = "";
+			//--------------------
+			if($confirm == "yes")
+			{
+				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'nie' where idw = $idw and usuniety = 'ukryty';"))
+				{
+					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
+					$rettext .= $this->lista("","","","");
+				}
+				else
+				{
+					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
+					$rettext .= $this->lista("","","","");
+				}
+			}
+			else
+			{
+				$rettext .= "This operation need confirm.";
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
@@ -1215,7 +1298,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 			
 			$nazwa="usuniety";
-			$pola[$nazwa][0]="enum('tak','nie','zablokowany')";
+			$pola[$nazwa][0]="enum('tak','nie','zablokowany','ukryty')";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'nie'";//default

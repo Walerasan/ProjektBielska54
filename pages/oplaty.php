@@ -78,7 +78,20 @@ if(!class_exists('oplaty'))
 					break;
 					case "lista":
 					default:
-						$content_text.=$this->lista();
+						$aktualnailosc = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$content_text.=$this->lista($aktualnailosc);
+						break;
+				}
+			}
+			else if( ($this->page_obj->template == "raw") )
+			{
+				switch($this->page_obj->target)
+				{
+					case "zestawienie_drukuj":
+						$content_text .= $this->zestawienie_drukuj();
+						break;
+					default:
+						$content_text .= "";
 						break;
 				}
 			}
@@ -88,7 +101,7 @@ if(!class_exists('oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista()
+		public function lista($aktualnailosc)
 		{
 			$rettext="";
 			//--------------------
@@ -96,7 +109,12 @@ if(!class_exists('oplaty'))
 			$rettext .= "<button class='button_raport' title='Zestawienie' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_zestawienie\"'>Zestawienie</button>&#160;";
 			$rettext .= "<br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
+			if($aktualnailosc == "") $aktualnailosc = 0;
+			$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
+			$iloscwszystkich=$this->page_obj->database_obj->result_count();
+			$iloscnastronie = 5;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
 			if($wynik)
 			{
 				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -127,7 +145,7 @@ if(!class_exists('oplaty'))
 					//--------------------
 					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idop' onmouseover=\"setopticalwhite50('wiersz$idop')\" onmouseout=\"setoptical0('wiersz$idop')\">
-							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>".($aktualnailosc + $lp).".</td>
 							<td>$nazwa</td>
 							<td>$kwota</td>
 							<td>{$this->page_obj->typy_oplat->get_name($idto)}</td>
@@ -136,6 +154,7 @@ if(!class_exists('oplaty'))
 						</tr>";
 				}
 				$rettext .= "</table>";
+				$rettext .= "<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 			}
 			else
 			{
@@ -371,8 +390,6 @@ if(!class_exists('oplaty'))
 			return $idto;
 		}
 		#endregion
-		//----------------------------------------------------------------------------------------------------
-		//----------------------------------------------------------------------------------------------------
 		//----------------------------------------------------------------------------------------------------
 		#region formularz_uczen
 		private function formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data)
@@ -705,6 +722,8 @@ if(!class_exists('oplaty'))
 		{
 			$rettext = "";
 			//--------------------
+			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,zestawienie_drukuj\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
+			//--------------------
 			if($store_od_do == "do_store")
 			{
 				if(isset($od))
@@ -719,30 +738,23 @@ if(!class_exists('oplaty'))
 			if($od == "") $od = date("Y-m-d");
 			if($do == "") $do = date("Y-m-d");
 			//--------------------
-			$rettext = "<style>
+			$rettext .= "<style>
 								div.wiersz{float:left;clear:left;}
 								div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
 								div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
 							</style>";
 			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},formularz_zestawienie'>
 								<div style='overflow:hidden;'>
-									<div class='wiersz'><div class='formularzkom1'>Od: </div><div class='formularzkom2'><input type='date' name='od' value='$od' style='width:150px;'/></div></div>
-									<div class='wiersz'><div class='formularzkom1'>Do: </div><div class='formularzkom2'><input type='date' name='do' value='$do' style='width:150px;'/></div></div>
-									<div class='wiersz'>
-										<div class='formularzkom1'>&#160;</div>
-										<div class='formularzkom2'>
-											<input type='submit' name='' title='Generuj zestawienie' value='Generuj zestawienie' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
-										</div>
-									</div>
+									<div class='wiersz'>Od: <input type='date' name='od' value='$od' class='date_field'/> do: <input type='date' name='do' value='$do' class='date_field'/> <input type='submit' class='button_raport' name='' title='Generuj zestawienie' value='Generuj zestawienie' style='font-size:16px;'/></div>
 									<input type='hidden' name='store_od_do' value='do_store' />
 								</div>
 							</form>";
 			//--------------------
-			//todo: dorobić by uwzględniał date:
 			$rettext .= "<div style='overflow:hidden;'>";
 			$rettext .= "<br />";
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 			$rettext .= "<tr>
+								<td style='width:30px;'>lp.</td>
 								<td style='height:30px;'>Data</td>
 								<td>nazwa</td>
 								<td>kwota</td>
@@ -755,10 +767,11 @@ if(!class_exists('oplaty'))
 			$suma_rabat = 0;
 			if($wynik)
 			{
+				$lp = 1;
 				while(list($iduop,$data,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
-					
 					$rettext .= "<tr id='wiersz$iduop' onmouseover=\"setopticalwhite50('wiersz$iduop')\" onmouseout=\"setoptical0('wiersz$iduop')\">
+										<td style='text-align:right;padding-right:10px;'>$lp.</td>
 										<td style='height:30px;'>".substr($data,0,10)."</td>
 										<td>$nazwa</td>
 										<td>$kwota</td>
@@ -768,12 +781,66 @@ if(!class_exists('oplaty'))
 									</tr>";
 					$suma += $kwota;
 					$suma_rabat += $rabat_kwota;
+					$lp++;
 				}
 			}
 			$rettext .= "<tr><td><br /></td></tr>";
-			$rettext .= "<tr><td></td><td></td><td>Suma opłat: $suma </td><td></td><td> suma rabatu: $suma_rabat </td><td> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
+			$rettext .= "<tr><td><td></td></td><td></td><td>Suma opłat: $suma </td><td></td><td> suma rabatu: $suma_rabat </td><td> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
 			$rettext .= "</table>";
 			$rettext .= "</div>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region zestawienie_drukuj
+		private function zestawienie_drukuj()
+		{
+			$rettext = "";
+			//--------------------
+			if(isset($_SESSION['oplaty_zestawienie_od']))
+				$od = $_SESSION['oplaty_zestawienie_od'];
+			if(isset($_SESSION['oplaty_zestawienie_do']))
+				$do = $_SESSION['oplaty_zestawienie_do'];
+			if($od == "") $od = date("Y-m-d");
+			if($do == "") $do = date("Y-m-d");
+			//--------------------
+			$rettext .= "<p>Od: $od do: $do</p>";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "<tr>
+								<td style='width:30px;'>lp.</td>
+								<td style='height:30px;'>Data</td>
+								<td>nazwa</td>
+								<td>kwota</td>
+								<td>nazwa rabatu</td>
+								<td>kwota rabatu</td>
+								<td>imie, nazwisko</td>
+							</tr>";
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,o.data,o.nazwa,o.kwota,uo.rabat_nazwa,uo.rabat_kwota,u.imie_uczniowie,u.nazwisko_uczniowie from oplaty o, uczniowie_oplaty uo, uczniowie u where o.idop = uo.idop and u.idu = uo.idu and o.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and data >= '$od' and data <= '$do' order by data;");
+			$suma = 0;
+			$suma_rabat = 0;
+			if($wynik)
+			{
+				$lp = 1;
+				while(list($iduop,$data,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
+				{
+					$rettext .= "<tr id='wiersz$iduop' onmouseover=\"setopticalwhite50('wiersz$iduop')\" onmouseout=\"setoptical0('wiersz$iduop')\">
+										<td style='text-align:right;padding-right:10px;'>$lp.</td>
+										<td style='height:30px;'>".substr($data,0,10)."</td>
+										<td>$nazwa</td>
+										<td>$kwota</td>
+										<td>$rabat_nazwa</td>
+										<td>$rabat_kwota</td>
+										<td>$imie_uczniowie $nazwisko_uczniowie</td>
+									</tr>";
+					$suma += $kwota;
+					$suma_rabat += $rabat_kwota;
+					$lp++;
+				}
+			}
+			$rettext .= "<tr><td><br /></td></tr>";
+			$rettext .= "<tr><td></td><td></td><td></td><td>Suma opłat: $suma </td><td></td><td> suma rabatu: $suma_rabat </td><td> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
+			$rettext .= "</table>";
 			//--------------------
 			return $rettext;
 		}

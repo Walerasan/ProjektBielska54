@@ -117,7 +117,7 @@ if(!class_exists('wyciagi_uczniowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu=$idu and usuniety='nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select wu.idw from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie';");
 			if($wynik)
 			{
 				while(list($idw)=$wynik->fetch_row())

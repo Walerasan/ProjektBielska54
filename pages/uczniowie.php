@@ -79,6 +79,19 @@ if(!class_exists('uczniowie'))
 					break;
 				}
 			}
+			else if( ($this->page_obj->template == "raw") )
+			{
+				switch($this->page_obj->target)
+				{
+					case "szczegoly_drukuj":
+						$idu = isset($_GET['par1']) ? $_GET['par1'] : (isset($_POST['idu']) ? $_POST['idu'] : 0);
+						$content_text .= $this->szczegoly_drukuj($idu);
+						break;
+					default:
+						$content_text .= "";
+						break;
+				}
+			}
 			//--------------------
 			return $this->page_obj->$template_class_name->get_content($content_text);
 		}
@@ -91,13 +104,11 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			$rettext .= "<button class='button_add' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
-			
-			if($aktualnailosc == "") $aktualnailosc=0;
+			if($aktualnailosc == "") $aktualnailosc = 0;
 			$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where usuniety='nie'");
 			$iloscwszystkich=$this->page_obj->database_obj->result_count();
 			$iloscnastronie = 15;
-
-
+			//--------------------
 			if(isset($_POST['submit_szukaj']))
 			{
 				if(isset($_POST['imie']) && !empty($_POST['imie']))
@@ -112,7 +123,7 @@ if(!class_exists('uczniowie'))
 				}
 				else
 				{
-					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");	
+					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
 				}
 
 				if($wynik)
@@ -388,12 +399,15 @@ if(!class_exists('uczniowie'))
 					}
 
 					$this->page_obj->uczniowie_opiekunowie->mark_usuniety($idu,"yes");
-					foreach($ido as $key => $val)
+					if( is_array($ido) )
 					{
-						if($val > 0)
+						foreach($ido as $key => $val)
 						{
-							$rettext .= "Zapisano opiekuna {$idu} , {$ido[$key]},<br />";
-							$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
+							if($val > 0)
+							{
+								$rettext .= "Zapisano opiekuna {$idu} , {$ido[$key]},<br />";
+								$this->page_obj->uczniowie_opiekunowie->insert($idu,$ido[$key]);
+							}
 						}
 					}
 					$rettext .= "Zapisane $idu<br />";
@@ -594,6 +608,7 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
+			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,szczegoly_drukuj,$idu\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -702,6 +717,132 @@ if(!class_exists('uczniowie'))
 									<td style='border-top:1px solid gray;'>$suma_rozliczen</td>
 									<td></td>
 									<td></td>
+								</tr>";
+			$rettext .= "<tr>
+									<td colspan='7'><b>Rozliczono w sumie: $suma_rozliczen </b></td>
+								</tr>";
+			$rettext .= "</table><br /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext .= "<hr /><br />";
+			//----------------------------------------------------------------------------------------------------
+			if($suma_rozliczen > $suma_do_rozliczenia)
+			{
+				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
+			}
+			else if($suma_rozliczen < $suma_do_rozliczenia)
+			{
+				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+			}
+			else
+			{
+				$rettext .= "<b style='font-size:16px;'>Rozliczone</b><br />";
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region szczegoly_drukuj
+		private function szczegoly_drukuj($idu)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
+			//-----
+			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+			$rettext .= "<b style='font-size:16px;'><u>OPŁATY</u></b><br /><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>nazwa</td>
+						<td style='width:100px;'>kwota</td>
+						<td>rabat nazwa</td>
+						<td style='width:100px;'>rabat kwota</td>
+					</tr>";
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			if(is_array($oplaty_list))
+			{
+				$suma_do_rozliczenia = 0;
+				$suma_oplat = 0;
+				$suma_rabat = 0;
+				$oplata_counter = 1;
+				foreach($oplaty_list as $row)
+				{
+					$oplata_nazwa = $this->page_obj->oplaty->get_name($row[1]);
+					$oplata_kwota = $this->page_obj->oplaty->get_kwota($row[1]);
+					$suma_oplat += $oplata_kwota;
+					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
+					$suma_rabat += $oplata_rabat;
+					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$oplata_nazwa</td>
+										<td>$oplata_kwota</td>
+										<td>{$row[3]}</td>
+										<td>{$row[2]}</td>
+									</tr>";
+									//	idop = $oplata_nazwa, {$row[1]} - rabat:  - {$row[3]} -  - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";
+					$oplata_counter++;
+				}
+				$rettext .= "<tr>
+									<td></td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_oplat</td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_rabat</td>
+								</tr>";
+				$rettext .= "<tr>
+									<td colspan='7'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
+								</tr>";
+			}
+			$rettext .= "</table><br /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext .= "<hr /><br />";
+			//----------------------------------------------------------------------------------------------------
+			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br /><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>tytuł</td>
+						<td>nadawca</td>
+						<td style='width:250px;'>data</td>
+						<td style='width:100px;'>kwota</td>
+					</tr>";
+			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
+			if(is_array($wyciagi_list))
+			{
+				$suma_rozliczen = 0;
+				$oplata_counter = 1;
+				foreach($wyciagi_list as $idw)
+				{
+					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
+					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
+					$data = $this->page_obj->wyciagi->get_date($idw);
+					$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					if(!is_nan($kwota))
+					{
+						$suma_rozliczen += $kwota;
+					}
+					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$tytul</td>
+										<td>$nadawca</td>
+										<td>$data</td>
+										<td>$kwota</td>
+									</tr>";
+					$oplata_counter++;
+				}
+			}
+			$rettext .= "<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td style='border-top:1px solid gray;'>$suma_rozliczen</td>
 								</tr>";
 			$rettext .= "<tr>
 									<td colspan='7'><b>Rozliczono w sumie: $suma_rozliczen </b></td>
