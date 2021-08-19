@@ -609,6 +609,7 @@ if(!class_exists('uczniowie'))
 			$rettext = "";
 			//--------------------
 			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,szczegoly_drukuj,$idu\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
+			$rettext .= "<button class='button_add' style='width:240px;' title='Dodaj identyfikator płatności' type='button' onclick='window.location=\"iden_wyciagu,admin,form,$idu\"'>Dodaj identyfikator płatności</button>&#160;";
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
