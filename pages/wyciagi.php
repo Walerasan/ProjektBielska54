@@ -139,9 +139,9 @@ if(!class_exists('wyciagi'))
 			$show_hidden = $_SESSION[get_class($this)."_show_hidden"];
 			//--------------------
 			//$rettext .= "<button title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
-			$rettext .= "<button title='Wgraj plik eksportu' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
-			$rettext .= "<button title='Raport wyciągów' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>Raport wyciągów</button> ";
-			$rettext .= "<button title='Processing' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			$rettext .= "<button title='Wgraj plik eksportu' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
+			$rettext .= "<button title='Raport wyciągów' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>Raport wyciągów</button> ";
+			//$rettext .= "<button title='Processing' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
 			//--------------------
 			$rettext .= "<br />";
 			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";

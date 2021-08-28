@@ -395,7 +395,7 @@ if(!class_exists('uczniowie'))
 					$_SESSION['antyrefresh']=true;
 					if( !( ($idu != "") && is_numeric($idu) && ($idu > 0) ) )
 					{
-						$idu=$this->page_obj->database_obj->last_id();
+						$idu = $this->page_obj->database_obj->last_id();
 					}
 
 					$this->page_obj->uczniowie_opiekunowie->mark_usuniety($idu,"yes");
@@ -609,7 +609,7 @@ if(!class_exists('uczniowie'))
 			$rettext = "";
 			//--------------------
 			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,szczegoly_drukuj,$idu\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
-			$rettext .= "<button class='button_add' style='width:240px;' title='Dodaj identyfikator płatności' type='button' onclick='window.location=\"iden_wyciagu,admin,form,$idu\"'>Dodaj identyfikator płatności</button>&#160;";
+			$rettext .= "<button class='button_add' style='width:240px;' title='Dodaj identyfikator płatności' type='button' onclick='window.location=\"iden_wyciagu,{$this->page_obj->template},form,$idu\"'>Dodaj identyfikator płatności</button>&#160;";
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -739,6 +739,38 @@ if(!class_exists('uczniowie'))
 				$rettext .= "<b style='font-size:16px;'>Rozliczone</b><br />";
 			}
 			//--------------------
+			$rettext .= "<br /><hr /><br />";
+			//--------------------
+			$rettext .= "<b style='font-size:16px;'><u>IDENTYFIKATORY PŁATNOŚCI:</u></b><br /><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>identyfikator</td>
+						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
+					</tr>";
+			$lp = 1;
+			foreach( $this->page_obj->iden_wyciagu->list($idu) as $key => $val)
+			{
+				if($val[1] == 'nie')
+				{
+					$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"iden_wyciagu,{$this->page_obj->template},usun,$idu,$val[2],yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+				}
+				else
+				{
+					$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"iden_wyciagu,{$this->page_obj->template},przywroc,$idu,$val[2],yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+				}
+				//--------------------
+				$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td>$lp.</td>
+						<td>$val[0]</td>
+						<td style='width:18px;'><a href='iden_wyciagu,{$this->page_obj->template},formularz,$idu,$val[2]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+						<td style='width:18px;'>$operacja</td>
+					</tr>";
+				$lp++;
+			}
 			return $rettext;
 		}
 		#endregion

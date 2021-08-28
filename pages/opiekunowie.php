@@ -202,7 +202,7 @@ if(!class_exists('opiekunowie'))
 			}
 			//--------------------
 			// w tablicy opiekunów email nie może wystąpić dwa razy
-			$wynik = $this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where email_opiekun = '$email_opiekun';");
+			$wynik = $this->page_obj->database_obj->get_data("select ido from ".get_class($this)." where email_opiekun = '$email_opiekun' and ido <> $ido;");
 			if( $this->page_obj->database_obj->result_count() == 0 )
 			{
 				if( ($ido != "") && is_numeric($ido) && ($ido > 0) )
