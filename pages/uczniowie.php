@@ -32,7 +32,7 @@ if(!class_exists('uczniowie'))
 				{
 					case "szczegoly":
 						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
-						$content_text.=$this->szczegoly($idu);
+						$content_text .= $this->szczegoly($idu);
 						break;
 					case "przywroc":
 						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
@@ -604,7 +604,7 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region szczegoly
-		private function szczegoly($idu)
+		public function szczegoly($idu)
 		{
 			$rettext = "";
 			//--------------------
@@ -766,7 +766,7 @@ if(!class_exists('uczniowie'))
 					<tr style='font-weight:bold;'>
 						<td>$lp.</td>
 						<td>$val[0]</td>
-						<td style='width:18px;'><a href='iden_wyciagu,{$this->page_obj->template},formularz,$idu,$val[2]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+						<td style='width:18px;'><a href='iden_wyciagu,{$this->page_obj->template},form,$idu,$val[2]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 						<td style='width:18px;'>$operacja</td>
 					</tr>";
 				$lp++;

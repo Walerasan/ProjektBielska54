@@ -804,6 +804,7 @@ if(!class_exists('wyciagi'))
 		private function refresh()
 		{
 			$this->page_obj->syslog(debug_backtrace(),"Execute - ".date("Y-m-d H:i:s"));
+			$this->processing_iden_wyciagu();
 			$this->processing();
 			return "refresh";
 		}
@@ -1115,6 +1116,23 @@ if(!class_exists('wyciagi'))
 			if($wynik) list($rachuneknadawcy)=$wynik->fetch_row();
 			//--------------------
 			return $rachuneknadawcy;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region processing_iden_wyciagu
+		private function processing_iden_wyciagu()
+		{
+			$rettext = "Auto processing_iden_wyciagu system <br />";
+			//--------------------
+			foreach($this->page_obj->iden_wyciagu->list_idiw() as $row) //[idiw][idu][identyfikator]
+			{
+				//select * from wyciagi where wyciagi.tytul = 'costam' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');
+				kontynuować SELECT * FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '172509299445' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');
+				// przypisz wyciag do ucznia
+				//$this->page_obj->wyciagi_uczniowie->synchronize($row[0],$idw[0],true);
+			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -208,7 +208,7 @@ if(!class_exists('wyciagi_uczniowie'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="status";
-			$pola[$nazwa][0]="enum('not_asigned','manual','auto')";
+			$pola[$nazwa][0]="enum('not_asigned','manual','auto','auto_iden')";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'not_asigned'";//default

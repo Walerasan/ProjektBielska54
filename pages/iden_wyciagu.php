@@ -31,7 +31,7 @@ if( !class_exists('iden_wyciagu') )
 				{
 					case "form":
 						$idu = isset($_GET['par1']) ? $_GET['par1'] : 0;
-						$idiw = isset($_POST['par2']) ? $_POST['par2'] : 0;
+						$idiw = isset($_GET['par2']) ? $_GET['par2'] : 0;
 						$content_text = $this->form($idu,$idiw);
 						break;
 					case "save":
@@ -58,7 +58,7 @@ if( !class_exists('iden_wyciagu') )
 			$identyfikator = "";
 			if($idu > 0)
 			{
-				if( isset($idiw) && ($idiw > 0) )
+				if( isset($idiw) && is_numeric($idiw) && ($idiw > 0) )
 				{
 					$wynik = $this->page_obj->database_obj->get_data("select identyfikator from ".get_class($this)." where idiw = $idiw;");
 					if($wynik)
@@ -82,7 +82,7 @@ if( !class_exists('iden_wyciagu') )
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
 									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
-									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},list\"'>Anuluj</button>
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"uczniowie,{$this->page_obj->template},szczegoly,$idu\"'>Anuluj</button>
 								</div>
 							</div>
 						</div>
@@ -117,7 +117,7 @@ if( !class_exists('iden_wyciagu') )
 
 				if($this->page_obj->database_obj->execute_query($zapytanie))
 				{
-					$rettext .= "Zapisane";//TODO: powrót do listy
+					$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
 				}
 				else
 				{
@@ -142,6 +142,24 @@ if( !class_exists('iden_wyciagu') )
 			if( isset($idu) && is_numeric($idu) && ($idu > 0) )
 			{
 					$wynik = $this->page_obj->database_obj->get_data("select identyfikator, usuniety, idiw from ".get_class($this)." where idu = $idu;");
+					if($wynik)
+					{
+						$rettext[] = $wynik->fetch_row();
+					}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region list
+		public function list_idiw()
+		{
+			$rettext = array();
+			//--------------------
+			if( isset($idu) && is_numeric($idu) && ($idu > 0) )
+			{
+					$wynik = $this->page_obj->database_obj->get_data("select idiw,idu,identyfikator from ".get_class($this)." where usuniety = 'nie';");
 					if($wynik)
 					{
 						$rettext[] = $wynik->fetch_row();
