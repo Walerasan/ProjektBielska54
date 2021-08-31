@@ -152,21 +152,37 @@ if( !class_exists('iden_wyciagu') )
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region list
+		#region list_idiw
 		public function list_idiw()
 		{
 			$rettext = array();
 			//--------------------
-			if( isset($idu) && is_numeric($idu) && ($idu > 0) )
+			$wynik = $this->page_obj->database_obj->get_data("select idiw,idu,identyfikator from ".get_class($this)." where usuniety = 'nie' and idw = 0;");
+			if($wynik)
 			{
-					$wynik = $this->page_obj->database_obj->get_data("select idiw,idu,identyfikator from ".get_class($this)." where usuniety = 'nie';");
-					if($wynik)
-					{
-						$rettext[] = $wynik->fetch_row();
-					}
+				while($row = $wynik->fetch_row())
+				{
+					$rettext[] = $row;
+				}
 			}
 			//--------------------
 			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region mark_idiw_assigned
+		public function mark_idiw_assigned($idu,$idiw,$idw)
+		{
+			if( isset($idu) && is_numeric($idu) && ($idu > 0) )
+			{
+				if( isset($idiw) && is_numeric($idiw) && ($idiw > 0) )
+				{
+					if( isset($idw) && is_numeric($idw) && ($idw > 0) )
+					{
+						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set idw = $idw where idu = $idu and idiw = $idiw;");
+					}
+				}
+			}
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -207,6 +223,14 @@ if( !class_exists('iden_wyciagu') )
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="idw";
+			$pola[$nazwa][0]="int(10)";
+			$pola[$nazwa][1]="not null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="0";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			

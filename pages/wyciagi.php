@@ -38,6 +38,7 @@ if(!class_exists('wyciagi'))
 				switch($this->page_obj->target)
 				{
 					case "processing":
+						$content_text .= $this->processing_iden_wyciagu();
 						$content_text .= $this->processing();
 						break;
 					case "assign_write":
@@ -141,7 +142,7 @@ if(!class_exists('wyciagi'))
 			//$rettext .= "<button title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
 			$rettext .= "<button title='Wgraj plik eksportu' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
 			$rettext .= "<button title='Raport wyciągów' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>Raport wyciągów</button> ";
-			//$rettext .= "<button title='Processing' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			$rettext .= "<button title='Processing' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
 			//--------------------
 			$rettext .= "<br />";
 			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
@@ -1126,10 +1127,21 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			foreach($this->page_obj->iden_wyciagu->list_idiw() as $row) //[idiw][idu][identyfikator]
 			{
-				//select * from wyciagi where wyciagi.tytul = 'costam' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');
-				kontynuować SELECT * FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '172509299445' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');
-				// przypisz wyciag do ucznia
-				//$this->page_obj->wyciagi_uczniowie->synchronize($row[0],$idw[0],true);
+				//$rettext .= "SELECT idw FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '{$row[2]}' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');<br />";
+				$wynik = $this->page_obj->database_obj->get_data("SELECT idw FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '{$row[2]}' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');");
+				if($wynik)
+				{
+					while(list($idw) = $wynik->fetch_row())
+					{
+						//sprawdzić czy nie ma użytego w auto (wyciagi_uczniowie)
+						foreach($this->page_obj->wyciagi_uczniowie->get_idwu_list_for_idw($idw) as $idwu)
+						{
+							$this->page_obj->wyciagi_uczniowie->delete_iduw($idwu);
+						}
+						$this->page_obj->wyciagi_uczniowie->synchronize($row[1],$idw,true,true);
+						$this->page_obj->iden_wyciagu->mark_idiw_assigned($row[1],$row[0],$idw);
+					}
+				}
 			}
 			//--------------------
 			return $rettext;
@@ -1139,6 +1151,8 @@ if(!class_exists('wyciagi'))
 		#region processing
 		private function processing()
 		{
+			//TODO: dokończyć tutaj -> musi uwzględniać iden_wyciagu że jest ustawiony na auto_iden.
+
 			$rettext = "Auto processing system <br />";
 			//--------------------
 			// znajdz numery kont przypisane do uczniów
@@ -1153,11 +1167,10 @@ if(!class_exists('wyciagi'))
 					{
 						$rettext .= "____ ".$idw[0]."<br />";
 						// przypisz wyciag do ucznia
-						$this->page_obj->wyciagi_uczniowie->synchronize($row[0],$idw[0],true);
+						$this->page_obj->wyciagi_uczniowie->synchronize($row[0],$idw[0],true,false);
 					}
 				}
 			}
-			
 			//--------------------
 			return $rettext;
 		}
@@ -1169,7 +1182,8 @@ if(!class_exists('wyciagi'))
 			$rettext = array();
 			//--------------------
 			//$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie';");
-			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie' and idw not in (select idw from wyciagi_uczniowie where idu=$idu and usuniety = 'nie');");
+			//$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie' and idw not in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie');");
+			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where rachuneknadawcy = '$nr_konta' and usuniety = 'nie' and idw not in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') and idw not in (select idw from iden_wyciagu);");
 			if($wynik)
 			{
 				while(list($idw)=$wynik->fetch_row())

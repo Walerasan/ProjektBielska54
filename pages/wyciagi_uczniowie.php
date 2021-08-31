@@ -33,7 +33,7 @@ if(!class_exists('wyciagi_uczniowie'))
 		#region get_idu_list_for_idw
 		public function get_idu_list_for_idw($idw)
 		{
-			$rettext=array();
+			$rettext = array();
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idw=$idw and usuniety='nie';");
 			if($wynik)
@@ -48,8 +48,36 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_idu_list_for_idw
+		public function get_idwu_list_for_idw($idw)
+		{
+			$rettext = array();
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select idwu from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				while(list($idwu)=$wynik->fetch_row())
+				{
+					$rettext[] = (int)$idwu;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region delete_iduw
+		public function delete_iduw($iduw)
+		{
+			if( isset($iduw) && is_numeric($iduw) && ($iduw > 0) )
+			{
+				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where iduw = $iduw limit 1");
+			}
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region synchronize
-		public function synchronize($idu,$idw,$set_automatic)
+		public function synchronize($idu,$idw,$set_automatic,$set_auto_ident)
 		{
 			#region safe
 			if( (!isset($idw)) || ($idw == "") ) $idw = 0;
@@ -57,7 +85,7 @@ if(!class_exists('wyciagi_uczniowie'))
 			$deleted = "empty";
 			$sql_query = "";
 			$rettext = "";
-			$sync_type = ($set_automatic) ? "auto" : "manual";			
+			$sync_type = ($set_auto_ident) ? "auto_iden" : ( ($set_automatic) ? "auto" : "manual" );
 			#endregion
 
 			#region select
