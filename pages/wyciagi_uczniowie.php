@@ -66,13 +66,18 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region delete_iduw
-		public function delete_iduw($iduw)
+		#region delete_idwu
+		public function delete_idwu($idwu)
 		{
-			if( isset($iduw) && is_numeric($iduw) && ($iduw > 0) )
+			$rettext = "";
+			//--------------------
+			if( isset($idwu) && is_numeric($idwu) && ($idwu > 0) )
 			{
-				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where iduw = $iduw limit 1");
+				$rettext .= "update ".get_class($this)." set usuniety = 'tak' where idwu = $idwu limit 1";
+				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where idwu = $idwu limit 1");
 			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

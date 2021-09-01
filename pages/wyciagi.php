@@ -1136,7 +1136,7 @@ if(!class_exists('wyciagi'))
 						//sprawdzić czy nie ma użytego w auto (wyciagi_uczniowie)
 						foreach($this->page_obj->wyciagi_uczniowie->get_idwu_list_for_idw($idw) as $idwu)
 						{
-							$this->page_obj->wyciagi_uczniowie->delete_iduw($idwu);
+							$rettext .= $this->page_obj->wyciagi_uczniowie->delete_idwu($idwu);
 						}
 						$this->page_obj->wyciagi_uczniowie->synchronize($row[1],$idw,true,true);
 						$this->page_obj->iden_wyciagu->mark_idiw_assigned($row[1],$row[0],$idw);
@@ -1151,8 +1151,6 @@ if(!class_exists('wyciagi'))
 		#region processing
 		private function processing()
 		{
-			//TODO: dokończyć tutaj -> musi uwzględniać iden_wyciagu że jest ustawiony na auto_iden.
-
 			$rettext = "Auto processing system <br />";
 			//--------------------
 			// znajdz numery kont przypisane do uczniów
