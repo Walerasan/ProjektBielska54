@@ -762,11 +762,12 @@ if(!class_exists('uczniowie'))
 					$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"iden_wyciagu,{$this->page_obj->template},przywroc,$idu,$val[2],yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
 				}
 				//--------------------
+				// link do edycji: <a href='iden_wyciagu,{$this->page_obj->template},form,$idu,$val[2]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>
 				$rettext .= "
-					<tr style='font-weight:bold;'>
+					<tr style='font-weight:bold;".(($val[3] != 0)?"color:red;":"color:gray;")."'>
 						<td>$lp.</td>
 						<td>$val[0]</td>
-						<td style='width:18px;'><a href='iden_wyciagu,{$this->page_obj->template},form,$idu,$val[2]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+						<td style='width:18px;'>".(($val[3] != 0)?"*":"")."</td>
 						<td style='width:18px;'>$operacja</td>
 					</tr>";
 				$lp++;

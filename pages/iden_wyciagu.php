@@ -29,6 +29,12 @@ if( !class_exists('iden_wyciagu') )
 			{
 				switch($this->page_obj->target)
 				{
+					case "usun":
+						$idu = isset($_GET['par1']) ? $_GET['par1'] : 0;
+						$idiw = isset($_GET['par2']) ? $_GET['par2'] : 0;
+						$confirm = isset($_GET['par3']) ? $_GET['par3'] : "";
+						$content_text = $this->usun($idu,$idiw,$confirm);
+						break;
 					case "form":
 						$idu = isset($_GET['par1']) ? $_GET['par1'] : 0;
 						$idiw = isset($_GET['par2']) ? $_GET['par2'] : 0;
@@ -106,23 +112,49 @@ if( !class_exists('iden_wyciagu') )
 			//--------------------
 			if( ($idu != "") && is_numeric($idu) && ($idu > 0) )
 			{
-				if( ($idiw != "") && is_numeric($idiw) && ($idiw > 0) )
+				$wynik = $this->page_obj->database_obj->get_data("select idu,idiw,usuniety from ".get_class($this)." where identyfikator = '$identyfikator';");
+				if($wynik)
 				{
-					$zapytanie = "update ".get_class($this)." set identyfikator = '$identyfikator' where idiw = $idiw and idu = $idu;";//poprawa wpisu
+					list($idu_s,$idiw_s,$usuniety) = $wynik->fetch_row();
+					if($usuniety == 'nie')
+					{
+						$rettext .= "Ten identyfikator jest już przypisany do ".($this->page_obj->uczniowie->get_imie_uczniowie_nazwisko_uczniowie($idu_s)).".<br />";
+						$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+					}
+					else
+					{
+						$zapytanie = "update ".get_class($this)." set usuniety = 'nie', idu = $idu, idw = 0 where idiw = $idiw_s;";//poprawa wpisu
+						if($this->page_obj->database_obj->execute_query($zapytanie))
+						{
+							$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+						}
+						else
+						{
+							$rettext .= "Błąd zapisu <br />";
+							$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+						}
+					}
 				}
 				else
 				{
-					$zapytanie = "insert into ".get_class($this)."(identyfikator, idu, idiw) values ('$identyfikator', $idu, $idiw)";//nowy wpis
-				}
+					if( ($idiw != "") && is_numeric($idiw) && ($idiw > 0) )
+					{
+						$zapytanie = "update ".get_class($this)." set identyfikator = '$identyfikator' where idiw = $idiw and idu = $idu;";//poprawa wpisu
+					}
+					else
+					{
+						$zapytanie = "insert into ".get_class($this)."(identyfikator, idu, idiw) values ('$identyfikator', $idu, $idiw)";//nowy wpis
+					}
 
-				if($this->page_obj->database_obj->execute_query($zapytanie))
-				{
-					$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
-				}
-				else
-				{
-					$rettext .= "Błąd zapisu <br />";
-					$rettext .= form($idu,$idiw);
+					if($this->page_obj->database_obj->execute_query($zapytanie))
+					{
+						$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+					}
+					else
+					{
+						$rettext .= "Błąd zapisu <br />";
+						$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+					}
 				}
 			}
 			else
@@ -141,10 +173,13 @@ if( !class_exists('iden_wyciagu') )
 			//--------------------
 			if( isset($idu) && is_numeric($idu) && ($idu > 0) )
 			{
-					$wynik = $this->page_obj->database_obj->get_data("select identyfikator, usuniety, idiw from ".get_class($this)." where idu = $idu;");
+					$wynik = $this->page_obj->database_obj->get_data("select identyfikator, usuniety, idiw, idw from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
 					if($wynik)
 					{
-						$rettext[] = $wynik->fetch_row();
+						while($row = $wynik->fetch_row())
+						{
+							$rettext[] = $row;
+						};
 					}
 			}
 			//--------------------
@@ -185,6 +220,41 @@ if( !class_exists('iden_wyciagu') )
 			}
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region usun
+		private function usun($idu,$idiw,$confirm)
+		{
+			$rettext = "";
+			//--------------------
+			if( ($idu != "") && is_numeric($idu) && ($idu > 0) )
+			{
+				if( isset($idiw) && is_numeric($idiw) && ($idiw > 0) )
+				{
+					if($confirm=="yes")
+					{
+						//pobrać idw
+						$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu = $idu and idiw = $idiw;");
+						if($wynik)
+						{
+							list($idw) = $wynik->fetch_row();
+							if($idw > 0)
+							{
+								$this->page_obj->database_obj->execute_query("update wyciagi_uczniowie set usuniety = 'tak' where idw = $idw and status = 'auto_iden';");//, status = 'not_asigned', idw = 0
+							}
+						}
+						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak', idw = 0 where idu = $idu and idiw = $idiw;");
+					}
+				}
+
+				$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
+			}
+			else
+			{
+				$rettext .= "Zły identyfikator ucznia.";
+			}
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
