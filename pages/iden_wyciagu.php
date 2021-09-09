@@ -1,5 +1,5 @@
 <?php
-if( !class_exists('iden_wyciagu') )
+if( !class_exists("iden_wyciagu") )
 {
 	class iden_wyciagu
 	{
@@ -166,8 +166,8 @@ if( !class_exists('iden_wyciagu') )
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region list
-		public function list($idu)
+		#region get_list
+		public function get_list($idu)
 		{
 			$rettext = array();
 			//--------------------
@@ -245,7 +245,6 @@ if( !class_exists('iden_wyciagu') )
 						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak', idw = 0 where idu = $idu and idiw = $idiw;");
 					}
 				}
-
 				$rettext .= $this->page_obj->uczniowie->szczegoly($idu);
 			}
 			else

@@ -57,7 +57,7 @@ if(!class_exists('statistics'))
 			$link="";
 			if(isset($_SERVER['SCRIPT_URI']) && strlen($_SERVER['SCRIPT_URI'])>0)
 			{
-				$adresserwera=substr($_SERVER['SCRIPT_URI'],7,strpos($_SERVER['SCRIPT_URI'],'/',8)-7);
+				$adresserwera=substr($_SERVER['SCRIPT_URI'],strpos($_SERVER['SCRIPT_URI'],'/',1)+2,strpos($_SERVER['SCRIPT_URI'],'/',strpos($_SERVER['SCRIPT_URI'],'/',1)+2)-(strpos($_SERVER['SCRIPT_URI'],'/',1)+2));
 				if(isset($_SERVER['HTTP_REFERER']) && !preg_match("/".$adresserwera."/i",$_SERVER['HTTP_REFERER']))
 					$link=$_SERVER['HTTP_REFERER'];
 			}

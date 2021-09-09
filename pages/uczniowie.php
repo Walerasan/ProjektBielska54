@@ -751,7 +751,7 @@ if(!class_exists('uczniowie'))
 						<td style='width:18px;'></td>
 					</tr>";
 			$lp = 1;
-			foreach( $this->page_obj->iden_wyciagu->list($idu) as $key => $val)
+			foreach( $this->page_obj->iden_wyciagu->get_list($idu) as $key => $val)
 			{
 				if($val[1] == 'nie')
 				{

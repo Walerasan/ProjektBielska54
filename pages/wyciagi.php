@@ -79,7 +79,7 @@ if(!class_exists('wyciagi'))
 					case "usun":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$confirm=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['confirm'])?$_POST['confirm']:"");
-						$content_text .= $this->delete($idw,$confirm);
+						$content_text .= $this->delete_idw($idw,$confirm);
 					break;
 					case "zapisz":
 						$idw=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
@@ -338,8 +338,8 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region delete
-		public function delete($idw,$confirm)
+		#region delete_idw
+		public function delete_idw($idw,$confirm)
 		{
 			$rettext="";
 			//--------------------
@@ -412,12 +412,12 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			$rettext .= "<hr>";
-        	$rettext .= "<br>pobieram nazwę pliku: ".$file."<br>";
+			$rettext .= "<br>pobieram nazwę pliku: ".$file."<br>";
 			/**
 			* dokument przetwarza plik html i zapisuje do bazy
 			* Hydrotrade Polska Rafał Płatkowski, Arkadiusz Waliczek
 			*/
-
+			
 			//Tworzę nowy obiekt struktury pliku html "dom"
 			$dom = new domDocument; 
 			
@@ -442,7 +442,7 @@ if(!class_exists('wyciagi'))
 			$rowsTr3Tabela = $tables->item(2)->getElementsByTagName('tr');
 			
 			
-			$tablicaData = [];
+			$tablicaData = array();
 			foreach($rowsTr3Tabela as $tr){
 				$cols = $tr->getElementsByTagName('td');
 				if($cols->item(2)->nodeValue == "Przelew na rachunek"){		
@@ -586,7 +586,6 @@ if(!class_exists('wyciagi'))
 							$this->page_obj->database_obj->execute_query($truncate_wyciagi_template);
 					}
 					//------------------------------------------------------------------------------
-				
 			//--------------------
 			/*
 			testy
@@ -790,13 +789,9 @@ if(!class_exists('wyciagi'))
 					} else {
 						echo "błąd raportu";
 					}
-
-
-
-
 				}
 			}
-
+			//--------------------
 			return $rettext;
 		}
 		#endregion
