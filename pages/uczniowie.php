@@ -772,6 +772,8 @@ if(!class_exists('uczniowie'))
 					</tr>";
 				$lp++;
 			}
+			$rettext .= "</table>";
+			//--------------------
 			return $rettext;
 		}
 		#endregion

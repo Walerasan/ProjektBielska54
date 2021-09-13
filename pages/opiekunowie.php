@@ -47,7 +47,7 @@ if(!class_exists('opiekunowie'))
 						$telefon_opiekun = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
 						$haslo = isset($_GET['par6'])?$_GET['par6']:(isset($_POST['haslo'])?$_POST['haslo']:"");
-						$haslo_confirm = isset($_GET['par7'])?$_GET['par7']:(isset($_POST['#'])?$_POST['haslo_confirm']:"");
+						$haslo_confirm = isset($_GET['par7'])?$_GET['par7']:(isset($_POST['haslo_confirm'])?$_POST['haslo_confirm']:"");
 						$content_text .= $this->add($ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun,$haslo,$haslo_confirm);
 					break;
 					case "formularz":
@@ -61,7 +61,8 @@ if(!class_exists('opiekunowie'))
 					break;
 					case "lista":
 					default:
-						$content_text.=$this->lista();
+						$aktualnailosc = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
+						$content_text.=$this->lista($aktualnailosc);
 					break;
 				}
 			}
@@ -71,13 +72,18 @@ if(!class_exists('opiekunowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista()
+		public function lista($aktualnailosc)
 		{
 			$rettext="";
 			//--------------------
 			$rettext .= "<button class='button_add' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
+			if($aktualnailosc == "") $aktualnailosc = 0;
+			$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
+			$iloscwszystkich = $this->page_obj->database_obj->result_count();
+			$iloscnastronie = 15;
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
 			if($wynik)
 			{
 				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -108,15 +114,16 @@ if(!class_exists('opiekunowie'))
 					//--------------------
 					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$ido' onmouseover=\"setopticalwhite50('wiersz$ido')\" onmouseout=\"setoptical0('wiersz$ido')\">
-							<td style='text-align:right;padding-right:10px;color:#555555;'>$lp.</td>
-							<td>$imie_opiekun,$nazwisko_opiekun</td>
+							<td style='text-align:right;padding-right:10px;color:#555555;'>".($aktualnailosc+$lp).".</td>
+							<td>$nazwisko_opiekun, $imie_opiekun</td>
 							<td>$telefon_opiekun</td>
 							<td>$email_opiekun</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$ido'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
 				}
-				$rettext .= "</table>";
+				$rettext .= "</table><br>";
+					$rettext .= "<div style='text-align:center;clear:both;'>".$this->page_obj->subpages->create($iloscwszystkich,$iloscnastronie,$aktualnailosc,get_class($this).",".$this->page_obj->template.",lista")."</div>";
 			}
 			else
 			{
