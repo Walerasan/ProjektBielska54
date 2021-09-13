@@ -32,9 +32,9 @@ if(!class_exists('database_cfg'))
 			else//ustawienia dla serwera
 			{
 				$this->server="localhost";
-				$this->login="user1";
-				$this->password="password1";
-				$this->database_name="labnode";
+				$this->login="01356449_ksiegowosc_nzpe_pl";
+				$this->password="KsieGowosC_nzpePL2021";
+				$this->database_name="01356449_ksiegowosc_nzpe_pl";
 				$this->show_queries_when_error=true;
 				$this->show_queries_when_ok=true;
 			}

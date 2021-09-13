@@ -4,7 +4,7 @@ RewriteEngine on
 FileETag MTime Size
 
 #RewriteCond %{HTTPS} off
-#RewriteRule (.*) https://labnode.org%{REQUEST_URI}
+#RewriteRule (.*) https://platnosci.nzpe.pl%{REQUEST_URI}
 
 AddType  application/vnd.openxmlformats  .docx .pptx .xlsx
 
