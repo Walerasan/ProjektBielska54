@@ -490,6 +490,14 @@ if(!class_exists('opiekunowie'))
 			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="password_change_token";
+			$pola[$nazwa][0]="varchar(128)";
+			$pola[$nazwa][1]="null";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
 			//----------------------------------------------------------------------------------------------------
 			$this->page_obj->database_obj->install($nazwatablicy,$pola);
 			unset($pola);
