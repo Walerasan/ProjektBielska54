@@ -49,9 +49,9 @@ if(!class_exists('index_template'))
 		//----------------------------------------------------------------------------------------------------
 		private function index_template_user_is_login($trescstrony)
 		{
-			$rettext="<link rel='Stylesheet' type='text/css' href='./css/index_login.css' />";
-			$rettext.="<div style='width:100%;'>";
-			$rettext.="<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
+			$rettext = "<link rel='Stylesheet' type='text/css' href='./css/index_login.css' />";
+			$rettext .= "<div style='width:100%;'>";
+			$rettext .= "<div style='width:250px;float:left;overflow:hidden;padding:10px;'>";
 			$rettext .= "<div class='button_spacing'></div>";
 			$rettext .= "<div class='login_imie_nazwisko'>".$this->page_obj->opiekunowie->get_login_imie_nazwisko()."</div>";
 			$rettext .= "<div class='button_spacing_x4'></div>";
@@ -62,12 +62,15 @@ if(!class_exists('index_template'))
 			$rettext .= $this->button("Wyciągi","wyciagi,index,lista");
 			$rettext .= "<div class='button_spacing_x4'></div>";
 			$rettext .= "<div class='button_spacing_x4'></div>";
+			$rettext .= $this->button("Zmień hasło","opiekunowie,index,change_password_form");
+			$rettext .= "<div class='button_spacing'></div>";
 			$rettext .= $this->button("Wyloguj","staticpages,index,logout");
-			$rettext.="</div>";
-			$rettext.="<div style='overflow:hidden;padding:20px;'>";
-			$rettext.=$trescstrony;
-			$rettext.="</div>";
-			$rettext.="</div>";
+			$rettext .= "</div>";
+			$rettext .= "<div style='overflow:hidden;padding:20px;'>";
+			$rettext .= $trescstrony;
+			$rettext .= "</div>";
+			$rettext .= "</div>";
+			$rettext .= "<div style='width:100%;height:30px;clear:both;text-align:right;position:absolute;bottom:10px;'><p style='padding:10px;'>v 1.1</p></div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------

@@ -22,15 +22,24 @@ if(!class_exists('opiekunowie'))
 		#region get_cntent
 		public function get_content()
 		{
-			$content_text="<p class='title'>OPIEKUNOWIE</p>";
-			$template_class_name=$this->page_obj->template."_template";
+			$content_text = "";//title is in function
+			$template_class_name = $this->page_obj->template."_template";
 			//--------------------
 			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
 			{
 				switch($this->page_obj->target)
 				{
+					case "save_new_password":
+						$current_pass = isset($_POST['current_pass']) ? $_POST['current_pass'] : "";
+						$new_pass = isset($_POST['new_pass']) ? $_POST['new_pass'] : "";
+						$new_pass_confirmation = isset($_POST['new_pass_confirmation']) ? $_POST['new_pass_confirmation'] : "";
+						$content_text .= $this->save_new_password($current_pass, $new_pass, $new_pass_confirmation);
+						break;
+					case "change_password_form":
+						$content_text .= $this->change_password_form("");
+						break;
 					default:
-						$content_text.="No access is available";
+						$content_text .= "No access is available";
 						break;
 				}
 			}
@@ -107,25 +116,26 @@ if(!class_exists('opiekunowie'))
 			if($r_access=="" || $r_ido==-1 || $r_ido=="")$r_access="no";
 			if($this->is_login())
 				return -2;
-			$r_MySqlLogin=$page_obj->database_obj->get_handle();
+			$r_MySqlLogin = $this->page_obj->database_obj->get_handle();
 			if(!$r_MySqlLogin)
 				return -1;
 			//mysql_select_db("presinfo");
 			//pobranie hasla uzytkownika
 			$r_wynik=$r_MySqlLogin->query("select ido,haslo from ".get_class($this)." where email_opiekun='$r_login';");
 			//jezeli puste zglosic info o zmiane hasla jezeli brak to wylot na zewnatrz
-			if($r_access=="no" && $r_MySqlLogin->affected_rows!=1)
+			if($r_access == "no" && $r_MySqlLogin->affected_rows != 1)
 			{
 				return 0;
 			}
 			else
 			{
-				list($ido,$pas)=$r_wynik->fetch_row();
+				list($ido,$pas) = $r_wynik->fetch_row();
 				if($pas == "")
 				{
-					$r_ido=$ido;
-					$_SESSION['r_ido']=$r_ido;
-					setcookie("r_access","oki",time()+session_cache_expire());
+					//nie można się zalogować bez hasła
+					//$r_ido = $ido;
+					//$_SESSION['r_ido'] = $r_ido;
+					//setcookie("r_access","oki",time() + session_cache_expire());
 					return -3;
 				};
 			}
@@ -188,6 +198,102 @@ if(!class_exists('opiekunowie'))
 			$rettext = "";
 			//--------------------
 			$rettext .= $this->get_imie_opiekun_nazwisko_opiekun($this->get_login_ido());
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region change password form
+		private function change_password_form($message)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<p class='title'>ZMIANA HASŁA:</p>";
+			//--------------------
+			$rettext .= "<p style = 'color:red;' >".$message."<br /><br /></p>";
+			//--------------------
+			$rettext .= "	<style>
+									div.wiersz{float:left;clear:left;}
+									div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+									div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+								</style>";
+			//--------------------
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},save_new_password'>";
+			$rettext .= "<div style='overflow:hidden;'>";
+
+			$rettext .= "	<div class='wiersz'>
+									<div class='formularzkom1'>
+										Aktualne hasło:
+									</div>
+									<div class='formularzkom2'>
+										<input type='password' name='current_pass' />
+									</div>
+								</div>";
+
+			$rettext .= "	<p><br /><br /><br /></p>";
+
+			$rettext .= "	<div class='wiersz'>
+									<div class='formularzkom1'>
+										Nowe hasło:
+									</div>
+									<div class='formularzkom2'>
+										<input type='password' name='new_pass' />
+									</div>
+								</div>";
+
+			$rettext .= "	<div class='wiersz'>
+									<div class='formularzkom1'>
+										potwierdź:
+									</div>
+									<div class='formularzkom2'>
+										<input type='password' name='new_pass_confirmation' />
+									</div>
+								</div>";
+
+			$rettext .= "	<div class='wiersz'>
+									<div class='formularzkom1'>
+										&#160;
+									</div>
+									<div class='formularzkom2'>
+										<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>
+									</div>
+								</div>";
+			$rettext .= "</div>";
+			$rettext .= "</form>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region save_new_password
+		private function save_new_password($current_pass, $new_pass, $new_pass_confirmation)
+		{
+			$rettext = "";
+			//--------------------
+			// check new_pass and new_pass_confirmation
+			if( $new_pass != $new_pass_confirmation )
+			{
+				$rettext .= $this->change_password_form("Potwierdzenie nowego hasła jest niepoprawne. Spróbuj ponownie.");
+				return $rettext;
+			}
+
+			// check current_pass
+			$sql_result = $this->page_obj->database_obj->get_data("select ido from opiekunowie where haslo = PASSWORD('$current_pass') and ido = ".$this->get_login_ido().";");
+			if( !$sql_result )
+			{
+				$rettext .= $this->change_password_form("Aktualne hasła jest niepoprawne. Spróbuj ponownie.");
+				return $rettext;
+			}
+
+			// change password
+			$sql_result = $this->page_obj->database_obj->execute_query("update opiekunowie set haslo = PASSWORD('$new_pass') where ido = ".$this->get_login_ido().";");
+			if( !$sql_result )
+			{
+				$rettext .= $this->change_password_form("Błąd zapisu do bazy. Spróbuj ponownie za chwilę.");
+				return $rettext;
+			}
+
+			$rettext .= "Hasło zmienione";
 			//--------------------
 			return $rettext;
 		}
