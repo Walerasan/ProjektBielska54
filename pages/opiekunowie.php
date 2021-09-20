@@ -25,10 +25,14 @@ if(!class_exists('opiekunowie'))
 			$content_text = "";//title is in function
 			$template_class_name = $this->page_obj->template."_template";
 			//--------------------
-			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
+			if( ($this->page_obj->template == "admin") || ($this->page_obj->template == "index") )
 			{
 				switch($this->page_obj->target)
 				{
+					case "restore_password":
+						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
+						$content_text .= "Link do zmiany hasła został wysłany na adres:<br />".$par1;
+						break;
 					case "save_new_password":
 						$current_pass = isset($_POST['current_pass']) ? $_POST['current_pass'] : "";
 						$new_pass = isset($_POST['new_pass']) ? $_POST['new_pass'] : "";

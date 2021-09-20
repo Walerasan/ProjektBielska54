@@ -38,7 +38,7 @@ if(!class_exists('index_template'))
 					<div class='center'>
 						<img src='./media/desktop/nowe_logo.png' alt='' class='nowe_logo'/>
 						<!--<img src='./media/desktop/tytul2.png' alt='' class='tytul2'/>-->
-						{$this->login_form()}
+						{$this->login_form($trescstrony)}
 						<div class='info'>
 							<img src='./media/desktop/ikonadomku.gif' alt='' style='vertical-align:middle;' /> Bielska 54, 43-200 Pszczyna <img src='./media/desktop/ikonatelefonu.gif' alt='' style='vertical-align:middle;'/>  502 243 181 <img src='./media/desktop/ikonakoperty.gif' alt='' style='vertical-align:middle;' /> <a href='mailto:biuro@nzpe.pl' style='color:inherit;text-decoration:none;'>biuro@nzpe.pl</a> <img src='./media/desktop/ikonamapy.gif' alt='' style='vertical-align:middle;' /> <a href='https://goo.gl/maps/bmHnVLcNAhYVxGy8A' onclick='window.open(\"https://goo.gl/maps/bmHnVLcNAhYVxGy8A\",\"chaild\");return false;' style='color:inherit;text-decoration:none;'> mapa</a> 
 						</div>
@@ -83,13 +83,34 @@ if(!class_exists('index_template'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function login_form()
+		private function login_form($message)
 		{
-			$rettext="<form method='post' action='staticpages,index,login' class='login_form'>";
-			$rettext.="<input type='text' class='login_form_input' name='r_login' placeholder='e-mail' /> <br />";
-			$rettext.="<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
-			$rettext.="<input type='submit' class='login_form_submit' value='zaloguj' />";
-			$rettext.="</form>";
+			$rettext = "<form method='post' action='staticpages,index,login' class='login_form'>";
+			$rettext .= "<input type='text' class='login_form_input' name='r_login' id='r_login' placeholder='e-mail' onkeyup='enable_restore_password_button(this.value);' onpaste='enable_restore_password_button(this.value);'/> <br />";
+			$rettext .= "<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
+			$rettext .= "<input type='submit' class='login_form_submit' value='zaloguj' /> <br /><br />";
+			$rettext .= "<button class='restore_password' style='color:gray;border-radius: 4px;' title='Wprowadź adres e-mail' id='restore_password' disabled='disabled' type='button' onclick='window.location=\"opiekunowie,{$this->page_obj->template},restore_password,\"+(document.getElementById(\"r_login\").value);'>Odzyskaj hasło</button>";
+			$rettext .= "<p style='clear:both;width:300px;text-align:center;'>$message</p>";
+			$rettext .= "</form>";
+
+			$rettext .= "<script type='text/javascript'>";
+			$rettext .= "function enable_restore_password_button(value)
+							{
+								var restore_password = document.getElementById('restore_password');
+								if ( value != \"\" )
+								{
+									restore_password.disabled = false;
+									restore_password.title = \"\";
+									restore_password.style.color = \"black\";
+								}
+								else
+								{
+									restore_password.disabled = true;
+									restore_password.title = \"Wprowadź adres e-mail\";
+									restore_password.style.color = \"gray\";
+								};
+							};";
+			$rettext .= "</script>";
 			//--------------------
 			return $rettext;
 		}

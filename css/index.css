@@ -294,3 +294,12 @@ input.login_form_submit
 	text-align: center;
 	margin:5px;
 }
+button.restore_password
+{
+	width:208px;
+	font-size: 14px;
+	text-align: center;
+	margin:5px;
+	color:black;
+	float:right;
+}

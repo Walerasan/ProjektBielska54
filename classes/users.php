@@ -264,10 +264,10 @@ if(!class_exists('users'))
                 $rettext.="<table style='width:100%;font-size:10pt;' cellspacing='0'>";
                 $rettext.="
 					<tr style='font-weight:bold;'>
-						<td style='width:25px;'>Lp.</td>						
+						<td style='width:25px;'>Lp.</td>
 						<td>nazwa</td>
 						<td style='width:18px;'></td>
-						<td style='width:18px;'></td>						
+						<td style='width:18px;'></td>
 					</tr>";
                 $lp=0;
                 while(list($idu,$imie,$nazwisko,$usuniety)=$wynik->fetch_row())
