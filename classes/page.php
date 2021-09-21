@@ -10,6 +10,7 @@ include_once("./classes/statistics.php");
 include_once("./classes/graphic.php");
 include_once("./classes/imagemagic.php");
 include_once("./classes/admin.php");
+include_once("./classes/sendmail.php");
 //----------------------------------------------------------------------------------------------------
 if(!class_exists('page'))
 {
@@ -26,6 +27,7 @@ if(!class_exists('page'))
 		var $graphic_obj;
 		var $imagemagic_obj;
 		var $admin;
+		var $sendmail_obj;
 		
 		var $page;
 		var $template;
@@ -38,7 +40,7 @@ if(!class_exists('page'))
 			//--------------------
 			$this->server_cfg_obj=new server_cfg;
 			$this->database_cfg_obj=new database_cfg;
-			$this->text_obj=new text;				
+			$this->text_obj=new text;
 			
 			//--------------------
 			// get control variables
@@ -110,6 +112,12 @@ if(!class_exists('page'))
 			// create imagemagic obiect
 			//--------------------
 			$this->imagemagic_obj=new imagemagic();
+			//~~~~~~~~~~~~~~~~~~~~
+
+			//--------------------
+			// create sendmail obiect
+			//--------------------
+			$this->sendmail_obj = new sendmail();
 			//~~~~~~~~~~~~~~~~~~~~
 			
 			//--------------------

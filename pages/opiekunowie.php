@@ -29,9 +29,13 @@ if(!class_exists('opiekunowie'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "new_password":
+						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
+						$content_text .= $this->new_password_form($par1);
+						break;
 					case "restore_password":
 						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
-						$content_text .= "Link do zmiany hasła został wysłany na adres:<br />".$par1;
+						$content_text .= $this->restore_password($par1);
 						break;
 					case "save_new_password":
 						$current_pass = isset($_POST['current_pass']) ? $_POST['current_pass'] : "";
@@ -300,6 +304,73 @@ if(!class_exists('opiekunowie'))
 			$rettext .= "Hasło zmienione";
 			//--------------------
 			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region cos
+		private function restore_password($adres_email)
+		{
+			$rettext = "";
+			//--------------------
+			// sprawdzam czy podany adres e-mail istnieje w bazei
+			$sql_result = $this->page_obj->database_obj->get_data("select ido from opiekunowie where email_opiekun = '$adres_email';");
+			if( !$sql_result )
+			{
+				$rettext .= "Adres $adres_email nie został zarejestrowany w naszym systemie.";
+			}
+			else
+			{
+				list($ido) = $sql_result->fetch_row();
+				$sql_result = $this->page_obj->database_obj->execute_query("update opiekunowie set password_change_token = CONCAT(UNIX_TIMESTAMP(NOW()),'_','".uniqid(true)."') where ido = $ido;");
+				if( !$sql_result )
+				{
+					$rettext .= "Wystąpił problem z zapisem do bazy danych. Proszę o kontakt z placówką w celu zmiany hasła.";
+				}
+				else 
+				{
+					$sql_result = $this->page_obj->database_obj->get_data("select password_change_token from opiekunowie where ido = $ido;");
+					if( !$sql_result )
+					{
+						$rettext .= "Wystąpił problem z odczytem bazy danych. Proszę o kontakt z placówką w celu zmiany hasła.";
+					}
+					else
+					{
+						$adres_from = "platnosci@nzpe.pl";
+						list($password_change_token) = $sql_result->fetch_row();
+						$content = "W celu zmiany hasła do platnosci.nzpe.pl proszę otworzyć link: <a href='https:\\\\platnosci.nzpe.pl\opiekunowie,index,new_password_form,$password_change_token'>https:\\\\platnosci.nzpe.pl\opiekunowie,index,new_password_form,$password_change_token</a> i postępować zgodnie z instrukcjami.";
+						if ( $this->page_obj->sendmail_obj->sendhtmlmessage_from($adres_from, $adres_email, "Zmiana hasła do platnosci.nzpe.pl", $content) )
+						{
+							$rettext .= "Link do zmiany hasła został wysłany na adres:<br />".$par1;
+						}
+						else
+						{
+							$rettext .= "Wystąpił problem z wysłaniem linku. Proszę o kontakt z placówką w celu zmiany hasła.";
+						}
+					}
+				}
+			}
+			
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region new_password_form
+		private function new_password_form($token)
+		{
+			//pobrać ido jak się nie uda to msg
+			//sprawdzić czy link nie starczy niż 12 godzin
+			//jak wszystko ok to formularz do zmiany hasła z ukrytym tokenem
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region new_password_save
+		private function new_password_save($new_pass,$new_pass_confirmation,$token)
+		{
+			//sprawdzić new_pass == $new_pass_confirmation
+			//pobrać ido jak się nie uda to msg
+			//sprawdzić czy link nie starczy niż 12 godzin
+			//jak wszystko ok to zapis nowego hasła do bazy
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -90,7 +90,7 @@ if(!class_exists('index_template'))
 			$rettext .= "<input type='password' class='login_form_input' name='r_password' placeholder='hasło' /> <br />";
 			$rettext .= "<input type='submit' class='login_form_submit' value='zaloguj' /> <br /><br />";
 			$rettext .= "<button class='restore_password' style='color:gray;border-radius: 4px;' title='Wprowadź adres e-mail' id='restore_password' disabled='disabled' type='button' onclick='window.location=\"opiekunowie,{$this->page_obj->template},restore_password,\"+(document.getElementById(\"r_login\").value);'>Odzyskaj hasło</button>";
-			$rettext .= "<p style='clear:both;width:300px;text-align:center;'>$message</p>";
+			$rettext .= "<p style='clear:both;width:300px;text-align:center;font-size:16px;'>$message</p>";
 			$rettext .= "</form>";
 
 			$rettext .= "<script type='text/javascript'>";
