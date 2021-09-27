@@ -352,10 +352,10 @@ if(!class_exists('opiekunowie'))
 					{
 						$adres_from = "platnosci@nzpe.pl";
 						list($password_change_token) = $sql_result->fetch_row();
-						$content = "W celu zmiany hasła do platnosci.nzpe.pl proszę otworzyć link: <a href='https:\\\\platnosci.nzpe.pl\opiekunowie,change_password,new_password_form,$password_change_token'>https:\\\\platnosci.nzpe.pl\opiekunowie,change_password,new_password_form,$password_change_token</a> i postępować zgodnie z instrukcjami.";
+						$content = "W celu zmiany hasła do platnosci.nzpe.pl proszę otworzyć link: <a href='https://platnosci.nzpe.pl/opiekunowie,change_password,new_password_form,$password_change_token'>https://platnosci.nzpe.pl/opiekunowie,change_password,new_password_form,$password_change_token</a> i postępować zgodnie z instrukcjami.";
 						if ( $this->page_obj->sendmail_obj->sendhtmlmessage_from($adres_from, $adres_email, "Zmiana hasła do platnosci.nzpe.pl", $content) )
 						{
-							$rettext .= "Link do zmiany hasła został wysłany na adres:<br />".$par1;
+							$rettext .= "Link do zmiany hasła został wysłany na adres:<br />".$adres_email;
 						}
 						else
 						{
@@ -470,7 +470,7 @@ if(!class_exists('opiekunowie'))
 				$rettext .= "Hasło zostało zmienione.<br />";
 				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
 			}
-			
+
 			return $rettext;
 		}
 		#endregion

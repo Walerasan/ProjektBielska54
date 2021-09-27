@@ -57,7 +57,7 @@ if(!class_exists('sendmail'))
 		public function sendhtmlmessage_from($email_from,$email_to,$title,$content)
 		{
 			//$content2="$title \n";
-			$content2.="$content\n";
+			$content2 = "$content\n";
 			$headers="From: $email_from \n";
 			$headers.="Reply-To: $email_from \n";
 			$headers.="X-Mailer: PHP/".phpversion()." LabNode.org \n";
