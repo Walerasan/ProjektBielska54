@@ -29,10 +29,6 @@ if(!class_exists('opiekunowie'))
 			{
 				switch($this->page_obj->target)
 				{
-					case "new_password":
-						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
-						$content_text .= $this->new_password_form($par1);
-						break;
 					case "restore_password":
 						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
 						$content_text .= $this->restore_password($par1);
@@ -45,6 +41,25 @@ if(!class_exists('opiekunowie'))
 						break;
 					case "change_password_form":
 						$content_text .= $this->change_password_form("");
+						break;
+					default:
+						$content_text .= "No access is available";
+						break;
+				}
+			}
+			else if( $this->page_obj->template == "change_password" )
+			{
+				switch($this->page_obj->target)
+				{
+					case "new_password_save":
+						$new_pass = isset($_POST['r_password']) ? $_POST['r_password'] : "";
+						$new_pass_confirmation = isset($_POST['r_password_conf']) ? $_POST['r_password_conf'] : "";
+						$token = isset($_POST['token']) ? $_POST['token'] : "";
+						$content_text .= $this->new_password_save($new_pass, $new_pass_confirmation, $token);
+						break;
+					case "new_password_form":
+						$par1 = isset($_GET['par1']) ? $_GET['par1'] : "";
+						$content_text .= $this->new_password_form($par1);
 						break;
 					default:
 						$content_text .= "No access is available";
@@ -337,7 +352,7 @@ if(!class_exists('opiekunowie'))
 					{
 						$adres_from = "platnosci@nzpe.pl";
 						list($password_change_token) = $sql_result->fetch_row();
-						$content = "W celu zmiany hasła do platnosci.nzpe.pl proszę otworzyć link: <a href='https:\\\\platnosci.nzpe.pl\opiekunowie,index,new_password_form,$password_change_token'>https:\\\\platnosci.nzpe.pl\opiekunowie,index,new_password_form,$password_change_token</a> i postępować zgodnie z instrukcjami.";
+						$content = "W celu zmiany hasła do platnosci.nzpe.pl proszę otworzyć link: <a href='https:\\\\platnosci.nzpe.pl\opiekunowie,change_password,new_password_form,$password_change_token'>https:\\\\platnosci.nzpe.pl\opiekunowie,change_password,new_password_form,$password_change_token</a> i postępować zgodnie z instrukcjami.";
 						if ( $this->page_obj->sendmail_obj->sendhtmlmessage_from($adres_from, $adres_email, "Zmiana hasła do platnosci.nzpe.pl", $content) )
 						{
 							$rettext .= "Link do zmiany hasła został wysłany na adres:<br />".$par1;
@@ -358,19 +373,105 @@ if(!class_exists('opiekunowie'))
 		#region new_password_form
 		private function new_password_form($token)
 		{
-			//pobrać ido jak się nie uda to msg
-			//sprawdzić czy link nie starczy niż 12 godzin
-			//jak wszystko ok to formularz do zmiany hasła z ukrytym tokenem
+			$rettext = "";
+			//--------------------
+
+			// pobrać ido jak się nie uda to msg
+			$sql_result = $this->page_obj->database_obj->get_data("select ido,UNIX_TIMESTAMP(NOW()) from opiekunowie where password_change_token = '$token';");
+			if( !$sql_result )
+			{
+				$rettext .= "Nieprawidłowy link. <br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+				return $rettext;
+			}
+			
+			// sprawdzić czas wygaśnięcia
+			list($ido,$current_time_stamp) = $sql_result->fetch_row();
+			$token_array = explode("_", $token);
+			//$rettext .= "$current_time_stamp - {$token_array[0]} = ".($current_time_stamp - $token_array[0]);
+			if( ($current_time_stamp - $token_array[0]) > 86400) //24 * 60 * 60 = 86 400
+			{
+				$rettext .= "Link wygasł.<br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+				return $rettext;
+			}
+
+			// jak wszystko ok to formularz do zmiany hasła z ukrytym tokenem
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},new_password_save'>";
+			$rettext .= "<input type='password' class='login_form_input' name='r_password' placeholder='nowe hasło' /> <br />";
+			$rettext .= "<input type='password' class='login_form_input' name='r_password_conf' placeholder='powtórz' /> <br />";
+			$rettext .= "<input type='submit' class='login_form_submit' value='zapisz' /> <br /><br />";
+			$rettext .= "<p style='clear:both;width:300px;text-align:center;font-size:16px;'>$message</p>";
+			$rettext .= "<input type='hidden' name='token' value='$token' />";
+			$rettext .= "</form>";
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region new_password_save
 		private function new_password_save($new_pass,$new_pass_confirmation,$token)
 		{
+			$rettext = "";
+			//--------------------
+
+			if( $new_pass == "" )
+			{
+				$rettext .= "Hasło nie może być puste.";
+				$rettext .= $this->new_password_form($token);
+				return $rettext;
+			}
+
+			if( strlen($new_pass) < 6 )
+			{
+				$rettext .= "Hasło musi mieć minimum 6 znaków.";
+				$rettext .= $this->new_password_form($token);
+				return $rettext;
+			}
+
 			//sprawdzić new_pass == $new_pass_confirmation
-			//pobrać ido jak się nie uda to msg
-			//sprawdzić czy link nie starczy niż 12 godzin
+			if( ($new_pass != $new_pass_confirmation) )
+			{
+				$rettext .= "Potwierdzenie hasła nieprawidłowe";
+				$rettext .= $this->new_password_form($token);
+				return $rettext;
+			}
+
+			// pobrać ido jak się nie uda to msg
+			$sql_result = $this->page_obj->database_obj->get_data("select ido,UNIX_TIMESTAMP(NOW()) from opiekunowie where password_change_token = '$token';");
+			if( !$sql_result )
+			{
+				$rettext .= "Nieprawidłowy link.<br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+				return $rettext;
+			}
+			
+			// sprawdzić czas wygaśnięcia
+			list($ido,$current_time_stamp) = $sql_result->fetch_row();
+			$token_array = explode("_", $token);
+			//$rettext .= "$current_time_stamp - {$token_array[0]} = ".($current_time_stamp - $token_array[0]);
+			if( ($current_time_stamp - $token_array[0]) > 86400) //24 * 60 * 60 = 86 400
+			{
+				$rettext .= "Link wygasł.<br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+				return $rettext;
+			}
+
 			//jak wszystko ok to zapis nowego hasła do bazy
+			$new_pass = $this->page_obj->text_obj->domysql($new_pass);
+			$sql_result = $this->page_obj->database_obj->execute_query("update opiekunowie set password_change_token = '', haslo = PASSWORD('$new_pass') where ido = $ido;");
+			if( !$sql_result )
+			{
+				$rettext .= "Wystąpił problem z zapisem do bazy danych. Proszę o kontakt z placówką w celu zmiany hasła.<br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+			}
+			else
+			{
+				$rettext .= "Hasło zostało zmienione.<br />";
+				$rettext .= "<a href='.'>Powrót do strony głównej</a>";
+			}
+			
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
