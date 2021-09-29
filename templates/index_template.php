@@ -71,7 +71,7 @@ if(!class_exists('index_template'))
 			$rettext .= 		$trescstrony;
 			$rettext .= 	"</div>";
 			$rettext .= "</div>";
-			$rettext .= "<div style='width:100%;height:30px;clear:both;text-align:right;position:absolute;bottom:10px;'><p style='padding:10px;'>v 1.3</p></div>";
+			$rettext .= "<div style='width:100%;height:30px;clear:both;text-align:right;position:absolute;bottom:10px;'><p style='padding:10px;'>v 1.4</p></div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------

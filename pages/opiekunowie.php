@@ -309,12 +309,12 @@ if(!class_exists('opiekunowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun from ".get_class($this)." where usuniety='nie' order by nazwisko_opiekun;");
 			if($wynik)
 			{
 				while(list($ido,$imie_opiekun,$nazwisko_opiekun)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$ido, "$imie_opiekun $nazwisko_opiekun");
+					$rettext[] = array((int)$ido, "$nazwisko_opiekun $imie_opiekun");
 				}
 			}
 			//--------------------

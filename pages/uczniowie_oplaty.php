@@ -350,7 +350,9 @@ if(!class_exists('uczniowie_oplaty'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select iduop,idop,rabat_kwota,rabat_nazwa from ".get_class($this)." where idu=$idu and usuniety='nie';");
+			//$wynik = $this->page_obj->database_obj->get_data("select iduop, idop, rabat_kwota, rabat_nazwa from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
+			//echo("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.ido = o.ido and uo.usuniety = 'nie' and o.usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.idop = o.idop and uo.usuniety = 'nie' and o.usuniety = 'nie';");
 			if($wynik)
 			{
 				while(list($iduop,$idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())

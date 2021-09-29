@@ -26,12 +26,22 @@ if(!class_exists('uczniowie'))
 			$content_text="<p class='title'>UCZNIOWIE</p>";
 			$template_class_name=$this->page_obj->template."_template";
 			//--------------------
-			if( ($this->page_obj->template=="admin") || ($this->page_obj->template=="index") )
+			if( ($this->page_obj->template == "admin") || ($this->page_obj->template == "index") )
 			{
 				switch($this->page_obj->target)
 				{
+					case "zapisz_gotowka":
+						$idu = isset($_POST['idu']) ? $_POST['idu'] : 0;
+						$kwota = isset($_POST['kwota']) ? $_POST['kwota'] : 0;
+						$tytul = isset($_POST['tytul']) ? $_POST['tytul'] : 0;
+						$content_text .= $this->zapisz_gotowka($idu, $kwota, $tytul);
+						break;
+					case "form_gotowka":
+						$idu = isset($_GET['par1']) ? $_GET['par1'] : 0;
+						$content_text .= $this->form_gotowka($idu, 0, "");
+						break;
 					case "szczegoly":
-						$idu=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$idu = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idu'])?$_POST['idu']:0);
 						$content_text .= $this->szczegoly($idu);
 						break;
 					case "przywroc":
@@ -70,7 +80,7 @@ if(!class_exists('uczniowie'))
 						$nazwisko_opiekun=isset($_GET['par8'])?$_GET['par8']:(isset($_POST['nazwisko_opiekun'])?$_POST['nazwisko_opiekun']:"");
 						$telefon_opiekun=isset($_GET['par9'])?$_GET['par9']:(isset($_POST['telefon_opiekun'])?$_POST['telefon_opiekun']:"");
 						$email_opiekun=isset($_GET['par10'])?$_GET['par10']:(isset($_POST['email_opiekun'])?$_POST['email_opiekun']:"");
-						$content_text.=$this->form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
+						$content_text .= $this->form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun);
 					break;
 					case "lista":
 					default:
@@ -114,16 +124,16 @@ if(!class_exists('uczniowie'))
 				if(isset($_POST['imie']) && !empty($_POST['imie']))
 				{
 					$szukajimie =$_POST['imie'];
-					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%';");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%' order by nazwisko_uczniowie ;");
 				}
 				else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko']))
 				{
 					$szukajnazwisko = $_POST['nazwisko'];
-					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%';");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%' order by nazwisko_uczniowie ;");
 				}
 				else
 				{
-					$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie limit $aktualnailosc,$iloscnastronie;");
 				}
 
 				if($wynik)
@@ -142,7 +152,7 @@ if(!class_exists('uczniowie'))
 					$rettext .= "
 						<tr style='font-weight:bold;'>
 							<td style='width:25px;'>Lp.</td>
-							<td>Imie, nazwisko</td>
+							<td>Nazwisko, imie</td>
 							<td>klasa</td>
 							
 							<td style='width:18px;'></td>
@@ -166,7 +176,7 @@ if(!class_exists('uczniowie'))
 						$rettext .= "
 							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
 								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">$lp.</td>
-								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
+								<td onclick=\"uczniowie.open($idu);\">$nazwisko_uczniowie $imie_uczniowie</td>
 								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 								
 								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
@@ -202,10 +212,10 @@ if(!class_exists('uczniowie'))
 			}
 			else
 			{
-				$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this).";");
+				$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie;");
 				$iloscwszystkich = $this->page_obj->database_obj->result_count();
 
-				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");				
+				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie limit $aktualnailosc,$iloscnastronie;");
 				if($wynik)
 				{
 					$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -222,7 +232,7 @@ if(!class_exists('uczniowie'))
 					$rettext .= "
 						<tr style='font-weight:bold;'>
 							<td style='width:25px;'>Lp.</td>
-							<td>Imie, nazwisko</td>
+							<td>Nazwisko, imie</td>
 							<td>klasa</td>
 							
 							<td style='width:18px;'></td>
@@ -246,7 +256,7 @@ if(!class_exists('uczniowie'))
 						$rettext .= "
 							<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idu' onmouseover=\"setopticalwhite50('wiersz$idu')\" onmouseout=\"setoptical0('wiersz$idu')\">
 								<td style='text-align:right;padding-right:10px;color:#555555;' onclick=\"uczniowie.open($idu);\">".($aktualnailosc + $lp).".</td>
-								<td onclick=\"uczniowie.open($idu);\">$imie_uczniowie, $nazwisko_uczniowie</td>
+								<td onclick=\"uczniowie.open($idu);\">$nazwisko_uczniowie $imie_uczniowie</td>
 								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 								
 								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
@@ -486,12 +496,12 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' order by nazwisko_uczniowie;");
 			if($wynik)
 			{
 				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
+					$rettext[] = array((int)$idu, "$nazwisko_uczniowie $imie_uczniowie");
 				}
 			}
 			//--------------------
@@ -610,6 +620,7 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,szczegoly_drukuj,$idu\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
 			$rettext .= "<button class='button_add' style='width:240px;' title='Dodaj identyfikator płatności' type='button' onclick='window.location=\"iden_wyciagu,{$this->page_obj->template},form,$idu\"'>Dodaj identyfikator płatności</button>&#160;";
+			$rettext .= "<button class='button_add' style='width:140px;' title='Wpłata gotówki' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},form_gotowka,$idu\"'>Wpłata gotówki</button>&#160;";
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -783,6 +794,13 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
+			$rettext .= "<!DOCTYPE HTML PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>";
+			$rettext .= "<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='pl'>";
+			$rettext .= "<head>";
+			$rettext .= "<meta http-equiv='Content-Type' content='application/xhtml+xml; charset=utf-8' />";
+			$rettext .= "</head>";
+			$rettext .= "<html>";
+			//--------------------
 			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
 			//-----
 			$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -900,6 +918,7 @@ if(!class_exists('uczniowie'))
 				$rettext .= "<b style='font-size:16px;'>Rozliczone</b><br />";
 			}
 			//--------------------
+			$rettext .= "</html>";
 			return $rettext;
 		}
 		#endregion
@@ -954,6 +973,59 @@ if(!class_exists('uczniowie'))
 				}
 				$rettext = $suma_rozliczen;
 			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region form_gotowka
+		private function form_gotowka($idu, $kwota, $tytul)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<b style='font-size:20px;'><u>" . $this->get_imie_uczniowie_nazwisko_uczniowie($idu) . "</u></b><br /><br /><br />";
+			//--------------------
+			$rettext .= "
+				<style>
+					div.wiersz{float:left;clear:left;}
+					div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+					div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+				</style>";
+			$rettext .= "
+				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_gotowka'>
+					<div style='overflow:hidden;'>
+						<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:150px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='number' name='kwota' value='$kwota' style='width:150px;'/></div></div>
+						<div class='wiersz'>
+							<div class='formularzkom1'>&#160;</div>
+								<div class='formularzkom2'>
+									<input type='submit' name='' title='Zapisz' value='Zapisz' style='font-size:20px;'/>&#160;&#160;&#160;&#160;
+									<button title='Anuluj' style='font-size:20px;float:right;' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},szczegoly,$idu\"'>Anuluj</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<input type='hidden' name='idu' value='$idu' />
+				</form>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region zapisz_gotowka
+		private function zapisz_gotowka($idu, $kwota, $tytul)
+		{
+			$rettext = "";
+			//--------------------
+			$idw = $this->page_obj->wyciagi->add_and_return_idw(0,$tytul, "gotowka", $kwota);
+			if($idw != 0)
+			{
+				$rettext .= "Dodać powiązanie";
+				dodać numer referencyjny do identyfikator platnosci i to samo przypisze ta wplate
+			}
+			else
+				$rettext .= "Kiszka";
+			$rettext .= $this->szczegoly($idu);
 			//--------------------
 			return $rettext;
 		}

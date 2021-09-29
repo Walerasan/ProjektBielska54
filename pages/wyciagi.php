@@ -591,7 +591,7 @@ if(!class_exists('wyciagi'))
 			testy
 				TRUNCATE wyciagi;
 				TRUNCATE nr_konta;
-                TRUNCATE wyciagi_template;
+			TRUNCATE wyciagi_template;
 				TRUNCATE dokumenthtml;
 				SELECT count(*) FROM wyciagi;
 			*/
@@ -1299,6 +1299,33 @@ if(!class_exists('wyciagi'))
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------
+		//----------------------------------------------------------------------------------------------------
+		#region add
+		public function add_and_return_idw($idw,$tytul,$typ,$kwota)
+		{
+			$rettext = "";
+			//--------------------
+			// zabezpieczam dane
+			//--------------------
+			$tytul = $this->page_obj->text_obj->domysql($tytul);
+			//--------------------
+			if( ($idw != "") && is_numeric($idw) && ($idw > 0) )
+			{
+				$result = $this->page_obj->database_obj->execute_query("update ".get_class($this)." set tytul='$tytul', dataoperacji = NOW(), typ='$typ', kwota = $kwota where idw=$idw;");
+			}
+			else
+			{
+				wygenerowac losowy numer referencyjny taki by go nie bylo w bazie moze timestamp plus cos
+				$result = $this->page_obj->database_obj->execute_query("insert into ".get_class($this)."(tytul,dataoperacji,typ,kwota,id_nr_konta,rachuneknadawcy,adresnadawcy,nazwanadawcy,nazwapliku_id)values('$tytul',NOW(),'$typ',$kwota, 0, '0', ' ', 'sekretariat',0)");
+				if($result)
+				{
+					$idw = $this->page_obj->database_obj->last_id();
+				}
+			}
+			return $idw;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
@@ -1387,7 +1414,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="typ";
-			$pola[$nazwa][0]="enum('bankowy','reczny','inny')";
+			$pola[$nazwa][0]="enum('bankowy','reczny','inny','gotowka')";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'inny'";//default
@@ -1516,7 +1543,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="typ";
-			$pola[$nazwa][0]="enum('bankowy','reczny','inny')";
+			$pola[$nazwa][0]="enum('bankowy','reczny','inny','gotowka')";
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'inny'";//default
