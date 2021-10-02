@@ -693,11 +693,12 @@ if(!class_exists('uczniowie'))
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
-			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
+			
+			$suma_rozliczen = 0;
+			$oplata_counter = 1;
+			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);			
 			if(is_array($wyciagi_list))
 			{
-				$suma_rozliczen = 0;
-				$oplata_counter = 1;
 				foreach($wyciagi_list as $idw)
 				{
 					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
@@ -721,6 +722,35 @@ if(!class_exists('uczniowie'))
 					$oplata_counter++;
 				}
 			}
+			//gotówka
+			$wyciagi_list = $this->page_obj->iden_wyciagu->get_liste_wyciagow_dla_ucznia($idu);
+			if(is_array($wyciagi_list))
+			{
+				foreach($wyciagi_list as $idw)
+				{
+					$kwota = $this->page_obj->wyciagi->get_kwota($idw);
+					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
+					$data = $this->page_obj->wyciagi->get_date($idw);
+					//$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					$nadawca = "gotówka";
+					if(!is_nan($kwota))
+					{
+						$suma_rozliczen += $kwota;
+					}
+					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$tytul</td>
+										<td>$nadawca</td>
+										<td>$data</td>
+										<td>$kwota</td>
+										<td></td>
+										<td>$edytuj_oplate_link</td>
+									</tr>";
+					$oplata_counter++;
+				}
+			}
+
 			$rettext .= "<tr>
 									<td></td>
 									<td></td>
@@ -891,6 +921,32 @@ if(!class_exists('uczniowie'))
 					$oplata_counter++;
 				}
 			}
+			//gotówka
+			$wyciagi_list = $this->page_obj->iden_wyciagu->get_liste_wyciagow_dla_ucznia($idu);
+			if(is_array($wyciagi_list))
+			{
+				foreach($wyciagi_list as $idw)
+				{
+					$kwota = $this->page_obj->wyciagi->get_kwota($idw);
+					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
+					$data = $this->page_obj->wyciagi->get_date($idw);
+					//$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					$nadawca = "gotówka";
+					if(!is_nan($kwota))
+					{
+						$suma_rozliczen += $kwota;
+					}
+					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					$rettext .= "<tr>
+										<td>$oplata_counter</td>
+										<td>$tytul</td>
+										<td>$nadawca</td>
+										<td>$data</td>
+										<td>$kwota</td>
+									</tr>";
+					$oplata_counter++;
+				}
+			}
 			$rettext .= "<tr>
 									<td></td>
 									<td></td>
@@ -1020,8 +1076,8 @@ if(!class_exists('uczniowie'))
 			$idw = $this->page_obj->wyciagi->add_and_return_idw(0,$tytul, "gotowka", $kwota);
 			if($idw != 0)
 			{
-				$rettext .= "Dodać powiązanie";
-				dodać numer referencyjny do identyfikator platnosci i to samo przypisze ta wplate
+				$nrreferencyjny = $this->page_obj->wyciagi->get_nrreferencyjny($idw);
+				$this->page_obj->iden_wyciagu->insert_and_asign($idu,$idw,$nrreferencyjny);
 			}
 			else
 				$rettext .= "Kiszka";

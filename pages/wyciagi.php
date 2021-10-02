@@ -1116,7 +1116,7 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region processing_iden_wyciagu
-		private function processing_iden_wyciagu()
+		public function processing_iden_wyciagu()
 		{
 			$rettext = "Auto processing_iden_wyciagu system <br />";
 			//--------------------
@@ -1249,6 +1249,7 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region ukryj
 		private function ukryj($idw,$confirm)
 		{
 			$rettext = "";
@@ -1273,7 +1274,9 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			return $rettext;
 		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region odkryj
 		private function odkryj($idw,$confirm)
 		{
 			$rettext = "";
@@ -1298,7 +1301,7 @@ if(!class_exists('wyciagi'))
 			//--------------------
 			return $rettext;
 		}
-		//----------------------------------------------------------------------------------------------------
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
 		public function add_and_return_idw($idw,$tytul,$typ,$kwota)
@@ -1315,14 +1318,34 @@ if(!class_exists('wyciagi'))
 			}
 			else
 			{
-				wygenerowac losowy numer referencyjny taki by go nie bylo w bazie moze timestamp plus cos
 				$result = $this->page_obj->database_obj->execute_query("insert into ".get_class($this)."(tytul,dataoperacji,typ,kwota,id_nr_konta,rachuneknadawcy,adresnadawcy,nazwanadawcy,nazwapliku_id)values('$tytul',NOW(),'$typ',$kwota, 0, '0', ' ', 'sekretariat',0)");
 				if($result)
 				{
 					$idw = $this->page_obj->database_obj->last_id();
+					$nrreferencyjny = time()."_".$idw;
+					$result = $this->page_obj->database_obj->execute_query("update ".get_class($this)." set nrreferencyjny = '$nrreferencyjny' where idw = $idw;");
+					if( !$result )
+					{
+						$idw = 0;
+					}
 				}
 			}
 			return $idw;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_nrreferencyjny
+		public function get_nrreferencyjny($idw)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select nrreferencyjny from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			if($wynik)
+			{
+				list($rettext) = $wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

@@ -254,6 +254,66 @@ if( !class_exists("iden_wyciagu") )
 			//--------------------
 			return $rettext;
 		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region insert_and_asign
+		public function insert_and_asign($idu,$idw,$identyfikator)
+		{
+			$rettext = "";
+			//--------------------
+			$idiw = 0;
+			//--------------------
+			if( ($idu != "") && is_numeric($idu) && ($idu > 0) )
+			{
+				$wynik = $this->page_obj->database_obj->get_data("select idu,idiw,usuniety from ".get_class($this)." where identyfikator = '$identyfikator';");
+				if($wynik)
+				{
+					list($idu,$idiw,$usuniety) = $wynik->fetch_row();
+					if($usuniety != 'nie')
+					{
+						$zapytanie = "update ".get_class($this)." set usuniety = 'nie', idu = $idu, idw = 0 where idiw = $idiw_s;";//poprawa wpisu
+						$this->page_obj->database_obj->execute_query($zapytanie);
+					}
+				}
+				else
+				{
+					$zapytanie = "insert into ".get_class($this)."(identyfikator, idu, idiw) values ('$identyfikator', $idu, $idiw)";//nowy wpis
+					if($this->page_obj->database_obj->execute_query($zapytanie))
+					{
+						$idiw = $this->page_obj->database_obj->last_id();
+					}
+				}
+
+				if( $idiw > 0 )
+				{
+					$this->mark_idiw_assigned($idu,$idiw,$idw);
+					$this->page_obj->wyciagi->processing_iden_wyciagu();
+				}
+			}
+
+			
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region get_liste_wyciagow_dla_ucznia
+		public function get_liste_wyciagow_dla_ucznia($idu)
+		{
+			$rettext = array();
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
+			if($wynik)
+			{
+				while(list($idw) = $wynik->fetch_row())
+				{
+					$rettext[] = (int)$idw;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()

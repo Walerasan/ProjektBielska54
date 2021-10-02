@@ -148,7 +148,7 @@ if(!class_exists('wyciagi_uczniowie'))
 		#region get_liste_wyciagow_dla_ucznia
 		public function get_liste_wyciagow_dla_ucznia($idu)
 		{
-			$rettext=array();
+			$rettext = array();
 			//--------------------
 			$wynik = $this->page_obj->database_obj->get_data("select wu.idw from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie';");
 			if($wynik)
@@ -184,7 +184,7 @@ if(!class_exists('wyciagi_uczniowie'))
 			}
 			else
 			{
-				return NAN;
+				$count = 1;
 			}
 			
 			//dzielę kwotę przez ilość idu
