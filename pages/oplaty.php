@@ -500,7 +500,7 @@ if(!class_exists('oplaty'))
 				{
 					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext .= "|" . $this->page_obj->database_obj->show_report_message() ."|";
-					$rettext.=$this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie);
+					$rettext .= $this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data);
 				}
 			}
 			else
