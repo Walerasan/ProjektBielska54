@@ -236,7 +236,7 @@ if(!class_exists('oplaty'))
 				{
 					$_SESSION['antyrefresh']=true;
 					$rettext .= "Zapisane<br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
@@ -246,7 +246,7 @@ if(!class_exists('oplaty'))
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				$rettext.=$this->lista(0);
 			}
 			return $rettext;
 		}
@@ -263,12 +263,12 @@ if(!class_exists('oplaty'))
 				{
 					$this->page_obj->powiadomienia->mark_oplata_usunieta_from_nowe($idop);
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 			}
 			else
@@ -292,12 +292,12 @@ if(!class_exists('oplaty'))
 				{
 					$this->page_obj->powiadomienia->mark_nowe_from_oplata_usunieta($idop);
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 			}
 			else
@@ -494,7 +494,7 @@ if(!class_exists('oplaty'))
 					}
 					#endregion
 					$_SESSION['antyrefresh']=true;
-					$rettext.=$this->lista();
+					$rettext.=$this->lista(0);
 				}
 				else
 				{
@@ -505,7 +505,7 @@ if(!class_exists('oplaty'))
 			}
 			else
 			{
-				$rettext.=$this->lista();
+				$rettext.=$this->lista(0);
 			}
 			return $rettext;
 		}
