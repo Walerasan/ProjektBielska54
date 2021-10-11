@@ -112,7 +112,7 @@ if(!class_exists('oplaty'))
 			if($aktualnailosc == "") $aktualnailosc = 0;
 			$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
 			$iloscwszystkich=$this->page_obj->database_obj->result_count();
-			$iloscnastronie = 5;
+			$iloscnastronie = 15;
 			//--------------------
 			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
 			if($wynik)
@@ -460,6 +460,16 @@ if(!class_exists('oplaty'))
 			//--------------------
 			$nazwa = $this->page_obj->text_obj->domysql($nazwa);
 			$kwota = $this->page_obj->text_obj->domysql($kwota);
+
+			$wzor[1]="/,/";
+         $zamiany[1]=".";
+			$kwota = preg_replace($wzor, $zamiany, $kwota);
+			//--------------------
+			if ( !is_numeric($kwota) )
+			{
+				$rettext .= "Nieprawidłowa zawartość pola kwota.<br />";
+				$rettext .= $this->formularz_uczen($idop,$nazwa,$kwota,$idto,$selected_uczniowie,$data);
+			}
 			//--------------------
 			if( ($idop != "") && is_numeric($idop) && ($idop > 0) )
 			{
@@ -887,7 +897,7 @@ if(!class_exists('oplaty'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="kwota";
-			$pola[$nazwa][0]="decimal(5,2)";
+			$pola[$nazwa][0]="decimal(8,2)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="";//default
