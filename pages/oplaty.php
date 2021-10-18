@@ -983,11 +983,13 @@ if(!class_exists('oplaty'))
 			//pobrać oddziały
 			//dla każdego oddziału zrobić sumę dla każdego typu
 			$suma_rabat = 0;
+			$suma_calkowita = 0;
 			$rettext .= "<br /><br /><b>PODSUMOWANIE OPŁAT W MIESIĄCU: " . $this->month_to_pl_string($miesiac) . " " . $rok . "</b><br /><br />";
+			$rettext .= "<table cellpadding='5' cellspacing='0'>";
 			foreach($this->page_obj->oddzialy->get_list() as $oddzialy_array) // [idod, nazwa]
 			{
 				$suma_razem = 0;
-				$rettext .= "<b>" . $oddzialy_array[1] . "</b><br />";
+				$rettext .= "<tr><td colspan = '2' ><b>" . $oddzialy_array[1] . "</b></td></tr>";
 				foreach($this->page_obj->typy_oplat->get_list() as $typy_oplat_array) // [idto,nazwa]
 				{
 					//$rettext .= "select * from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';" . "<br />";
@@ -995,13 +997,21 @@ if(!class_exists('oplaty'))
 					if($wynik)
 					{
 						list($suma,$rabat) = $wynik->fetch_row();
-						$rettext .= "&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ": " .($suma - $rabat) . "<br />";
+						$rettext .= "<tr>
+											<td style='border-bottom:1px solid gray;'>&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ":</td>
+											<td style='border-bottom:1px solid gray;border-left:1px solid gray;'> " .($suma - $rabat) . "</td>
+										</tr>";
 						$suma_razem += ($suma - $rabat);
 					}
 				}
-				$rettext .= "razem: $suma_razem<br />";
-				$rettext .= "<br />";
+				$rettext .= "<tr><td collspan = '2' >razem:</td><td style='border-left:1px solid gray;'>$suma_razem</td></tr>";
+				$rettext .= "<tr><td collspan = '2' ></td><td><br /></td></tr>";
+				$suma_calkowita += $suma_razem;
 			}
+
+			$rettext .= "<tr><td collspan = '2' >W sumie:</td><td style='border-left:1px solid gray;'>$suma_calkowita</td></tr>";
+
+			$rettext .= "</table>";
 			return $rettext;
 		}
 		#endregion
@@ -1041,11 +1051,13 @@ if(!class_exists('oplaty'))
 			//pobrać oddziały
 			//dla każdego oddziału zrobić sumę dla każdego typu
 			$suma_rabat = 0;
+			$suma_calkowita = 0;
 			$rettext .= "<br /><br /><b>PODSUMOWANIE OPŁAT W MIESIĄCU: " . $this->month_to_pl_string($miesiac) . " " . $rok . "</b><br /><br />";
+			$rettext .= "<table cellpadding='5' cellspacing='0'>";
 			foreach($this->page_obj->oddzialy->get_list() as $oddzialy_array) // [idod, nazwa]
 			{
 				$suma_razem = 0;
-				$rettext .= "<b>" . $oddzialy_array[1] . "</b><br />";
+				$rettext .= "<tr><td colspan = '2' ><b>" . $oddzialy_array[1] . "</b></td></tr>";
 				foreach($this->page_obj->typy_oplat->get_list() as $typy_oplat_array) // [idto,nazwa]
 				{
 					//$rettext .= "select * from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';" . "<br />";
@@ -1053,13 +1065,21 @@ if(!class_exists('oplaty'))
 					if($wynik)
 					{
 						list($suma,$rabat) = $wynik->fetch_row();
-						$rettext .= "&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ": " .($suma - $rabat) . "<br />";
+						$rettext .= "<tr>
+											<td style='border-bottom:1px solid gray;'>&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ":</td>
+											<td style='border-bottom:1px solid gray;border-left:1px solid gray;'> " .($suma - $rabat) . "</td>
+										</tr>";
 						$suma_razem += ($suma - $rabat);
 					}
 				}
-				$rettext .= "razem: $suma_razem<br />";
-				$rettext .= "<br />";
+				$rettext .= "<tr><td collspan = '2' >razem:</td><td style='border-left:1px solid gray;'>$suma_razem</td></tr>";
+				$rettext .= "<tr><td collspan = '2' ></td><td><br /></td></tr>";
+				$suma_calkowita += $suma_razem;
 			}
+
+			$rettext .= "<tr><td collspan = '2' >W sumie:</td><td style='border-left:1px solid gray;'>$suma_calkowita</td></tr>";
+
+			$rettext .= "</table>";
 			//--------------------
 			return $rettext;
 		}
