@@ -4,10 +4,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 if(isset($_POST['submitpdf'])){
 
-    $od = $_POST['od'];
-    $do = $_POST['do'];
-    $kwota = $_POST['kwota'];
-    $mpdf = new \Mpdf\Mpdf();
+	$od = $_POST['od'];
+	$do = $_POST['do'];
+	$kwota = $_POST['kwota'];
+	$mpdf = new \Mpdf\Mpdf();
     
     $data = '';
     

@@ -92,7 +92,7 @@ if(!class_exists('oplaty'))
 					case "lista":
 					default:
 						$aktualnailosc = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
-						$content_text.=$this->lista($aktualnailosc);
+						$content_text .= $this->lista($aktualnailosc);
 						break;
 				}
 			}
@@ -131,11 +131,11 @@ if(!class_exists('oplaty'))
 			$rettext .= "<br />";
 			//--------------------
 			if($aktualnailosc == "") $aktualnailosc = 0;
-			$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this).";");
+			$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." order by idop;");
 			$iloscwszystkich=$this->page_obj->database_obj->result_count();
 			$iloscnastronie = 15;
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." limit $aktualnailosc,$iloscnastronie;");
+			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." order by idop desc limit $aktualnailosc,$iloscnastronie;");
 			if($wynik)
 			{
 				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
@@ -195,7 +195,7 @@ if(!class_exists('oplaty'))
 			//--------------------
 			if($idop!="" && is_numeric($idop) && $idop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik = $this->page_obj->database_obj->get_data("select idto,nazwa,kwota from ".get_class($this)." where usuniety='nie' and idop = $idop");
 				if($wynik)
 				{
 					list($idto,$nazwa,$kwota)=$wynik->fetch_row();
@@ -351,7 +351,7 @@ if(!class_exists('oplaty'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota from ".get_class($this)." where usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota from ".get_class($this)." where usuniety='nie' order by idop desc;");
 			if($wynik)
 			{
 				while(list($idop,$idto,$nazwa,$kwota)=$wynik->fetch_row())
@@ -370,7 +370,7 @@ if(!class_exists('oplaty'))
 			$nazwa='';
 			if($idop!="" && is_numeric($idop) && $idop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik=$this->page_obj->database_obj->get_data("select nazwa from ".get_class($this)." where usuniety='nie' and idop = $idop");
 				if($wynik)
 				{
 					list($nazwa)=$wynik->fetch_row();
@@ -386,7 +386,7 @@ if(!class_exists('oplaty'))
 			$kwota=NAN;
 			if($idop!="" && is_numeric($idop) && $idop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select kwota from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik=$this->page_obj->database_obj->get_data("select kwota from ".get_class($this)." where usuniety='nie' and idop = $idop");
 				if($wynik)
 				{
 					list($kwota)=$wynik->fetch_row();
@@ -402,7 +402,7 @@ if(!class_exists('oplaty'))
 			$idto=0;
 			if($idop!="" && is_numeric($idop) && $idop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select idto from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik=$this->page_obj->database_obj->get_data("select idto from ".get_class($this)." where usuniety='nie' and idop = $idop");
 				if($wynik)
 				{
 					list($idto)=$wynik->fetch_row();
@@ -421,7 +421,7 @@ if(!class_exists('oplaty'))
 			//--------------------
 			if( isset($idop) && ($idop != "") && is_numeric($idop) && ($idop > 0) )
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota,data from ".get_class($this)." where usuniety='nie' and idop=$idop");
+				$wynik=$this->page_obj->database_obj->get_data("select idto,nazwa,kwota,data from ".get_class($this)." where usuniety='nie' and idop = $idop");
 				if($wynik)
 				{
 					list($idto,$nazwa,$kwota,$data)=$wynik->fetch_row();
@@ -837,14 +837,14 @@ if(!class_exists('oplaty'))
 			if($do == "") $do = date("Y-m-d");
 			//--------------------
 			$rettext .= "<p>Od: $od do: $do</p>";
-			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "<table style = 'font-size:11px;width:100%;' cellspacing = '0' cellpadding = '5'  border = '1'>";
 			$rettext .= "<tr>
 								<td style='width:30px;'>lp.</td>
-								<td style='height:30px;'>Data</td>
+								<td style=''>Data</td>
 								<td>nazwa</td>
-								<td>kwota</td>
+								<td style=''>kwota</td>
 								<td>nazwa rabatu</td>
-								<td>kwota rabatu</td>
+								<td style=''>kwota rabatu</td>
 								<td>imie, nazwisko</td>
 							</tr>";
 			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,o.data,o.nazwa,o.kwota,uo.rabat_nazwa,uo.rabat_kwota,u.imie_uczniowie,u.nazwisko_uczniowie from oplaty o, uczniowie_oplaty uo, uczniowie u where o.idop = uo.idop and u.idu = uo.idu and o.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and data >= '$od' and data <= '$do' order by data;");
@@ -859,9 +859,9 @@ if(!class_exists('oplaty'))
 										<td style='text-align:right;padding-right:10px;'>$lp.</td>
 										<td style='height:30px;'>".substr($data,0,10)."</td>
 										<td>$nazwa</td>
-										<td>$kwota</td>
+										<td style='text-align:right;'>$kwota</td>
 										<td>$rabat_nazwa</td>
-										<td>$rabat_kwota</td>
+										<td style='text-align:right;'>$rabat_kwota</td>
 										<td>$imie_uczniowie $nazwisko_uczniowie</td>
 									</tr>";
 					$suma += $kwota;
@@ -870,7 +870,7 @@ if(!class_exists('oplaty'))
 				}
 			}
 			$rettext .= "<tr><td><br /></td></tr>";
-			$rettext .= "<tr><td></td><td></td><td></td><td>Suma opłat: $suma </td><td></td><td> suma rabatu: $suma_rabat </td><td> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
+			$rettext .= "<tr><td></td><td></td><td>Suma:</td><td style='text-align:right;'> $suma </td><td></td><td style='text-align:right;'> $suma_rabat </td><td style='text-align:right;'> kwota wpływu: ".($suma - $suma_rabat)."</td></tr>";
 			$rettext .= "</table>";
 			//--------------------
 			return $rettext;

@@ -410,32 +410,32 @@ if(!class_exists('wyciagi'))
 		#region processing from HTML to SQL db
 		public function przetwarzanie_htmlToSql($file)
 		{
-			$rettext="";
+			$rettext = "";
 			$rettext .= "<hr>";
-			$rettext .= "<br>pobieram nazwę pliku: ".$file."<br>";
+			$rettext .= "<br>pobieram nazwę pliku: " . $file . "<br>";
 			/**
 			* dokument przetwarza plik html i zapisuje do bazy
 			* Hydrotrade Polska Rafał Płatkowski, Arkadiusz Waliczek
 			*/
 			
 			//Tworzę nowy obiekt struktury pliku html "dom"
-			$dom = new domDocument; 
+			$dom = new domDocument(); 
 			
-			//dynamicznie pobieram dokument do przetwarzania 
-			$dom->loadHTMLFile("./media/filehtml/$file"); 
+			//dynamicznie pobieram dokument do przetwarzania
+			$dom->loadHTMLFile("./media/filehtml/$file");
 
 			//Zezwalamy na usuwanie nadmiarowych białych znaków z dokumentu HTML
-			$dom->preserveWhiteSpace = false; 
+			$dom->preserveWhiteSpace = false;
 			
 			//tworzę uchwyt do znaczników <table> (jest ich w obenym dokumencie 3)
-			$tables = $dom->getElementsByTagName('table'); 
+			$tables = $dom->getElementsByTagName('table');
 				
 			//dla pierwszej tabeli, pierwszy wiersz, dwie komórki
-			$rows = $tables->item(0)->getElementsByTagName('tr'); 
+			$rows = $tables->item(0)->getElementsByTagName('tr');
 			$nrkonta = $rows[0]->getElementsByTagName('td');
 
 			$nrkontaBaza = $nrkonta->item(1)->nodeValue;
-			echo "Nr konta bankowego<b>".$nrkontaBaza.'</b><br/><br/>';
+			$rettext .= "Nr konta bankowego<b>".$nrkontaBaza.'</b><br/><br/>';
 			$nrkontaBaza = $this->page_obj->text_obj->domysql($nrkontaBaza);
 
 			//uchwyt do trzeciej tabeli
@@ -445,7 +445,8 @@ if(!class_exists('wyciagi'))
 			$tablicaData = array();
 			foreach($rowsTr3Tabela as $tr){
 				$cols = $tr->getElementsByTagName('td');
-				if($cols->item(2)->nodeValue == "Przelew na rachunek"){		
+				if($cols->item(2)->nodeValue == "Przelew na rachunek")
+				{
 					array_push($tablicaData,$cols->item(0)->nodeValue);//zawiera daty przelewów dla Przelewu na rachunek
 				}
 			}
@@ -455,7 +456,8 @@ if(!class_exists('wyciagi'))
 
 			//------Dodaje do tablicy tymczasowej i porównuje je z tabelą stała wyciagi
 			//-----------------------Tablica tymczasowa----------------------
-						foreach($rowsTr3Tabela as $tr){
+						foreach($rowsTr3Tabela as $tr)
+						{
 							$cols = $tr->getElementsByTagName('td');
 							if($cols->item(2)->nodeValue == "Przelew na rachunek"){
 								
@@ -644,7 +646,7 @@ if(!class_exists('wyciagi'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		#region uploadfile
+		#region raporty
 		public function raporty()
 		{
 			$rettext="";
