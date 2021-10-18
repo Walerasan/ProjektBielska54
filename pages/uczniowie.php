@@ -1051,7 +1051,7 @@ if(!class_exists('uczniowie'))
 				<form method='post' action='".get_class($this).",{$this->page_obj->template},zapisz_gotowka'>
 					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>Tytuł: </div><div class='formularzkom2'><input type='text' name='tytul' value='$tytul' style='width:150px;'/></div></div>
-						<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='number' name='kwota' value='$kwota' style='width:150px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>Kwota: </div><div class='formularzkom2'><input type='number' step='0.01' name='kwota' value='$kwota' style='width:150px;'/></div></div>
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -1073,6 +1073,10 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
+			$wzor[1] = "/,/";
+         $zamiany[1] = ".";
+			$kwota = preg_replace($wzor, $zamiany, $kwota);
+			//--------------------
 			$idw = $this->page_obj->wyciagi->add_and_return_idw(0,$tytul, "gotowka", $kwota);
 			if($idw != 0)
 			{
@@ -1080,7 +1084,7 @@ if(!class_exists('uczniowie'))
 				$this->page_obj->iden_wyciagu->insert_and_asign($idu,$idw,$nrreferencyjny);
 			}
 			else
-				$rettext .= "Kiszka";
+				$rettext .= "Błąd";
 			$rettext .= $this->szczegoly($idu);
 			//--------------------
 			return $rettext;

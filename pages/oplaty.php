@@ -33,6 +33,19 @@ if(!class_exists('oplaty'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "formularz_podsumowanie_oddzial":
+						$rok = isset($_POST['rok']) ? $_POST['rok'] : date("Y");
+						$miesiac = isset($_POST['miesiac']) ? $_POST['miesiac'] : date("m");
+						$store = isset($_POST['store']) ? $_POST['store'] == "true" : false;
+						$idod = isset($_POST['idod']) ? $_POST['idod'] : 1;
+						$content_text .= $this->formularz_podsumowanie_oddzial($rok, $miesiac, $store, $idod);
+						break;
+					case "formularz_podsumowanie_miesiaca":
+						$rok = isset($_POST['rok']) ? $_POST['rok'] : date("Y");
+						$miesiac = isset($_POST['miesiac']) ? $_POST['miesiac'] : date("m");
+						$store = isset($_POST['store']) ? $_POST['store'] == "true" : false;
+						$content_text .= $this->formularz_podsumowanie_miesiaca($rok, $miesiac, $store);
+						break;
 					case "formularz_zestawienie":
 						$od = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['od'])?$_POST['od']:date("Y-m-d"));
 						$do = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['do'])?$_POST['do']:date("Y-m-d"));
@@ -87,6 +100,12 @@ if(!class_exists('oplaty'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "podsumowanie_oddzial_drukuj":
+						$content_text .= $this->podsumowanie_oddzial_drukuj();
+						break;
+					case "podsumowanie_miesiaca_drukuj":
+						$content_text .= $this->podsumowanie_miesiaca_drukuj();
+						break;
 					case "zestawienie_drukuj":
 						$content_text .= $this->zestawienie_drukuj();
 						break;
@@ -107,6 +126,8 @@ if(!class_exists('oplaty'))
 			//--------------------
 			$rettext .= "<button class='button_add' title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_uczen\"'>Dodaj nowy</button>&#160;";
 			$rettext .= "<button class='button_raport' title='Zestawienie' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_zestawienie\"'>Zestawienie</button>&#160;";
+			$rettext .= "<button class='button_raport' style='width:200px;' title='Podsumowanie miesiąca' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_podsumowanie_miesiaca\"'>Podsumowanie miesiąca</button>&#160;";
+			$rettext .= "<button class='button_raport' style='width:200px;' title='Podsumowanie oddziału' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz_podsumowanie_oddzial\"'>Podsumowanie oddziału</button>&#160;";
 			$rettext .= "<br />";
 			//--------------------
 			if($aktualnailosc == "") $aktualnailosc = 0;
@@ -195,7 +216,7 @@ if(!class_exists('oplaty'))
 						<div style='overflow:hidden;'>
 							<div class='wiersz'><div class='formularzkom1'>Nazwa: </div><div class='formularzkom2'><input type='text' name='nazwa' value='$nazwa' style='width:800px;'/></div></div>
 							<div class='wiersz'><div class='formularzkom1'>typ: </div><div class='formularzkom2'>{$this->create_select_field_from_typy_oplat($idto)}</div></div>
-							<div class='wiersz'><div class='formularzkom1'>kwota: </div><div class='formularzkom2'><input type='text' name='kwota' value='$kwota' style='width:800px;'/></div></div>
+							<div class='wiersz'><div class='formularzkom1'>kwota: </div><div class='formularzkom2'><input type='number' step='0.01' name='kwota' value='$kwota' style='width:800px;'/></div></div>
 							<div class='wiersz'>
 								<div class='formularzkom1'>&#160;</div>
 								<div class='formularzkom2'>
@@ -853,6 +874,583 @@ if(!class_exists('oplaty'))
 			$rettext .= "</table>";
 			//--------------------
 			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region formularz_podsumowanie_miesiaca
+		private function formularz_podsumowanie_miesiaca($rok,$miesiac,$store)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,podsumowanie_miesiaca_drukuj\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
+			//--------------------
+			if( $store )
+			{
+				if( isset($rok) )
+					$_SESSION['podsumowanie_miesiaca_rok'] = $rok;
+				if( isset($miesiac) )
+					$_SESSION['podsumowanie_miesiaca_miesiac'] = $miesiac;
+			}
+			//--------------------
+			if(isset($_SESSION['podsumowanie_miesiaca_rok']))
+			{
+				$rok = $_SESSION['podsumowanie_miesiaca_rok'];
+			}
+			if(isset($_SESSION['podsumowanie_miesiaca_miesiac']))
+			{
+				$miesiac = $_SESSION['podsumowanie_miesiaca_miesiac'];
+			}
+			if ( $rok == "" ) 
+			{
+				$rok = date("Y");
+			}
+			if ( $miesiac == "" )
+			{
+				$miesiac = date("m");
+			}
+			if($miesiac == 12)
+			{
+				$rok2 = $rok + 1;
+				$miesiac2 = 1;
+			}
+			else
+			{
+				$rok2 = $rok;
+				$miesiac2 = $miesiac + 1;
+			}
+			//--------------------
+			$rettext .= "<style>
+								div.wiersz{float:left;clear:left;}
+								div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+								div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+							</style>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},formularz_podsumowanie_miesiaca'>
+								<div style='overflow:hidden;'>
+									<div class='wiersz'>
+										Rok: 
+											<select name='rok' >
+												<option value = '2021' ".($rok == 2021 ? "selected='selected'" : "").">2021</option>
+												<option value = '2022' ".($rok == 2022 ? "selected='selected'" : "").">2022</option>
+												<option value = '2023' ".($rok == 2023 ? "selected='selected'" : "").">2023</option>
+												<option value = '2024' ".($rok == 2024 ? "selected='selected'" : "").">2024</option>
+												<option value = '2025' ".($rok == 2025 ? "selected='selected'" : "").">2025</option>
+												<option value = '2026' ".($rok == 2026 ? "selected='selected'" : "").">2026</option>
+												<option value = '2027' ".($rok == 2027 ? "selected='selected'" : "").">2027</option>
+												<option value = '2028' ".($rok == 2028 ? "selected='selected'" : "").">2028</option>
+												<option value = '2029' ".($rok == 2029 ? "selected='selected'" : "").">2029</option>
+												<option value = '2030' ".($rok == 2030 ? "selected='selected'" : "").">2030</option>
+												<option value = '2031' ".($rok == 2031 ? "selected='selected'" : "").">2031</option>
+												<option value = '2032' ".($rok == 2032 ? "selected='selected'" : "").">2032</option>
+												<option value = '2033' ".($rok == 2033 ? "selected='selected'" : "").">2033</option>
+												<option value = '2034' ".($rok == 2034 ? "selected='selected'" : "").">2034</option>
+												<option value = '2035' ".($rok == 2035 ? "selected='selected'" : "").">2035</option>
+												<option value = '2036' ".($rok == 2036 ? "selected='selected'" : "").">2036</option>
+												<option value = '2037' ".($rok == 2037 ? "selected='selected'" : "").">2037</option>
+												<option value = '2038' ".($rok == 2038 ? "selected='selected'" : "").">2038</option>
+												<option value = '2039' ".($rok == 2039 ? "selected='selected'" : "").">2039</option>
+												<option value = '2040' ".($rok == 2040 ? "selected='selected'" : "").">2040</option>
+												<option value = '2041' ".($rok == 2041 ? "selected='selected'" : "").">2041</option>
+												<option value = '2042' ".($rok == 2042 ? "selected='selected'" : "").">2042</option>
+												<option value = '2043' ".($rok == 2043 ? "selected='selected'" : "").">2043</option>
+												<option value = '2044' ".($rok == 2044 ? "selected='selected'" : "").">2044</option>
+												<option value = '2045' ".($rok == 2045 ? "selected='selected'" : "").">2045</option>
+												<option value = '2046' ".($rok == 2046 ? "selected='selected'" : "").">2046</option>
+												<option value = '2047' ".($rok == 2047 ? "selected='selected'" : "").">2047</option>
+												<option value = '2048' ".($rok == 2048 ? "selected='selected'" : "").">2048</option>
+												<option value = '2049' ".($rok == 2049 ? "selected='selected'" : "").">2049</option>
+												<option value = '2050' ".($rok == 2050 ? "selected='selected'" : "").">2050</option>
+											</select>
+										miesiąć: 
+											<select name='miesiac' >
+											<option value = '1' ".($miesiac == 1 ? "selected='selected'" : "").">styczeń</option>
+											<option value = '2' ".($miesiac == 2 ? "selected='selected'" : "").">luty</option>
+											<option value = '3' ".($miesiac == 3 ? "selected='selected'" : "").">marzec</option>
+											<option value = '4' ".($miesiac == 4 ? "selected='selected'" : "").">kwiecień</option>
+											<option value = '5' ".($miesiac == 5 ? "selected='selected'" : "").">maj</option>
+											<option value = '6' ".($miesiac == 6 ? "selected='selected'" : "").">czerwiec</option>
+											<option value = '7' ".($miesiac == 7 ? "selected='selected'" : "").">lipiec</option>
+											<option value = '8' ".($miesiac == 8 ? "selected='selected'" : "").">sierpień</option>
+											<option value = '9' ".($miesiac == 9 ? "selected='selected'" : "").">wrzesień</option>
+											<option value = '10' ".($miesiac == 10 ? "selected='selected'" : "").">październik</option>
+											<option value = '11' ".($miesiac == 11 ? "selected='selected'" : "").">listopad</option>
+											<option value = '12' ".($miesiac == 12 ? "selected='selected'" : "").">grudzień</option>
+											</select> 
+										<input type='submit' class='button_raport' name='' title='Generuj zestawienie' value='Generuj zestawienie' style='font-size:16px;'/></div>
+									<input type='hidden' name='store' value='true' />
+								</div>
+							</form>";
+			//--------------------
+			//pobrać oddziały
+			//dla każdego oddziału zrobić sumę dla każdego typu
+			$suma_rabat = 0;
+			$rettext .= "<br /><br /><b>PODSUMOWANIE OPŁAT W MIESIĄCU: " . $this->month_to_pl_string($miesiac) . " " . $rok . "</b><br /><br />";
+			foreach($this->page_obj->oddzialy->get_list() as $oddzialy_array) // [idod, nazwa]
+			{
+				$suma_razem = 0;
+				$rettext .= "<b>" . $oddzialy_array[1] . "</b><br />";
+				foreach($this->page_obj->typy_oplat->get_list() as $typy_oplat_array) // [idto,nazwa]
+				{
+					//$rettext .= "select * from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';" . "<br />";
+					$wynik = $this->page_obj->database_obj->get_data("select sum(o.kwota), sum(uo.rabat_kwota) from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';");
+					if($wynik)
+					{
+						list($suma,$rabat) = $wynik->fetch_row();
+						$rettext .= "&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ": " .($suma - $rabat) . "<br />";
+						$suma_razem += ($suma - $rabat);
+					}
+				}
+				$rettext .= "razem: $suma_razem<br />";
+				$rettext .= "<br />";
+			}
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region podsumowanie_miesiaca_drukuj
+		private function podsumowanie_miesiaca_drukuj()
+		{
+			$rettext = "";
+			//--------------------
+			if(isset($_SESSION['podsumowanie_miesiaca_rok']))
+			{
+				$rok = $_SESSION['podsumowanie_miesiaca_rok'];
+			}
+			if(isset($_SESSION['podsumowanie_miesiaca_miesiac']))
+			{
+				$miesiac = $_SESSION['podsumowanie_miesiaca_miesiac'];
+			}
+			if ( $rok == "" ) 
+			{
+				$rok = date("Y");
+			}
+			if ( $miesiac == "" )
+			{
+				$miesiac = date("m");
+			}
+			if($miesiac == 12)
+			{
+				$rok2 = $rok + 1;
+				$miesiac2 = 1;
+			}
+			else
+			{
+				$rok2 = $rok;
+				$miesiac2 = $miesiac + 1;
+			}
+			//--------------------
+			//pobrać oddziały
+			//dla każdego oddziału zrobić sumę dla każdego typu
+			$suma_rabat = 0;
+			$rettext .= "<br /><br /><b>PODSUMOWANIE OPŁAT W MIESIĄCU: " . $this->month_to_pl_string($miesiac) . " " . $rok . "</b><br /><br />";
+			foreach($this->page_obj->oddzialy->get_list() as $oddzialy_array) // [idod, nazwa]
+			{
+				$suma_razem = 0;
+				$rettext .= "<b>" . $oddzialy_array[1] . "</b><br />";
+				foreach($this->page_obj->typy_oplat->get_list() as $typy_oplat_array) // [idto,nazwa]
+				{
+					//$rettext .= "select * from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';" . "<br />";
+					$wynik = $this->page_obj->database_obj->get_data("select sum(o.kwota), sum(uo.rabat_kwota) from oplaty o, typy_oplat t, uczniowie_oplaty uo, uczniowie u, klasa k where o.idto = t.idto and uo.idop = o.idop and uo.idu = u.idu and k.idkl = u.idkl and o.usuniety = 'nie' and t.usuniety = 'nie' and uo.usuniety = 'nie' and u.usuniety = 'nie' and k.usuniety = 'nie' and k.idod = {$oddzialy_array[0]} and t.idto = {$typy_oplat_array[0]} and o.data >= '".$rok."-".$miesiac."-01 00:00:00' and o.data < '".$rok2."-".$miesiac2."-01 00:00:00';");
+					if($wynik)
+					{
+						list($suma,$rabat) = $wynik->fetch_row();
+						$rettext .= "&nbsp;&nbsp;&nbsp;&nbsp;" . $typy_oplat_array[1] . ": " .($suma - $rabat) . "<br />";
+						$suma_razem += ($suma - $rabat);
+					}
+				}
+				$rettext .= "razem: $suma_razem<br />";
+				$rettext .= "<br />";
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function formularz_podsumowanie_oddzial($rok, $miesiac, $store, $idod)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,podsumowanie_oddzial_drukuj\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
+			//--------------------
+			if( $store )
+			{
+				if( isset($rok) )
+					$_SESSION['podsumowanie_oddzial_rok'] = $rok;
+				if( isset($miesiac) )
+					$_SESSION['podsumowanie_oddzial_miesiac'] = $miesiac;
+				if( isset($idod) )
+					$_SESSION['podsumowanie_oddzial_idod'] = $idod;
+			}
+			//--------------------
+			if(isset($_SESSION['podsumowanie_oddzial_rok']))
+			{
+				$rok = $_SESSION['podsumowanie_oddzial_rok'];
+			}
+			if(isset($_SESSION['podsumowanie_oddzial_miesiac']))
+			{
+				$miesiac = $_SESSION['podsumowanie_oddzial_miesiac'];
+			}
+			if(isset($_SESSION['podsumowanie_oddzial_idod']))
+			{
+				$idod = $_SESSION['podsumowanie_oddzial_idod'];
+			}
+			if ( $rok == "" ) 
+			{
+				$rok = date("Y");
+			}
+			if ( $miesiac == "" )
+			{
+				$miesiac = date("m");
+			}
+			if($miesiac == 12)
+			{
+				$rok2 = $rok + 1;
+				$miesiac2 = 1;
+			}
+			else
+			{
+				$rok2 = $rok;
+				$miesiac2 = $miesiac + 1;
+			}
+			//--------------------
+			$rettext .= "<style>
+								div.wiersz{float:left;clear:left;}
+								div.formularzkom1{width:150px;text-align:right;margin-right:5px;float:left;clear:left;margin:2px;}
+								div.formularzkom2{width:450px;text-align:left;margin-right:5px;float:left;margin:2px;}
+							</style>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},formularz_podsumowanie_oddzial'>
+								<div style='overflow:hidden;'>
+									<div class='wiersz'>
+										Rok: 
+											<select name='rok' >
+												<option value = '2021' ".($rok == 2021 ? "selected='selected'" : "").">2021</option>
+												<option value = '2022' ".($rok == 2022 ? "selected='selected'" : "").">2022</option>
+												<option value = '2023' ".($rok == 2023 ? "selected='selected'" : "").">2023</option>
+												<option value = '2024' ".($rok == 2024 ? "selected='selected'" : "").">2024</option>
+												<option value = '2025' ".($rok == 2025 ? "selected='selected'" : "").">2025</option>
+												<option value = '2026' ".($rok == 2026 ? "selected='selected'" : "").">2026</option>
+												<option value = '2027' ".($rok == 2027 ? "selected='selected'" : "").">2027</option>
+												<option value = '2028' ".($rok == 2028 ? "selected='selected'" : "").">2028</option>
+												<option value = '2029' ".($rok == 2029 ? "selected='selected'" : "").">2029</option>
+												<option value = '2030' ".($rok == 2030 ? "selected='selected'" : "").">2030</option>
+												<option value = '2031' ".($rok == 2031 ? "selected='selected'" : "").">2031</option>
+												<option value = '2032' ".($rok == 2032 ? "selected='selected'" : "").">2032</option>
+												<option value = '2033' ".($rok == 2033 ? "selected='selected'" : "").">2033</option>
+												<option value = '2034' ".($rok == 2034 ? "selected='selected'" : "").">2034</option>
+												<option value = '2035' ".($rok == 2035 ? "selected='selected'" : "").">2035</option>
+												<option value = '2036' ".($rok == 2036 ? "selected='selected'" : "").">2036</option>
+												<option value = '2037' ".($rok == 2037 ? "selected='selected'" : "").">2037</option>
+												<option value = '2038' ".($rok == 2038 ? "selected='selected'" : "").">2038</option>
+												<option value = '2039' ".($rok == 2039 ? "selected='selected'" : "").">2039</option>
+												<option value = '2040' ".($rok == 2040 ? "selected='selected'" : "").">2040</option>
+												<option value = '2041' ".($rok == 2041 ? "selected='selected'" : "").">2041</option>
+												<option value = '2042' ".($rok == 2042 ? "selected='selected'" : "").">2042</option>
+												<option value = '2043' ".($rok == 2043 ? "selected='selected'" : "").">2043</option>
+												<option value = '2044' ".($rok == 2044 ? "selected='selected'" : "").">2044</option>
+												<option value = '2045' ".($rok == 2045 ? "selected='selected'" : "").">2045</option>
+												<option value = '2046' ".($rok == 2046 ? "selected='selected'" : "").">2046</option>
+												<option value = '2047' ".($rok == 2047 ? "selected='selected'" : "").">2047</option>
+												<option value = '2048' ".($rok == 2048 ? "selected='selected'" : "").">2048</option>
+												<option value = '2049' ".($rok == 2049 ? "selected='selected'" : "").">2049</option>
+												<option value = '2050' ".($rok == 2050 ? "selected='selected'" : "").">2050</option>
+											</select>
+										miesiąć: 
+											<select name='miesiac' >
+											<option value = '1' ".($miesiac == 1 ? "selected='selected'" : "").">styczeń</option>
+											<option value = '2' ".($miesiac == 2 ? "selected='selected'" : "").">luty</option>
+											<option value = '3' ".($miesiac == 3 ? "selected='selected'" : "").">marzec</option>
+											<option value = '4' ".($miesiac == 4 ? "selected='selected'" : "").">kwiecień</option>
+											<option value = '5' ".($miesiac == 5 ? "selected='selected'" : "").">maj</option>
+											<option value = '6' ".($miesiac == 6 ? "selected='selected'" : "").">czerwiec</option>
+											<option value = '7' ".($miesiac == 7 ? "selected='selected'" : "").">lipiec</option>
+											<option value = '8' ".($miesiac == 8 ? "selected='selected'" : "").">sierpień</option>
+											<option value = '9' ".($miesiac == 9 ? "selected='selected'" : "").">wrzesień</option>
+											<option value = '10' ".($miesiac == 10 ? "selected='selected'" : "").">październik</option>
+											<option value = '11' ".($miesiac == 11 ? "selected='selected'" : "").">listopad</option>
+											<option value = '12' ".($miesiac == 12 ? "selected='selected'" : "").">grudzień</option>
+											</select>
+											<select name='idod' >
+												{$this->page_obj->oddzialy->creat_options($idod)}
+											</select>
+										<input type='submit' class='button_raport' name='' title='Generuj zestawienie' value='Generuj zestawienie' style='font-size:16px;'/></div>
+									<input type='hidden' name='store' value='true' />
+								</div>
+							</form>";
+			//--------------------
+			// pobrać typy opłat
+			// dla każdej klasy
+				//dla każdego ucznia
+					//dla każdego typu oplaty
+						//pobrać opłaty
+						//--------------------
+			$rettext .= "<br />";
+			$rettext .= "<b>" . $this->page_obj->oddzialy->get_name($idod) . " - " . $this->month_to_pl_string($miesiac) . " $rok</b><br /><hr />";
+			$rettext .= "<table border = '0' cellspacing = '0' cellpadding = '8'>";
+			
+			$suma_all = array();
+			$typy_oplat = $this->page_obj->typy_oplat->get_list();
+			foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+			{
+				$suma_all[$key] = 0;
+			}
+
+			foreach($this->page_obj->klasa->get_list_for_idod($idod) as $klasy_array) //[idkl, idod, nazwa]
+			{
+				$rettext .= "<tr><td colspan='6'><b>" . $klasy_array[2] . "</b></td></tr>";
+
+				$rettext .= "	<tr>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				
+				foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+				{
+					$typy_oplat[$key][2] = 0;
+					$rettext .= "		<td style='border-bottom:1px solid gray;border-left:1px solid gray;'>{$typy_oplat_array[1]}</td>";
+				}
+				$rettext .= "	</tr>";
+
+				$suma_klasa = 0;
+				foreach($this->page_obj->uczniowie->get_list_for_klasa($klasy_array[0]) as $uczniowie_array) //[idu, imie_nazwisko]
+				{
+					$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'>{$uczniowie_array[1]} &#160;</td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "<td style='border-bottom:1px solid gray;border-left:1px solid gray;vertical-align:bottom;width:200px;'>";
+						$rettext .= "<table cellspacing='0' style='width:100%;'>";
+						$suma = 0;
+						foreach($this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia_i_typu_oplaty($uczniowie_array[0],$typy_oplat_array[0], $rok."-".$miesiac."-01 00:00:00", $rok2."-".$miesiac2."-01 00:00:00") as $oplaty_array) //[iduop, idop, rabat_kwota, rabat_nazwa]
+						{
+							$kwota = $this->page_obj->oplaty->get_kwota($oplaty_array[1]);
+							$suma += $kwota - $oplaty_array[2];
+							if($oplaty_array[2] != 0)
+							{
+								$rettext .= "<tr><td>" . $this->page_obj->oplaty->get_name($oplaty_array[1]) . "</td><td style='padding-left:15px;text-align:right;width:100px;'>$kwota - {$oplaty_array[2]}</td></tr>";
+							}
+							else
+							{
+								$rettext .= "<tr><td>" . $this->page_obj->oplaty->get_name($oplaty_array[1]) . "</td><td style='padding-left:15px;text-align:right;width:100px;'>$kwota</td></tr>";
+							}
+						}
+						if($suma != 0)
+						{
+							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2,))."</td></tr>";
+						}
+						$rettext .= "</table>";
+						$rettext .= "</td>";
+						$typy_oplat[$key][2] += $suma;
+					}
+					$rettext .= "</tr>";
+				}
+				$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$typy_oplat[$key][2]}</td>";
+						$suma_all[$key] += $typy_oplat[$key][2];
+					}
+					$rettext .= "</tr>";
+
+				$rettext .= "<tr><td colspan='6'>&#160;</td></tr>";
+			}
+
+			$rettext .= "<tr><td colspan='6'><b>Podsumowanie:</b></td></tr>";
+
+				$rettext .= "	<tr>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				
+				foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+				{
+					$typy_oplat[$key][2] = 0;
+					$rettext .= "		<td style='border-bottom:1px solid gray;border-left:1px solid gray;'>{$typy_oplat_array[1]}</td>";
+				}
+				$rettext .= "	</tr>";
+			$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$suma_all[$key]}</td>";
+					}
+					$rettext .= "</tr>";
+
+			$rettext .= "</table>";
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		#region podsumowanie_oddzial_drukuj
+		private function podsumowanie_oddzial_drukuj()
+		{
+			$rettext = "";
+			//--------------------
+			if(isset($_SESSION['podsumowanie_oddzial_rok']))
+			{
+				$rok = $_SESSION['podsumowanie_oddzial_rok'];
+			}
+			if(isset($_SESSION['podsumowanie_oddzial_miesiac']))
+			{
+				$miesiac = $_SESSION['podsumowanie_oddzial_miesiac'];
+			}
+			if(isset($_SESSION['podsumowanie_oddzial_idod']))
+			{
+				$idod = $_SESSION['podsumowanie_oddzial_idod'];
+			}
+			if ( ( !isset($rok) ) || ( $rok == "" ) ) 
+			{
+				$rok = date("Y");
+			}
+			if (  ( !isset($miesiac) ) || ( $miesiac == "" ) )
+			{
+				$miesiac = date("m");
+			}
+			if($miesiac == 12)
+			{
+				$rok2 = $rok + 1;
+				$miesiac2 = 1;
+			}
+			else
+			{
+				$rok2 = $rok;
+				$miesiac2 = $miesiac + 1;
+			}
+			if ( ( !isset($idod) ) || ( $idod == "" ) ) 
+			{
+				$idod = 1;
+			}
+			//--------------------
+			$rettext .= "<b>" . $this->page_obj->oddzialy->get_name($idod) . " - " . $this->month_to_pl_string($miesiac) . " $rok</b><br /><hr />";
+			$rettext .= "<table border = '0' cellspacing = '0' cellpadding = '8'>";
+			
+			$suma_all = array();
+			$typy_oplat = $this->page_obj->typy_oplat->get_list();
+			foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+			{
+				$suma_all[$key] = 0;
+			}
+
+			foreach($this->page_obj->klasa->get_list_for_idod($idod) as $klasy_array) //[idkl, idod, nazwa]
+			{
+				$rettext .= "<tr><td colspan='6'><b>" . $klasy_array[2] . "</b></td></tr>";
+
+				$rettext .= "	<tr>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				
+				foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+				{
+					$typy_oplat[$key][2] = 0;
+					$rettext .= "		<td style='border-bottom:1px solid gray;border-left:1px solid gray;'>{$typy_oplat_array[1]}</td>";
+				}
+				$rettext .= "	</tr>";
+
+				$suma_klasa = 0;
+				foreach($this->page_obj->uczniowie->get_list_for_klasa($klasy_array[0]) as $uczniowie_array) //[idu, imie_nazwisko]
+				{
+					$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'>{$uczniowie_array[1]} &#160;</td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "<td style='border-bottom:1px solid gray;border-left:1px solid gray;vertical-align:bottom;width:200px;'>";
+						$rettext .= "<table cellspacing='0' style='width:100%;'>";
+						$suma = 0;
+						foreach($this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia_i_typu_oplaty($uczniowie_array[0],$typy_oplat_array[0], $rok."-".$miesiac."-01 00:00:00", $rok2."-".$miesiac2."-01 00:00:00") as $oplaty_array) //[iduop, idop, rabat_kwota, rabat_nazwa]
+						{
+							$kwota = $this->page_obj->oplaty->get_kwota($oplaty_array[1]);
+							$suma += $kwota - $oplaty_array[2];
+							if($oplaty_array[2] != 0)
+							{
+								$rettext .= "<tr><td>" . $this->page_obj->oplaty->get_name($oplaty_array[1]) . "</td><td style='padding-left:15px;text-align:right;width:100px;'>$kwota - {$oplaty_array[2]}</td></tr>";
+							}
+							else
+							{
+								$rettext .= "<tr><td>" . $this->page_obj->oplaty->get_name($oplaty_array[1]) . "</td><td style='padding-left:15px;text-align:right;width:100px;'>$kwota</td></tr>";
+							}
+						}
+						if($suma != 0)
+						{
+							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2,))."</td></tr>";
+						}
+						$rettext .= "</table>";
+						$rettext .= "</td>";
+						$typy_oplat[$key][2] += $suma;
+					}
+					$rettext .= "</tr>";
+				}
+				$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$typy_oplat[$key][2]}</td>";
+						$suma_all[$key] += $typy_oplat[$key][2];
+					}
+					$rettext .= "</tr>";
+
+				$rettext .= "<tr><td colspan='6'>&#160;</td></tr>";
+			}
+
+			$rettext .= "<tr><td colspan='6'><b>Podsumowanie:</b></td></tr>";
+
+				$rettext .= "	<tr>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				$rettext .= "		<td style='border-bottom:1px solid gray;'>&#160;</td>";
+				
+				foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+				{
+					$typy_oplat[$key][2] = 0;
+					$rettext .= "		<td style='border-bottom:1px solid gray;border-left:1px solid gray;'>{$typy_oplat_array[1]}</td>";
+				}
+				$rettext .= "	</tr>";
+			$rettext .= "<tr>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+					{
+						$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$suma_all[$key]}</td>";
+					}
+					$rettext .= "</tr>";
+
+			$rettext .= "</table>";
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region month_to_pl_string
+		private function month_to_pl_string($mc)
+		{
+			switch($mc)
+			{
+				case 1: return "styczeń";
+				case 2: return "luty";
+				case 3: return "marzec";
+				case 4: return "kwiecień";
+				case 5: return "maj";
+				case 6: return "czerwiec";
+				case 7: return "lipiec";
+				case 8: return "sierpień";
+				case 9: return "wrzesień";
+				case 10: return "październik";
+				case 11: return "listopad";
+				case 12: return "grudzień";
+				default: return "";
+			}
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

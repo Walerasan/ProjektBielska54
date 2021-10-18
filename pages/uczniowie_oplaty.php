@@ -365,6 +365,26 @@ if(!class_exists('uczniowie_oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_liste_oplat_dla_ucznia_i_typu_oplaty
+		public function get_liste_oplat_dla_ucznia_i_typu_oplaty($idu,$idto,$od,$do)
+		{
+			$rettext=array();
+			//--------------------
+			//$wynik = $this->page_obj->database_obj->get_data("select iduop, idop, rabat_kwota, rabat_nazwa from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
+			//echo("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.ido = o.ido and uo.usuniety = 'nie' and o.usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and o.idto = $idto and uo.idop = o.idop and uo.usuniety = 'nie' and o.usuniety = 'nie'  and o.data >= '$od' and o.data < '$do';");
+			if($wynik)
+			{
+				while(list($iduop,$idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
+				{
+					$rettext[] = array((int)$iduop,(int)$idop, $rabat_kwota, $rabat_nazwa);
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{

@@ -255,12 +255,12 @@ if(!class_exists('oddzialy'))
 		#region get_list
 		public function get_list()
 		{
-			$rettext=array();
+			$rettext = array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie';");
 			if($wynik)
 			{
-				while(list($idod,$nazwa)=$wynik->fetch_row())
+				while(list($idod, $nazwa) = $wynik->fetch_row())
 				{
 					$rettext[] = array((int)$idod, $nazwa);
 				}
@@ -283,6 +283,24 @@ if(!class_exists('oddzialy'))
 				}
 			}
 			return $nazwa;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
+		#region creat_options
+		public function creat_options($idod_i)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select idod,nazwa from ".get_class($this)." where usuniety='nie' order by nazwa;");
+			if($wynik)
+			{
+				while(list($idod, $nazwa) = $wynik->fetch_row())
+				{
+					$rettext .= "<option value='$idod' ".($idod_i == $idod ? "selected='selected'" : "").">$nazwa</option>";
+				}
+			}
+			//--------------------
+			return $rettext;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------

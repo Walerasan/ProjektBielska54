@@ -1413,7 +1413,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="kwota";
-			$pola[$nazwa][0]="decimal";
+			$pola[$nazwa][0]="decimal(8,2)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="0";//default
@@ -1542,7 +1542,7 @@ if(!class_exists('wyciagi'))
 			$pola[$nazwa][5]=$nazwa;
 
 			$nazwa="kwota";
-			$pola[$nazwa][0]="decimal";
+			$pola[$nazwa][0]="decimal(8,2)";
 			$pola[$nazwa][1]="";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="0";//default
