@@ -1019,11 +1019,11 @@ if(!class_exists('oplaty'))
 			{
 				$miesiac = $_SESSION['podsumowanie_miesiaca_miesiac'];
 			}
-			if ( $rok == "" ) 
+			if ( !isset($rok)  || ($rok == "") ) 
 			{
 				$rok = date("Y");
 			}
-			if ( $miesiac == "" )
+			if ( !isset($miesiac)  ||  ($miesiac == "") )
 			{
 				$miesiac = date("m");
 			}
@@ -1237,7 +1237,7 @@ if(!class_exists('oplaty'))
 						}
 						if($suma != 0)
 						{
-							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2,))."</td></tr>";
+							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2))."</td></tr>";
 						}
 						$rettext .= "</table>";
 						$rettext .= "</td>";
@@ -1272,15 +1272,16 @@ if(!class_exists('oplaty'))
 					$rettext .= "		<td style='border-bottom:1px solid gray;border-left:1px solid gray;'>{$typy_oplat_array[1]}</td>";
 				}
 				$rettext .= "	</tr>";
-			$rettext .= "<tr>";
-					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
-					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
-					$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
-					foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
-					{
-						$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$suma_all[$key]}</td>";
-					}
-					$rettext .= "</tr>";
+
+				$rettext .= "<tr>";
+				$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+				$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+				$rettext .= "	<td style='border-bottom:1px solid gray;'></td>";
+				foreach($typy_oplat as $key => $typy_oplat_array) //[idto,nazwa]
+				{
+					$rettext .= "	<td style='border-bottom:1px solid gray;border-left:1px solid gray;padding-left:15px;text-align:right;'>{$suma_all[$key]}</td>";
+				}
+				$rettext .= "</tr>";
 
 			$rettext .= "</table>";
 			//--------------------
@@ -1381,7 +1382,7 @@ if(!class_exists('oplaty'))
 						}
 						if($suma != 0)
 						{
-							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2,))."</td></tr>";
+							$rettext .= "<tr><td>Suma:</td><td style='text-align:right;padding-left:15px;border-top:1px solid gray;width:60px;'>".(number_format($suma, 2))."</td></tr>";
 						}
 						$rettext .= "</table>";
 						$rettext .= "</td>";
