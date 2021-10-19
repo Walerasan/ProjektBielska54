@@ -31,7 +31,7 @@ if(!class_exists('wyciagi'))
 				switch($this->page_obj->target)
 				{
 					default:
-						$content_text.=$this->get_statements_list($this->page_obj->opiekunowie->get_login_ido());
+						$content_text .= $this->get_statements_list($this->page_obj->opiekunowie->get_login_ido());
 						break;
 				}
 			}
