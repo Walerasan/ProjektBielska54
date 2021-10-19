@@ -494,9 +494,9 @@ if(!class_exists('uczniowie'))
 		#region get_list
 		public function get_list()
 		{
-			$rettext=array();
+			$rettext = array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' order by nazwisko_uczniowie;");
+			$wynik = $this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' order by nazwisko_uczniowie;");
 			if($wynik)
 			{
 				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
@@ -514,12 +514,12 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' and idkl=$idkl;");
+			$wynik=$this->page_obj->database_obj->get_data("select idu,imie_uczniowie,nazwisko_uczniowie from ".get_class($this)." where usuniety='nie' and idkl=$idkl order by nazwisko_uczniowie;");
 			if($wynik)
 			{
 				while(list($idu,$imie_uczniowie,$nazwisko_uczniowie)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$idu, "$imie_uczniowie $nazwisko_uczniowie");
+					$rettext[] = array((int)$idu, "$nazwisko_uczniowie $imie_uczniowie");
 				}
 			}
 			//--------------------

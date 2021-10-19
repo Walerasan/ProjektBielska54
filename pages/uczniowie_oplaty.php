@@ -332,7 +332,7 @@ if(!class_exists('uczniowie_oplaty'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where idop=$idop and usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select uo.idu from ".get_class($this)." uo, uczniowie u where uo.idop = $idop and uo.idu = u.idu and uo.usuniety = 'nie' and u.usuniety = 'nie' order by u.nazwisko_uczniowie;");
 			if($wynik)
 			{
 				while(list($idu)=$wynik->fetch_row())
