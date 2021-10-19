@@ -48,10 +48,9 @@ if(!class_exists('oplaty'))
 			// dla danego opiekuna
 			$rettext = "";
 			$wynik = $this->page_obj->database_obj->get_data("select idu from uczniowie_opiekunowie where ido = $ido and usuniety = 'nie';");
-			if($wynik){
-				
-
-				$rettext.="
+			if($wynik)
+			{
+				$rettext .= "
 				<style>
 					#customers {
 					font-family: Arial, Helvetica, sans-serif;
