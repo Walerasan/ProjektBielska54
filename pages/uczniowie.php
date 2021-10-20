@@ -69,6 +69,33 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
+			// pobrac sume jaka ma uczen rozliczona
+			$suma_rozliczona = 0;
+			// [wyciagi]
+			//select wu.idw,count(wu.idu) from wyciagi_uczniowie wu where wu.usuniety = 'nie' and wu.idw in (select idw from wyciagi_uczniowie where idu = 1 and usuniety = 'nie') group by wu.idw;
+			//select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = 1 and usuniety = 'nie') group by wu.idw;
+			//$rettext .= "select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') group by wu.idw; <br />";
+			$wynik = $this->page_obj->database_obj->get_data("select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') group by wu.idw;");
+			if($wynik)
+			{
+				while( list($idw_r,$idu_r,$kwota_r,$kwota_jednostowa_r) = $wynik->fetch_row() )
+				{
+					$suma_rozliczona += $kwota_jednostowa_r;
+				}
+			}
+			// [gotowka]
+			//select kwota from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = 14 and iw.usuniety = 'nie';
+			//select sum(kwota) from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = 14 and iw.usuniety = 'nie';
+			$wynik = $this->page_obj->database_obj->get_data("select sum(kwota) from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = $idu and iw.usuniety = 'nie';");
+			if($wynik)
+			{
+				while( list($kwota_jednostowa_r) = $wynik->fetch_row() )
+				{
+					$suma_rozliczona += $kwota_jednostowa_r;
+				}
+			}
+			//--------------------
+
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
 			
 			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");			
@@ -124,21 +151,43 @@ if(!class_exists('uczniowie'))
 						<th>kwota</th>
 						<th>rabat</th>
 						<th>kwota</th>
+						<th>saldo</th>
 						<th>do zapłaty</th>
 						<th>Opłaty</th>
 					</tr>";
 				$lp=1;
+
 				while(list($idop,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota)=$wynik->fetch_row())
 				{
+					$kwota_m = $kwota;
+					$kwota_z_r = $kwota - $rabat_kwota;
+					$suma_rozliczona_b = $suma_rozliczona;
+					if( $suma_rozliczona > $kwota_z_r )
+					{
+						$kwota = 0;
+					}
+					else
+					{
+						$kwota = $kwota_z_r - $suma_rozliczona;
+					}
+					if( ($suma_rozliczona - $kwota_z_r) < 0 )
+					{
+						$suma_rozliczona = 0;
+					}
+					else
+					{
+						$suma_rozliczona = $suma_rozliczona - $kwota_z_r;
+					}
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
 							<td>$nazwa</td>
-							<td>$kwota zł</td>
+							<td>$kwota_m zł</td>
 							<td>$rabat_nazwa</td>
 							<td>$rabat_kwota zł</td>
-							<td>".($kwota - $rabat_kwota)."</td>
-							<td><button class='oplac'>OPŁAĆ</button></td>
+							<td>$suma_rozliczona_b</td>
+							<td>".($kwota)."</td>
+							<td>".( $kwota > 0 ? "<button class='oplac'>OPŁAĆ</button>":"")."</td>
 						</tr>";
 					$lp++;
 				}
