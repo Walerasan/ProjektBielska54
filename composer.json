@@ -1,0 +1,5 @@
+{
+    "require": {
+        "bluepayment-plugin/bm-sdk": "^1.1"
+    }
+}

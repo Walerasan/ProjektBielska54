@@ -3,6 +3,10 @@ RewriteEngine on
 
 FileETag MTime Size
 
+:Location /*.php
+Use php74
+:Location
+
 #RewriteCond %{HTTPS} off
 #RewriteRule (.*) https://platnosci.nzpe.pl%{REQUEST_URI}
 
