@@ -397,10 +397,10 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext="";
 			//--------------------
-			$rettext .= "<h3>Przetwarzanie pliku HTML</h3><br>";
+			$rettext .= "<h3>Przetwarzanie pliku XML</h3><br>";
 			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},dodajplik' enctype='multipart/form-data'>";
-			$rettext .= "Pobierz HTML: <input type='file' name='filehtml'>";
-			$rettext .= "<br><input type='submit' name='submit' value='ZAŁADUJ HTML'>";
+			$rettext .= "Pobierz XML: <input type='file' name='filehtml'>";
+			$rettext .= "<br><input type='submit' name='submit' value='ZAŁADUJ XML'>";
 			$rettext .= "</form>";
 			//--------------------
 			return $rettext;
@@ -613,31 +613,42 @@ if(!class_exists('wyciagi'))
 			$uploadOk = 1;
 			$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));     
 			// Sprawdzam czy istnieje już plik o tej samej nazwie
-			if (file_exists($target_file)) {
+			// TODO: odblokować to sprawdzanie
+			if (file_exists($target_file) && false)
+			{
 				$rettext .= "<h5 class='warnigs'>Plik istnieje o podanej nazwie.</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam rozmiar pliku
-			if ($file["size"] > 500000) {
+			if ($file["size"] > 500000)
+			{
 				$rettext .= "<h5 class='warnigs'>Plik jest za duży......</h5>";
 				$uploadOk = 0;
 			}
-			// Przetwarzam tylko pliki o rozszerzeniu html
-			if($FileType != "html") {
-				$rettext .= "<h5 class='warnigs'>Przetwarzanie tylko dla plików o rozszerzeniu html.....</h5>";
+			// Przetwarzam tylko pliki o rozszerzeniu xml
+			if($FileType != "xml")
+			{
+				$rettext .= "<h5 class='warnigs'>Przetwarzanie tylko dla plików o rozszerzeniu xml.....</h5>";
 				$uploadOk = 0;
 			}
 			// Sprawdzam jeżeli $uploadOk 1 to ok a jeżeli 0 to error
-			if ($uploadOk == 0) {
+			if ($uploadOk == 0)
+			{
 				$rettext .= "<h5 class='warnigs'>Nie można przesłać pliku.</h5>";
-			} else {
-				if (move_uploaded_file($file["tmp_name"], $target_file)) {
-					$rettext .= "Plik ". htmlspecialchars( basename( $file["name"])). " został przesłany.";
-					$plik = htmlspecialchars( basename( $file["name"]));
+			}
+			else
+			{
+				if (move_uploaded_file($file["tmp_name"], $target_file))
+				{
+					$rettext .= "Plik " . htmlspecialchars( basename( $file["name"])) . " został przesłany.";
+					$plik = htmlspecialchars( basename($file["name"]) );
 					//uruchamiam funkcje do przetwarzania skryptu
-					$this->przetwarzanie_htmlToSql($plik);
+					//$this->przetwarzanie_htmlToSql($plik);
+					$rettext .= $this->przetwarzanie_xmlToSql($plik);
 				//--------------------------------------------------------------------
-				} else {
+				}
+				else
+				{
 					$rettext .= "<h5 class='warnigs'>błąd przesłania pliku na serwer.</h5>";
 				}
 			}
@@ -645,6 +656,211 @@ if(!class_exists('wyciagi'))
 			return $rettext;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function przetwarzanie_xmlToSql($uploaded_file)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<hr />";
+
+			$xml = simplexml_load_file("./media/filehtml/" . $uploaded_file);
+			if ($xml === false)
+			{
+				$rettext .= "Błąd składni pliku XML:<br>";
+				foreach( libxml_get_errors() as $error )
+				{
+					$rettext .= $error->message . "<br />";
+				}
+			}
+			else
+			{
+				//--------------------
+				// account number
+				//--------------------
+				if ( isset($xml->search) && isset($xml->search->account) )
+				{
+					$account_number = $this->page_obj->text_obj->domysql($xml->search->account);
+					//TODO: po co to jak kolejny wpis już tego nie zamiesci - co autora miał na myśli
+					$dataOd = $this->page_obj->text_obj->domysql($xml->search->date['since']);
+					$dataDo = $this->page_obj->text_obj->domysql($xml->search->date['to']);
+					//~~~~~~~~~~~~~~~~~~~~~~~~
+					//$rettext .= "$account_number : $dataOd : $dataDo <br />";
+
+					$wynik = $this->page_obj->database_obj->get_data("select idnk from nr_konta where numer_konta = '$account_number' limit 1;");
+					if($wynik)
+					{
+						list($idnk) = $wynik->fetch_row();
+					}
+					else
+					{
+						$this->page_obj->database_obj->execute_query("insert into nr_konta(numer_konta,dataod,datado) values('$account_number','$dataOd','$dataDo')");
+						$idnk =  $this->page_obj->database_obj->last_id();
+					}
+
+					$uploaded_file_sql = $this->page_obj->text_obj->domysql($uploaded_file);
+					$wynik_dokumenthtml = $this->page_obj->database_obj->get_data("select idhtml from dokumenthtml where nazwa = '$uploaded_file_sql' limit 1;");
+					if($wynik_dokumenthtml)
+					{
+						list($iddokumenthtml)=$wynik_dokumenthtml->fetch_row();
+					}
+					else
+					{
+						$this->page_obj->database_obj->execute_query("insert into dokumenthtml(nazwa) values('$uploaded_file_sql')");
+						$iddokumenthtml =  $this->page_obj->database_obj->last_id();
+					}
+
+				}
+				else
+				{
+					return "Plik nieprawidłowy. Nie znaleziono numeru konta.";
+				}
+
+				//--------------------
+				// operations
+				//--------------------
+				if ( isset($xml->operations) )
+				{
+					// clear temporary table
+					$this->page_obj->database_obj->execute_query("TRUNCATE TABLE wyciagi_template");
+					$limit = 10;
+					$licznik_odczytanych_wpisow = 0;
+					foreach($xml->operations->children() as $operation)
+					{
+						if($operation->type == "Przelew na rachunek")
+						{
+							$rachunekNadawcy = "";
+							$NazwaNadawcy = "";
+							$AdresNadawcy = "";
+							$tytul = "";
+							$Referencje = "";
+							$wplyw = 0;
+							$data = "2020-01-01";
+
+							//[description] => 
+								//Rachunek nadawcy: 10 1020 2528 0000 0902 0408 9249 
+								//Nazwa nadawcy: DOROTA MARIA SIKORA Adres nadawcy: UL. KAZIMIERZA WIELKIEGO 32 M.6 43-200 PSZCZYNA 
+								//Tytuł: WRZESIEŃ + PAŹDZIERNIK CZESNE FRANC ISZEK SIKORA 
+								//Referencje własne zleceniodawcy: 172614825767 
+
+							//for debug
+							//$rettext .= $operation->type . "<br />";
+							//$rettext .= $operation->{'exec-date'} . "<br />";
+							//$rettext .= $operation->{'order-date'} . "<br />";
+							//$rettext .= $operation->description . "<br />"; 
+							//$rettext .= $operation->amount . "<br />";
+							//$rettext .= $operation->{'ending-balance'} . "<br />";
+							//$rettext .= "<hr />";*/
+
+							//add to temporary table
+
+							$description_array = explode("\n",$operation->description);
+							foreach($description_array as $val)
+							{
+								if ( strpos($val, "Rachunek nadawcy:") !== false )
+								{
+									$rachunekNadawcy = $this->page_obj->text_obj->domysql( trim( substr($val, 18) ) );
+								}
+
+								if ( strpos($val, "Nazwa nadawcy:") !== false )
+								{
+									$NazwaNadawcy = $this->page_obj->text_obj->domysql( trim( substr($val, 15) ) );
+								}
+
+								if ( strpos($val, "Adres nadawcy:") !== false )
+								{
+									$AdresNadawcy = $this->page_obj->text_obj->domysql( trim( substr($val, 15) ) );
+								}
+
+								if ( strpos($val, "Tytuł:") !== false )
+								{
+									$tytul = $this->page_obj->text_obj->domysql( trim( substr($val, 7) ) );
+								}
+
+								if ( strpos($val, "Referencje własne zleceniodawcy:") !== false )
+								{
+									$Referencje = $this->page_obj->text_obj->domysql( trim( substr($val, 33) ) );
+								}
+							}
+							$wplyw = floatval( trim( $operation->amount ) );
+							$data = $this->page_obj->text_obj->domysql( trim( $operation->{'exec-date'} ) );
+
+							//for debug
+							
+							//$rettext .= $wplyw . " (".$operation->amount.")<br />";
+							//$rettext .= $data . "<br />";
+							//$rettext .= $rachunekNadawcy . "<br />";
+							//$rettext .= $NazwaNadawcy . "<br />";
+							//$rettext .= $AdresNadawcy . "<br />";
+							//$rettext .= $tytul . "<br />";
+							//$rettext .= $Referencje . "<br />";
+							//$rettext .= "<hr />";
+
+							$this->page_obj->database_obj->execute_query("insert into wyciagi_template(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id) values ('$tytul', 'bankowy', '$rachunekNadawcy', '$AdresNadawcy', $wplyw, '$data', '$NazwaNadawcy', '$Referencje', $idnk, $iddokumenthtml)");
+							$licznik_odczytanych_wpisow++;
+							if($limit -- <= 0) break;
+						}
+					}
+
+					//merge temporary table with destination table
+					$licznik_wstawionych_wpisow = 0;
+					$wynik = $this->page_obj->database_obj->get_data("SELECT idt, rachuneknadawcy, dataoperacji, kwota, id_nr_konta, tytul, adresnadawcy, nazwanadawcy, nrreferencyjny, nazwapliku_id FROM wyciagi_template;");
+					if($wynik)
+					{
+						while( list($idt, $rachuneknadawcy, $dataoperacji, $kwota, $id_nr_konta, $tytul, $adresnadawcy, $nazwanadawcy, $nrreferencyjny, $nazwapliku_id) = $wynik->fetch_row() )
+						{
+							$wynik_wyciagi_template = $this->page_obj->database_obj->get_data("SELECT COUNT(idt) FROM wyciagi_template WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							if($wynik_wyciagi_template)
+							{
+								list($ilosc_wyciagi_template)=$wynik_wyciagi_template->fetch_row();
+							}
+							else
+							{
+								$rettext .= "błąd ilość rekordów tabeli wyciagi_template <br />";
+							}
+							$wynik_wyciagi = $this->page_obj->database_obj->get_data("SELECT COUNT(idw) FROM wyciagi WHERE rachuneknadawcy='$rachuneknadawcy' AND dataoperacji='$dataoperacji' AND kwota=$kwota;");
+							if($wynik_wyciagi)
+							{
+								list($ilosc_wyciagi)=$wynik_wyciagi->fetch_row();
+							}
+							else
+							{
+								$rettext .= "błąd ilość rekordów tabeli wyciagi <br />";
+							}
+
+							$rettext .= "$ilosc_wyciagi_template : $ilosc_wyciagi<br>";
+							//jeśli ilosc wyciagi < wyciagi_template to dodajemy do tabeli wyciagi
+
+							if( $ilosc_wyciagi_template > $ilosc_wyciagi )
+							{
+								$rettext .= "ok <br />";
+								// dodajemy do bazy danych
+								$zapytanie_wyciagi = "insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
+								values('$tytul','bankowy','$rachuneknadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
+								$this->page_obj->database_obj->execute_query($zapytanie_wyciagi);
+								$licznik_wstawionych_wpisow++;
+							}
+							else
+							{
+								$rettext .= "baza posiada wpisy <br />";
+							}
+						}
+					}
+
+					$rettext .= "Odczytano $licznik_odczytanych_wpisow wpisów. <br />";
+					$rettext .= "Wprowadzono $licznik_wstawionych_wpisow nowych wpisów. <br />";
+					$rettext .= "Duplikatów:". ($licznik_odczytanych_wpisow - $licznik_wstawionych_wpisow) . "<br />";
+
+					//czyszczenie tablicy tymczasowej
+					$this->page_obj->database_obj->execute_query("TRUNCATE TABLE wyciagi_template");
+				}
+				else
+				{
+					$rettext .= "Plik nie zawiera operacji płatniczych  (error 1)<br>";
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region raporty
 		public function raporty()
