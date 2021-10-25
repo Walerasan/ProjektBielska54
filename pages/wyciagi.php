@@ -722,7 +722,6 @@ if(!class_exists('wyciagi'))
 				{
 					// clear temporary table
 					$this->page_obj->database_obj->execute_query("TRUNCATE TABLE wyciagi_template");
-					$limit = 10;
 					$licznik_odczytanych_wpisow = 0;
 					foreach($xml->operations->children() as $operation)
 					{
@@ -797,7 +796,6 @@ if(!class_exists('wyciagi'))
 
 							$this->page_obj->database_obj->execute_query("insert into wyciagi_template(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id) values ('$tytul', 'bankowy', '$rachunekNadawcy', '$AdresNadawcy', $wplyw, '$data', '$NazwaNadawcy', '$Referencje', $idnk, $iddokumenthtml)");
 							$licznik_odczytanych_wpisow++;
-							if($limit -- <= 0) break;
 						}
 					}
 
@@ -827,12 +825,12 @@ if(!class_exists('wyciagi'))
 								$rettext .= "błąd ilość rekordów tabeli wyciagi <br />";
 							}
 
-							$rettext .= "$ilosc_wyciagi_template : $ilosc_wyciagi<br>";
+							//$rettext .= "$ilosc_wyciagi_template : $ilosc_wyciagi<br>";
 							//jeśli ilosc wyciagi < wyciagi_template to dodajemy do tabeli wyciagi
 
 							if( $ilosc_wyciagi_template > $ilosc_wyciagi )
 							{
-								$rettext .= "ok <br />";
+								//$rettext .= "ok <br />";
 								// dodajemy do bazy danych
 								$zapytanie_wyciagi = "insert into wyciagi(tytul, typ, rachuneknadawcy, adresnadawcy, kwota, dataoperacji, nazwanadawcy,nrreferencyjny,id_nr_konta,nazwapliku_id)
 								values('$tytul','bankowy','$rachuneknadawcy','$adresnadawcy',$kwota,'$dataoperacji','$nazwanadawcy','$nrreferencyjny',$id_nr_konta,$nazwapliku_id)";
