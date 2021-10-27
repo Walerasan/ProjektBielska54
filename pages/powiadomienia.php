@@ -252,7 +252,7 @@ if(!class_exists('powiadomienia'))
 							foreach($this->page_obj->uczniowie_opiekunowie->get_ido($idu) as $ido)
 							{
 								//wysłać e-mails
-								if($this->page_obj->sendmail_obj->sendhtmlmessage($this->page_obj->opiekunowie->get_email_opiekun($ido),"Powiadomienie o nowej opłacie.","TODO: zrobić treść powiadomienia"))
+								if($this->page_obj->sendmail_obj->sendhtmlmessage($this->page_obj->opiekunowie->get_email_opiekun($ido),"Powiadomienie.","Sprawdź stan swojego konta.\r\n Dziękujemy, NZPE."))
 								{
 									// zamarkować że wysłany
 									$zapytanie_sql = "update ".get_class($this)." set status = 'wyslane', data = now() where idpo = $idpo;";
