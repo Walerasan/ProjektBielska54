@@ -199,7 +199,7 @@ if(!class_exists('uczniowie'))
 							<td>$rabat_kwota zł</td>
 							<td>$suma_rozliczona_b</td>
 							<td>" . ($kwota) . "</td>
-							<td>" . ( $kwota >= 0 ? "<button class='oplac' $link_action >OPŁAĆ</button>" : "")."</td>
+							<td>" . ( $kwota > 0 ) ? "<button class='oplac' $link_action >OPŁAĆ</button>" : "")."</td>
 						</tr>";
 					$lp++;
 				}
