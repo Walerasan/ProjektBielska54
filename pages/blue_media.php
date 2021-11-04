@@ -112,7 +112,7 @@ if(!class_exists('blue_media'))
 			$pola[$nazwa][5] = $nazwa;
 
 			$nazwa = "status";
-			$pola[$nazwa][0] = "enum('nowe','oplacone','blad')";
+			$pola[$nazwa][0] = "enum('nowe','oplacone','blad', 'expired')";
 			$pola[$nazwa][1] = "not null";//null
 			$pola[$nazwa][2] = "";//key
 			$pola[$nazwa][3] = "'nowe'";//default
