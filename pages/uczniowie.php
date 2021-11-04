@@ -29,8 +29,11 @@ if(!class_exists('uczniowie'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "lista2":
+						$content_text .= $this->uczniowie_info(true);
+						break;
 					default:
-						$content_text.=$this->uczniowie_info();
+						$content_text .= $this->uczniowie_info(false);
 						break;
 				}
 			}
@@ -40,7 +43,7 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region uczniowie_info
-		private function uczniowie_info()
+		private function uczniowie_info($active_link)
 		{
 			$rettext = "";
 			//--------------------
@@ -51,7 +54,7 @@ if(!class_exists('uczniowie'))
 				{
 					$rettext .= "<div style='padding-bottom:20px;'>";
 					$rettext .= "<h3>".$this->get_imie_uczniowie_nazwisko_uczniowie($idu)."</h3><br />";
-					$rettext .= $this->szczegoly_dla_ucznia($idu);
+					$rettext .= $this->szczegoly_dla_ucznia($idu, $active_link);
 					$rettext .= "</div>";
 				}
 			}
@@ -65,7 +68,7 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region szczegoly_dla_ucznia
-		private function szczegoly_dla_ucznia($idu)
+		private function szczegoly_dla_ucznia($idu, $active_link)
 		{
 			$rettext = "";
 			//--------------------
@@ -178,6 +181,15 @@ if(!class_exists('uczniowie'))
 					{
 						$suma_rozliczona = $suma_rozliczona - $kwota_z_r;
 					}
+
+					if($active_link)
+					{
+						$link_action = "onclick='window.location.href=\"blue_media,index,get_link,$idop\"'";
+					}
+					else
+					{
+						$link_action = "";
+					}
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
@@ -186,8 +198,8 @@ if(!class_exists('uczniowie'))
 							<td>$rabat_nazwa</td>
 							<td>$rabat_kwota zł</td>
 							<td>$suma_rozliczona_b</td>
-							<td>".($kwota)."</td>
-							<td>".( $kwota > 0 ? "<button class='oplac'>OPŁAĆ</button>":"")."</td>
+							<td>" . ($kwota) . "</td>
+							<td>" . ( $kwota >= 0 ? "<button class='oplac' $link_action >OPŁAĆ</button>" : "")."</td>
 						</tr>";
 					$lp++;
 				}

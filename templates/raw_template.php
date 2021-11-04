@@ -2,13 +2,13 @@
 //--------------------
 if(!class_exists('raw_template'))
 {
-    class raw_template
+	class raw_template
 	{
 		var $page_obj;
 		//----------------------------------------------------------------------------------------------------
-	    public function __construct($page_obj)
+		public function __construct($page_obj)
 		{
-			$this->page_obj=$page_obj;
+			$this->page_obj = $page_obj;
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function __destruct()
@@ -16,8 +16,9 @@ if(!class_exists('raw_template'))
 		}
 		//----------------------------------------------------------------------------------------------------
 		public function get_content($trescstrony)
-		{			
-		    return $trescstrony;
+		{
+			echo $trescstrony;
+			exit;
 		}
 		//----------------------------------------------------------------------------------------------------		
 	}

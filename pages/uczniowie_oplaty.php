@@ -57,6 +57,20 @@ if(!class_exists('uczniowie_oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		public function get_kwota_do_zaplaty($idop)
+		{
+			$kwota = 0;
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idop = $idop;");
+			if($wynik)
+			{
+				list($idop,$nazwa,$kwota_z_r,$rabat_nazwa,$rabat_kwota)=$wynik->fetch_row();
+				$kwota = $kwota_z_r - $rabat_kwota;
+			}
+			//--------------------
+			return $kwota;
+		}
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
