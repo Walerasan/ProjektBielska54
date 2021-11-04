@@ -163,11 +163,11 @@ if(!class_exists('wyciagi'))
 			if($hidde_assigned)
 			{
 				//$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w, wyciagi_uczniowie wu where w.usuniety='nie' and w.idw = wu.idw");
-				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie');");
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie') order by dataoperacji desc;");
 			}
 			else
 			{
-				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr)");
+				$this->page_obj->database_obj->get_data("select w.idw from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr)  order by dataoperacji desc");
 			}
 			
 
@@ -177,11 +177,11 @@ if(!class_exists('wyciagi'))
 			if($hidde_assigned)
 			{
 				//$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where w.usuniety='nie' limit $aktualnailosc,$iloscnastronie;");
-				$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie')  limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select idw,tytul,dataoperacji,typ,usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) and w.idw not in (select idw from wyciagi_uczniowie wu where wu.usuniety='nie')  order by dataoperacji desc limit $aktualnailosc,$iloscnastronie;");
 			}
 			else
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select w.idw,w.tytul,w.dataoperacji,w.typ,w.usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr) limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select w.idw,w.tytul,w.dataoperacji,w.typ,w.usuniety from ".get_class($this)." w where (w.usuniety = 'nie' $show_hidden_filtr)  order by dataoperacji desc limit $aktualnailosc,$iloscnastronie;");
 			}
 			if($wynik)
 			{
