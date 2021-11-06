@@ -357,7 +357,8 @@ if(!class_exists('uczniowie_oplaty'))
 			{
 				while(list($iduop,$idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
 				{
-					$rettext[] = array((int)$iduop,(int)$idop, $rabat_kwota, $rabat_nazwa);
+					$zaplacone_online = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
+					$rettext[] = array((int)$iduop,(int)$idop, $rabat_kwota, $rabat_nazwa, $zaplacone_online);
 				}
 			}
 			//--------------------

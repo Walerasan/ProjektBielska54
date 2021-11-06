@@ -636,7 +636,7 @@ if(!class_exists('uczniowie'))
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
-			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); //[iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online]
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
@@ -651,7 +651,10 @@ if(!class_exists('uczniowie'))
 					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
 					$suma_rabat += $oplata_rabat;
 					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					if( $row[4] == false )
+					{
 					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					}
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
 										<td>$oplata_nazwa</td>
@@ -767,6 +770,8 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
+			$rettext .= $this->platnosci_online($idu);
+			//----------------------------------------------------------------------------------------------------
 			if($suma_rozliczen > $suma_do_rozliczenia)
 			{
 				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
@@ -844,7 +849,7 @@ if(!class_exists('uczniowie'))
 						<td>rabat nazwa</td>
 						<td style='width:100px;'>rabat kwota</td>
 					</tr>";
-			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); // [iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online]
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
@@ -859,7 +864,10 @@ if(!class_exists('uczniowie'))
 					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
 					$suma_rabat += $oplata_rabat;
 					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
-					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					if( $row[4] == false )
+					{
+						$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					}
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
 										<td>$oplata_nazwa</td>
@@ -961,6 +969,8 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
+			$rettext .= $this->platnosci_online($idu);
+			//----------------------------------------------------------------------------------------------------
 			if($suma_rozliczen > $suma_do_rozliczenia)
 			{
 				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
@@ -987,7 +997,7 @@ if(!class_exists('uczniowie'))
 			$rettext[1] = 0;//suma_oplat
 			$rettext[2] = 0;//suma_do_rozliczenia
 			//--------------------
-			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu);
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); //[iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online]
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
@@ -1090,6 +1100,53 @@ if(!class_exists('uczniowie'))
 			return $rettext;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function platnosci_online($idu)
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<b style='font-size:16px;'><u>Płatności Blue Media</u></b><br /><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>tytuł</td>
+						<td>order ID</td>
+						<td style='width:250px;'>data</td>
+						<td style='width:100px;'>kwota</td>
+						
+					</tr>";
+			//--------------------
+			if( isset($idu) && ($idu > 0) )
+			{
+				$zapytanie = "select uo.iduop, uo.idop, bm.orderID, bm.amount, bm.date from uczniowie_oplaty uo, blue_media_uczniowie_oplaty bmuo, blue_media bm where uo.idu = $idu and uo.iduop = bmuo.iduop and bmuo.idbm = bm.idbm and bm.status = 'oplacone';";
+				$wynik = $this->page_obj->database_obj->get_data($zapytanie);
+				if($wynik)
+				{
+					$oplata_counter = 1;
+					while( list($iduop, $idop, $orderID, $amount, $date) = $wynik->fetch_row() )
+					{
+						$nazwa_oplaty = $this->page_obj->oplaty->get_name($idop);
+
+						$rettext .= "<tr>
+											<td>$oplata_counter</td>
+											<td>$nazwa_oplaty</td>
+											<td>$orderID</td>
+											<td>$date</td>
+											<td>$amount</td>
+											
+										</tr>";
+						$oplata_counter++;
+					}
+				}
+			}
+			//--------------------
+			$rettext .= "</table><br /><br />";
+			//--------------------
+			$rettext .= "<hr /><br />";
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
