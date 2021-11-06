@@ -101,8 +101,8 @@ if(!class_exists('uczniowie'))
 
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
 			
-			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");			
-			$wynik = $this->page_obj->database_obj->get_data("select uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
+			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop, uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
 			if($wynik)
 			{
 				$rettext.="
@@ -160,18 +160,28 @@ if(!class_exists('uczniowie'))
 					</tr>";
 				$lp=1;
 
-				while(list($idop,$nazwa,$kwota,$rabat_nazwa,$rabat_kwota)=$wynik->fetch_row())
+				while(list($iduop, $idop, $nazwa, $kwota, $rabat_nazwa, $rabat_kwota) = $wynik->fetch_row())
 				{
+					//pobieram płatności online
+					$oplata_rozliczona = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
+					//-----
 					$kwota_m = $kwota;
 					$kwota_z_r = $kwota - $rabat_kwota;
 					$suma_rozliczona_b = $suma_rozliczona;
-					if( $suma_rozliczona > $kwota_z_r )
+					if( $oplata_rozliczona )
 					{
 						$kwota = 0;
 					}
 					else
 					{
-						$kwota = $kwota_z_r - $suma_rozliczona;
+						if( $suma_rozliczona > $kwota_z_r )
+						{
+							$kwota = 0;
+						}
+						else
+						{
+							$kwota = $kwota_z_r - $suma_rozliczona;
+						}
 					}
 					if( ($suma_rozliczona - $kwota_z_r) < 0 )
 					{
@@ -184,12 +194,26 @@ if(!class_exists('uczniowie'))
 
 					if($active_link)
 					{
-						$link_action = "onclick='window.location.href=\"blue_media,index,get_link,$idop\"'";
+						$link_action = "onclick='window.location.href=\"blue_media,index,get_link, $idop, $idu\"'";
 					}
 					else
 					{
 						$link_action = "";
 					}
+					$link_do_platnosci = "";
+					if($oplata_rozliczona)
+					{
+						$link_do_platnosci = "Opłacone online";
+					}
+					else if ($kwota > 0)
+					{
+						$link_do_platnosci = "<button class='oplac' $link_action >OPŁAĆ</button>";
+					}
+					else
+					{
+						$link_do_platnosci = "Rozliczone z salda";
+					}
+					//--------------------
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
@@ -199,7 +223,7 @@ if(!class_exists('uczniowie'))
 							<td>$rabat_kwota zł</td>
 							<td>$suma_rozliczona_b</td>
 							<td>" . ($kwota) . "</td>
-							<td>" . ( $kwota > 0 ? "<button class='oplac' $link_action >OPŁAĆ</button>" : "")."</td>
+							<td>$link_do_platnosci</td>
 						</tr>";
 					$lp++;
 				}

@@ -39,7 +39,8 @@ if(!class_exists('blue_media'))
 						break;
 					case "get_link":
 						$idop = isset($_GET['par1']) ? $_GET['par1'] : 0;
-						$content_text .= $this->get_link($idop);
+						$idu = isset($_GET['par2']) ? $_GET['par2'] : 0;
+						$content_text .= $this->get_link($idop, $idu);
 						break;
 					default:
 						$content_text .= "";
@@ -152,7 +153,7 @@ if(!class_exists('blue_media'))
 			}
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function get_link($idop)
+		private function get_link($idop, $idu)
 		{
 			$rettext = "";
 			//--------------------
@@ -161,10 +162,16 @@ if(!class_exists('blue_media'))
 				return "Nieprawidłowa wartość opłaty.";
 			}
 			//--------------------
-			$amount = $this->page_obj->uczniowie_oplaty->get_kwota_do_zaplaty($idop);
+			$amount = $this->page_obj->uczniowie_oplaty->get_kwota_do_zaplaty($idop, $idu);
 			if( $amount <= 0 )
 			{
 				return "Nieprawidłowa kwota do zapłaty.";
+			}
+			//--------------------
+			$iduop = $this->page_obj->uczniowie_oplaty->get_iduop($idop, $idu);
+			if( $amount <= 0 )
+			{
+				return "Nieprawidłowa opłata.";
 			}
 			//--------------------
 			$description = "Płatność: $idop";
@@ -183,6 +190,9 @@ if(!class_exists('blue_media'))
 				$idbm = $this->get_new_payment($description, $amount, $email);
 				if ( $idbm > 0 )
 				{
+					//join bluemedia with uczen and oplata
+					$this->set_idbm_iduo($idbm,$iduop);
+					//--------------------
 					$orderID = $this->get_orderID($idbm);
 					if ( $orderID != "" )
 					{
@@ -359,6 +369,31 @@ if(!class_exists('blue_media'))
 
 			$zapytanie = "insert into " . get_class($this) . "_ITN" . " (idbm, status, status_details, payment_date, amount) values ($idbm, '$status', '$status_details', '$payment_date', $amount);";
 			return $this->page_obj->database_obj->execute_query($zapytanie);
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function set_idbm_iduo($idbm,$iduo)
+		{
+			$zapytanie = "select idbm_u_o from " . get_class($this)."_uczniowie_oplaty where idbm = $idbm and iduo = $iduo;";
+			$wynik = $this->page_obj->database_obj->get_data($zapytanie);
+			if( !$wynik )
+			{
+				$zapytanie = "insert into " . get_class($this)."_uczniowie_oplaty (idbm, iduo) values ($idbm, $iduo);";
+				$this->page_obj->database_obj->execute_query($zapytanie);
+			}
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function jest_oplata_rozliczona($iduop)
+		{
+			$result = false;
+			//--------------------
+			$zapytanie = "select bm.idbm from " . get_class($this) . " bm, " . get_class($this)."_uczniowie_oplaty bmuo where bm.idbm = bmuo.idbm and status = 'oplacone' and iduop = $iduop;";
+			$wynik = $this->page_obj->database_obj->get_data($zapytanie);
+			if( $wynik )
+			{
+				$result = true;
+			}
+			//--------------------
+			return $result;
 		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy

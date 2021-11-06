@@ -57,18 +57,31 @@ if(!class_exists('uczniowie_oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
-		public function get_kwota_do_zaplaty($idop)
+		public function get_kwota_do_zaplaty($idop, $idu)
 		{
 			$kwota = 0;
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idop = $idop;");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idop = $idop and uo.idu = $idu;");
 			if($wynik)
 			{
-				list($idop,$nazwa,$kwota_z_r,$rabat_nazwa,$rabat_kwota)=$wynik->fetch_row();
+				list($idop,$nazwa,$kwota_z_r,$rabat_nazwa,$rabat_kwota) = $wynik->fetch_row();
 				$kwota = $kwota_z_r - $rabat_kwota;
 			}
 			//--------------------
 			return $kwota;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function get_iduop($idop, $idu)
+		{
+			$iduop = 0;
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select iduop from uczniowie_oplaty where usuniety = 'nie' and idop = $idop and idu = $idu;");
+			if($wynik)
+			{
+				list( $iduop ) = $wynik->fetch_row();
+			}
+			//--------------------
+			return $iduop;
 		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
