@@ -81,7 +81,7 @@ if(!class_exists('uczniowie'))
 			$wynik = $this->page_obj->database_obj->get_data("select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') group by wu.idw;");
 			if($wynik)
 			{
-				while( list($idw_r,$idu_r,$kwota_r,$kwota_jednostowa_r) = $wynik->fetch_row() )
+				while( list($idw_r,$idu_r,$kwota_r,$kwota_jednostowa_r, $comment) = $wynik->fetch_row() )
 				{
 					$suma_rozliczona += $kwota_jednostowa_r;
 				}
@@ -102,7 +102,7 @@ if(!class_exists('uczniowie'))
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
 			
 			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
-			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop, uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop, uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota, comment from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
 			if($wynik)
 			{
 				$rettext.="
@@ -160,7 +160,7 @@ if(!class_exists('uczniowie'))
 					</tr>";
 				$lp=1;
 
-				while(list($iduop, $idop, $nazwa, $kwota, $rabat_nazwa, $rabat_kwota) = $wynik->fetch_row())
+				while(list($iduop, $idop, $nazwa, $kwota, $rabat_nazwa, $rabat_kwota, $comment) = $wynik->fetch_row())
 				{
 					//pobieram płatności online
 					$oplata_rozliczona = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
@@ -217,7 +217,7 @@ if(!class_exists('uczniowie'))
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
-							<td>$nazwa</td>
+							<td>$nazwa ($comment)</td>
 							<td>$kwota_m zł</td>
 							<td>$rabat_nazwa</td>
 							<td>$rabat_kwota zł</td>

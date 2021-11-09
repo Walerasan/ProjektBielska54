@@ -111,10 +111,10 @@ if(!class_exists('oplaty'))
 					$wynik_imie_nazwisko = $this->page_obj->database_obj->get_data("select imie_uczniowie, nazwisko_uczniowie from uczniowie where idu = $idu and usuniety = 'nie';");
 					list($imie,$nazwisko)=$wynik_imie_nazwisko->fetch_row();
 					
-					$wynik_uczniowie_oplaty = $this->page_obj->database_obj->get_data("select idop,rabat_kwota,rabat_nazwa,status from uczniowie_oplaty where idu = $idu and usuniety = 'nie';");
+					$wynik_uczniowie_oplaty = $this->page_obj->database_obj->get_data("select idop,rabat_kwota,rabat_nazwa,status, comment from uczniowie_oplaty where idu = $idu and usuniety = 'nie';");
 					if($wynik_uczniowie_oplaty){
 						
-						while(list($idop,$rabat_kwota,$rabat_nazwa,$status)=$wynik_uczniowie_oplaty->fetch_row()){
+						while(list($idop,$rabat_kwota,$rabat_nazwa,$status, $comment)=$wynik_uczniowie_oplaty->fetch_row()){
 						
 							$wynik_oplaty = $this->page_obj->database_obj->get_data("select idto,nazwa,kwota from oplaty where idop = $idop and usuniety = 'nie';");
 							if($wynik_oplaty){
@@ -123,7 +123,7 @@ if(!class_exists('oplaty'))
 								<tr>
 									<td>$lp.</td>
 									<td>$imie $nazwisko</td>
-									<td>$nazwa</td>
+									<td>$nazwa ($comment)</td>
 									<td>$kwota zł</td>
 									<td>$rabat_nazwa</td>
 									<td>$rabat_kwota</td>
@@ -202,7 +202,7 @@ if(!class_exists('oplaty'))
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
 			
 			//$wynik=$this->page_obj->database_obj->get_data("select idop,nazwa,kwota from oplaty where usuniety='nie';");
-			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop, uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop, uo.idop,nazwa,kwota,rabat_nazwa,rabat_kwota, comment from uczniowie_oplaty uo, oplaty o where o.idop = uo.idop and o.usuniety = 'nie' and uo.usuniety = 'nie' and uo.idu = $idu;");
 			if($wynik)
 			{
 				$rettext.="
@@ -260,7 +260,7 @@ if(!class_exists('oplaty'))
 					</tr>";
 				$lp=1;
 
-				while(list($iduop, $idop, $nazwa, $kwota, $rabat_nazwa, $rabat_kwota) = $wynik->fetch_row())
+				while(list($iduop, $idop, $nazwa, $kwota, $rabat_nazwa, $rabat_kwota, $comment) = $wynik->fetch_row())
 				{
 					//pobieram płatności online
 					$oplata_rozliczona = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
@@ -317,7 +317,7 @@ if(!class_exists('oplaty'))
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
-							<td>$nazwa</td>
+							<td>$nazwa ($comment)</td>
 							<td>$kwota_m zł</td>
 							<td>$rabat_nazwa</td>
 							<td>$rabat_kwota zł</td>
