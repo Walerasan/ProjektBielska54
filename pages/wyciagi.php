@@ -37,8 +37,10 @@ if(!class_exists('wyciagi'))
 			{
 				switch($this->page_obj->target)
 				{
-					case "processing":
+					case "processing_iden_wyciagu":
 						$content_text .= $this->processing_iden_wyciagu();
+						break;
+					case "processing":
 						$content_text .= $this->processing();
 						break;
 					case "assign_write":
@@ -1332,25 +1334,74 @@ if(!class_exists('wyciagi'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region processing_iden_wyciagu
-		public function processing_iden_wyciagu()
+		public function processing_iden_wyciagu($verbose = false)
 		{
-			$rettext = "Auto processing_iden_wyciagu system <br />";
+			//----------------------------------------------------------------------------------------------------
+			// to clear:
+			/*
+				START TRANSACTION;
+				update iden_wyciagu set idw = 0;
+				update wyciagi_uczniowie set status = "not_asigned" where status = "auto_iden";
+				COMMIT;
+			*/
+			//----------------------------------------------------------------------------------------------------
+			$idiw_array = $this->page_obj->iden_wyciagu->list_idiw();
+			$rettext = "Auto processing_iden_wyciagu system: found " . sizeof($idiw_array) . " new rows. <br />";
 			//--------------------
-			foreach($this->page_obj->iden_wyciagu->list_idiw() as $row) //[idiw][idu][identyfikator]
+			if($verbose)
 			{
-				//$rettext .= "SELECT idw FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '{$row[2]}' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');<br />";
+				//$this->page_obj->iden_wyciagu->list_idiw()
+				$rettext .= "select idiw,idu,identyfikator from iden_wyciagu where usuniety = 'nie' and idw = 0; <br />";
+				$rettext .= "list_idiw: " . sizeof($idiw_array) . " rows <br />";
+			}
+			foreach($idiw_array as $row) //[idiw][idu][identyfikator]
+			{
+				if($verbose)
+				{
+					$rettext .= "SELECT idw FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '{$row[2]}' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');<br />";
+				}
 				$wynik = $this->page_obj->database_obj->get_data("SELECT idw FROM `wyciagi` WHERE wyciagi.nrreferencyjny = '{$row[2]}' and idw not in (select idw from wyciagi_uczniowie where usuniety = 'nie' and status = 'auto_iden');");
 				if($wynik)
 				{
+					if($verbose)
+					{
+						$rettext .= $this->page_obj->database_obj->result_count() . " results. <br />";
+					}
 					while(list($idw) = $wynik->fetch_row())
 					{
 						//sprawdzić czy nie ma użytego w auto (wyciagi_uczniowie)
 						foreach($this->page_obj->wyciagi_uczniowie->get_idwu_list_for_idw($idw) as $idwu)
 						{
-							$rettext .= $this->page_obj->wyciagi_uczniowie->delete_idwu($idwu);
+							if($verbose)
+							{
+								$rettext .= "$idwu used in auto. Delete it. <br />";
+							}
+							if($verbose)
+							{
+								$rettext .= $this->page_obj->wyciagi_uczniowie->delete_idwu($idwu);
+							}
+							else
+							{
+								$this->page_obj->wyciagi_uczniowie->delete_idwu($idwu);
+							}
 						}
-						$this->page_obj->wyciagi_uczniowie->synchronize($row[1],$idw,true,true);
+						if($verbose)
+						{
+							$rettext .= "Synchronize {$row[1]}, $idw, true, true. <br />";
+						}
+						$this->page_obj->wyciagi_uczniowie->synchronize($row[1], $idw, true, true);
+						if($verbose)
+						{
+							$rettext .= "Mark_idiw_assigned {$row[1]}, {$row[0]}, $idw <br />";
+						}
 						$this->page_obj->iden_wyciagu->mark_idiw_assigned($row[1],$row[0],$idw);
+					}
+				}
+				else
+				{
+					if($verbose)
+					{
+						$rettext .= "Empty result. <br />";
 					}
 				}
 			}

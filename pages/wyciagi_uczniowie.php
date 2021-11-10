@@ -73,7 +73,7 @@ if(!class_exists('wyciagi_uczniowie'))
 			//--------------------
 			if( isset($idwu) && is_numeric($idwu) && ($idwu > 0) )
 			{
-				$rettext .= "update ".get_class($this)." set usuniety = 'tak' where idwu = $idwu limit 1";
+				$rettext .= "update ".get_class($this)." set usuniety = 'tak' where idwu = $idwu limit 1 <br />";
 				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where idwu = $idwu limit 1");
 			}
 			//--------------------
@@ -150,12 +150,19 @@ if(!class_exists('wyciagi_uczniowie'))
 		{
 			$rettext = array();
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select wu.idw from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select wu.idw, wu.status from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie' and status = 'auto';");
 			if($wynik)
 			{
-				while(list($idw)=$wynik->fetch_row())
+				while( list($idw, $status) = $wynik->fetch_row() )
 				{
-					$rettext[] = (int)$idw;
+					if( $status == "auto_iden" )
+					{
+						$rettext[] = (int)$idw;
+					}
+					else
+					{
+						$rettext[] = (int)$idw;
+					}
 				}
 			}
 			//--------------------

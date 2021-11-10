@@ -40,17 +40,19 @@ if(!class_exists('uczniowie_oplaty'))
 						$content_text=$this->delete($iduop,$confirm);
 					break;
 					case "zapisz":
-						$iduop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['iduop'])?$_POST['iduop']:0);
-						$idu=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idu'])?$_POST['idu']:0);
-						$rabat_kwota=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['rabat_kwota'])?$_POST['rabat_kwota']:"");
-						$rabat_nazwa=isset($_GET['par4'])?$_GET['par4']:(isset($_POST['rabat_nazwa'])?$_POST['rabat_nazwa']:"");
-						$content_text=$this->add($iduop,$idu,$rabat_kwota,$rabat_nazwa);
+						$iduop = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['iduop'])?$_POST['iduop']:0);
+						$idu = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['idu'])?$_POST['idu']:0);
+						$rabat_kwota = isset($_GET['par3'])?$_GET['par3']:(isset($_POST['rabat_kwota'])?$_POST['rabat_kwota']:"");
+						$rabat_nazwa = isset($_GET['par4'])?$_GET['par4']:(isset($_POST['rabat_nazwa'])?$_POST['rabat_nazwa']:"");
+						$comment = isset($_GET['par5'])?$_GET['par5']:(isset($_POST['comment'])?$_POST['comment']:"");
+						$content_text = $this->add($iduop, $idu, $rabat_kwota, $rabat_nazwa, $comment);
 					break;
 					case "formularz":
-						$iduop=isset($_GET['par1'])?$_GET['par1']:(isset($_POST['iduop'])?$_POST['iduop']:0);
-						$rabat_kwota=isset($_GET['par2'])?$_GET['par2']:(isset($_POST['rabat_kwota'])?$_POST['rabat_kwota']:"");
-						$rabat_nazwa=isset($_GET['par3'])?$_GET['par3']:(isset($_POST['rabat_nazwa'])?$_POST['rabat_nazwa']:"");
-						$content_text=$this->form($iduop,$rabat_kwota,$rabat_nazwa);
+						$iduop=isset($_GET['par1']) ? $_GET['par1']:(isset($_POST['iduop']) ? $_POST['iduop'] : 0);
+						$rabat_kwota=isset($_GET['par2']) ? $_GET['par2']:(isset($_POST['rabat_kwota']) ? $_POST['rabat_kwota'] : "");
+						$rabat_nazwa = isset($_GET['par3']) ? $_GET['par3']:(isset($_POST['rabat_nazwa']) ? $_POST['rabat_nazwa'] : "");
+						$comment = isset($_GET['par4']) ? $_GET['par4']:(isset($_POST['comment']) ? $_POST['comment'] : "");
+						$content_text = $this->form($iduop, $rabat_kwota, $rabat_nazwa, $comment);
 					break;
 					case "lista":
 					default:
@@ -119,7 +121,7 @@ if(!class_exists('uczniowie_oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region form
-		public function form($iduop,$rabat_kwota,$rabat_nazwa)
+		public function form($iduop, $rabat_kwota, $rabat_nazwa, $comment)
 		{
 			$rettext="";
 			//--------------------
@@ -127,15 +129,16 @@ if(!class_exists('uczniowie_oplaty'))
 			//--------------------
 			if($iduop!="" && is_numeric($iduop) && $iduop>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select idu,rabat_kwota,rabat_nazwa from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
+				$wynik=$this->page_obj->database_obj->get_data("select idu, rabat_kwota, rabat_nazwa, comment from ".get_class($this)." where usuniety='nie' and iduop=$iduop");
 				if($wynik)
 				{
-					list($idu,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row();
+					list($idu, $rabat_kwota, $rabat_nazwa, $comment) = $wynik->fetch_row();
 				}
 			}
 			//--------------------
-			$rabat_kwota=$this->page_obj->text_obj->doedycji($rabat_kwota);
-			$rabat_nazwa=$this->page_obj->text_obj->doedycji($rabat_nazwa);
+			$rabat_kwota = $this->page_obj->text_obj->doedycji($rabat_kwota);
+			$rabat_nazwa = $this->page_obj->text_obj->doedycji($rabat_nazwa);
+			$comment = $this->page_obj->text_obj->doedycji($comment);
 			//--------------------
 			$rettext .= "
 				<style>
@@ -148,6 +151,7 @@ if(!class_exists('uczniowie_oplaty'))
 					<div style='overflow:hidden;'>
 						<div class='wiersz'><div class='formularzkom1'>rabat nazwa: </div><div class='formularzkom2'><input type='text' name='rabat_nazwa' value='$rabat_nazwa' style='width:800px;'/></div></div>
 						<div class='wiersz'><div class='formularzkom1'>rabat kwota: </div><div class='formularzkom2'><input type='text' name='rabat_kwota' value='$rabat_kwota' style='width:100px;'/></div></div>
+						<div class='wiersz'><div class='formularzkom1'>Komentarz: </div><div class='formularzkom2'><input type='text' name='comment' value='$comment' style='width:800px;'/></div></div>
 						<div class='wiersz'>
 							<div class='formularzkom1'>&#160;</div>
 							<div class='formularzkom2'>
@@ -165,7 +169,7 @@ if(!class_exists('uczniowie_oplaty'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region add
-		public function add($iduop,$idu,$rabat_kwota,$rabat_nazwa)
+		public function add($iduop, $idu, $rabat_kwota, $rabat_nazwa, $comment)
 		{
 			$rettext = "";
 			//--------------------
@@ -176,11 +180,11 @@ if(!class_exists('uczniowie_oplaty'))
 			//--------------------
 			if( ($iduop != "") && is_numeric($iduop) && ($iduop > 0) )
 			{
-				$zapytanie="update ".get_class($this)." set rabat_nazwa='$rabat_nazwa',rabat_kwota=$rabat_kwota where iduop=$iduop;";//poprawa wpisu
+				$zapytanie="update ".get_class($this)." set rabat_nazwa = '$rabat_nazwa', rabat_kwota = $rabat_kwota, comment = '$comment' where iduop=$iduop;";//poprawa wpisu
 			}
 			else
 			{
-				$zapytanie="insert into ".get_class($this)."(rabat_nazwa,rabat_kwota,idu,idop)values('$rabat_nazwa',$rabat_kwota,0,0)";//nowy wpis
+				$zapytanie="insert into ".get_class($this)."(rabat_nazwa, rabat_kwota, idu, idop, comment)values('$rabat_nazwa', $rabat_kwota, 0, 0, '$comment')";//nowy wpis
 			}
 			//--------------------
 			if(!$_SESSION['antyrefresh'])
@@ -197,7 +201,7 @@ if(!class_exists('uczniowie_oplaty'))
 				{
 					$rettext .= "Błąd zapisu - proszę spróbować ponownie - jeżeli błąd występuje nadal proszę zgłosić to twórcy systemu.<br />";
 					$rettext.=$zapytanie."<br />";
-					$rettext.=$this->form($iduop,$rabat_kwota,$rabat_nazwa);
+					$rettext.=$this->form($iduop, $rabat_kwota, $rabat_nazwa, $comment);
 				}
 			}
 			else
@@ -352,13 +356,13 @@ if(!class_exists('uczniowie_oplaty'))
 			//--------------------
 			//$wynik = $this->page_obj->database_obj->get_data("select iduop, idop, rabat_kwota, rabat_nazwa from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
 			//echo("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.ido = o.ido and uo.usuniety = 'nie' and o.usuniety = 'nie';");
-			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.idop = o.idop and uo.usuniety = 'nie' and o.usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select uo.iduop,uo.idop,uo.rabat_kwota,uo.rabat_nazwa, uo.comment from ".get_class($this)." uo, oplaty o where uo.idu = $idu and uo.idop = o.idop and uo.usuniety = 'nie' and o.usuniety = 'nie';");
 			if($wynik)
 			{
-				while(list($iduop,$idop,$rabat_kwota,$rabat_nazwa)=$wynik->fetch_row())
+				while(list($iduop, $idop, $rabat_kwota, $rabat_nazwa, $comment)=$wynik->fetch_row())
 				{
 					$zaplacone_online = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
-					$rettext[] = array((int)$iduop,(int)$idop, $rabat_kwota, $rabat_nazwa, $zaplacone_online);
+					$rettext[] = array((int)$iduop, (int)$idop, $rabat_kwota, $rabat_nazwa, $zaplacone_online, $comment);
 				}
 			}
 			//--------------------
@@ -447,6 +451,14 @@ if(!class_exists('uczniowie_oplaty'))
 			$pola[$nazwa][1]="not null";//null
 			$pola[$nazwa][2]="";//key
 			$pola[$nazwa][3]="'nowe'";//default
+			$pola[$nazwa][4]="";//extra
+			$pola[$nazwa][5]=$nazwa;
+
+			$nazwa="comment";
+			$pola[$nazwa][0]="varchar(250)";
+			$pola[$nazwa][1]="";//null
+			$pola[$nazwa][2]="";//key
+			$pola[$nazwa][3]="";//default
 			$pola[$nazwa][4]="";//extra
 			$pola[$nazwa][5]=$nazwa;
 			

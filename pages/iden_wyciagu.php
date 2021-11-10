@@ -286,11 +286,10 @@ if( !class_exists("iden_wyciagu") )
 
 				if( $idiw > 0 )
 				{
-					$this->mark_idiw_assigned($idu,$idiw,$idw);
 					$this->page_obj->wyciagi->processing_iden_wyciagu();
+					$this->mark_idiw_assigned($idu,$idiw,$idw);
 				}
 			}
-
 			
 			//--------------------
 			return $rettext;

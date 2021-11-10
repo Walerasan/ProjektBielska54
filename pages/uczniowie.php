@@ -630,13 +630,14 @@ if(!class_exists('uczniowie'))
 					<tr style='font-weight:bold;'>
 						<td style='width:35px;'>Lp.</td>
 						<td>nazwa</td>
+						<td>komentarz</td>
 						<td style='width:100px;'>kwota</td>
 						<td>rabat nazwa</td>
 						<td style='width:100px;'>rabat kwota</td>
 						<td style='width:18px;'></td>
 						<td style='width:18px;'></td>
 					</tr>";
-			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); //[iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online]
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); //[iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online, comment]
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
@@ -658,6 +659,7 @@ if(!class_exists('uczniowie'))
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
 										<td>$oplata_nazwa</td>
+										<td>{$row[5]}</td>
 										<td>$oplata_kwota</td>
 										<td>{$row[3]}</td>
 										<td>{$row[2]}</td>
@@ -670,6 +672,7 @@ if(!class_exists('uczniowie'))
 				$rettext .= "<tr>
 									<td></td>
 									<td></td>
+									<td></td>
 									<td style='border-top:1px solid gray;'>$suma_oplat</td>
 									<td></td>
 									<td style='border-top:1px solid gray;'>$suma_rabat</td>
@@ -677,7 +680,7 @@ if(!class_exists('uczniowie'))
 									<td></td>
 								</tr>";
 				$rettext .= "<tr>
-									<td colspan='7'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
+									<td colspan='8'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
 								</tr>";
 			}
 			$rettext .= "</table><br /><br />";
@@ -688,7 +691,7 @@ if(!class_exists('uczniowie'))
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 			$rettext .= "
 					<tr style='font-weight:bold;'>
-						<td style='width:35px;'>Lp.</td>
+						<td style='width:85px;'>Lp.</td>
 						<td>tytuł</td>
 						<td>nadawca</td>
 						<td style='width:250px;'>data</td>
@@ -699,7 +702,7 @@ if(!class_exists('uczniowie'))
 			
 			$suma_rozliczen = 0;
 			$oplata_counter = 1;
-			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);			
+			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
 			if(is_array($wyciagi_list))
 			{
 				foreach($wyciagi_list as $idw)
@@ -714,7 +717,7 @@ if(!class_exists('uczniowie'))
 					}
 					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					$rettext .= "<tr>
-										<td>$oplata_counter</td>
+										<td>$oplata_counter ($idw)</td>
 										<td>$tytul</td>
 										<td>$nadawca</td>
 										<td>$data</td>
@@ -845,11 +848,12 @@ if(!class_exists('uczniowie'))
 					<tr style='font-weight:bold;'>
 						<td style='width:35px;'>Lp.</td>
 						<td>nazwa</td>
+						<td>komentarz</td>
 						<td style='width:100px;'>kwota</td>
 						<td>rabat nazwa</td>
 						<td style='width:100px;'>rabat kwota</td>
 					</tr>";
-			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); // [iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online]
+			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); // [iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online, comment]
 			if(is_array($oplaty_list))
 			{
 				$suma_do_rozliczenia = 0;
@@ -871,6 +875,7 @@ if(!class_exists('uczniowie'))
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
 										<td>$oplata_nazwa</td>
+										<td>{$row[5]}</td>
 										<td>$oplata_kwota</td>
 										<td>{$row[3]}</td>
 										<td>{$row[2]}</td>
@@ -881,12 +886,13 @@ if(!class_exists('uczniowie'))
 				$rettext .= "<tr>
 									<td></td>
 									<td></td>
+									<td></td>
 									<td style='border-top:1px solid gray;'>$suma_oplat</td>
 									<td></td>
 									<td style='border-top:1px solid gray;'>$suma_rabat</td>
 								</tr>";
 				$rettext .= "<tr>
-									<td colspan='7'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
+									<td colspan='8'><b>Do zapłaty w sumie: $suma_do_rozliczenia </b></td>
 								</tr>";
 			}
 			$rettext .= "</table><br /><br />";
