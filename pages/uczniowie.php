@@ -78,25 +78,30 @@ if(!class_exists('uczniowie'))
 			//select wu.idw,count(wu.idu) from wyciagi_uczniowie wu where wu.usuniety = 'nie' and wu.idw in (select idw from wyciagi_uczniowie where idu = 1 and usuniety = 'nie') group by wu.idw;
 			//select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = 1 and usuniety = 'nie') group by wu.idw;
 			//$rettext .= "select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') group by wu.idw; <br />";
-			$wynik = $this->page_obj->database_obj->get_data("select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie') group by wu.idw;");
+			$wynik = $this->page_obj->database_obj->get_data("select wu.idw,count(wu.idu),w.kwota,(w.kwota/count(wu.idu)) from wyciagi_uczniowie wu, wyciagi w where wu.usuniety = 'nie' and w.usuniety = 'nie' and w.idw = wu.idw and wu.idw in (select idw from wyciagi_uczniowie where idu = $idu and usuniety = 'nie' and status = 'auto') group by wu.idw;");
 			if($wynik)
 			{
-				while( list($idw_r,$idu_r,$kwota_r,$kwota_jednostowa_r, $comment) = $wynik->fetch_row() )
+				while( list($idw_r,$idu_r,$kwota_r,$kwota_jednostowa_r) = $wynik->fetch_row() )
 				{
 					$suma_rozliczona += $kwota_jednostowa_r;
 				}
 			}
+			//$rettext .= "Saldo z wyciągów: $suma_rozliczona<br />";
+
 			// [gotowka]
 			//select kwota from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = 14 and iw.usuniety = 'nie';
 			//select sum(kwota) from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = 14 and iw.usuniety = 'nie';
+			$suma_rozliczona_g = 0;
 			$wynik = $this->page_obj->database_obj->get_data("select sum(kwota) from iden_wyciagu iw, wyciagi w where iw.idw = w.idw and iw.idu = $idu and iw.usuniety = 'nie';");
 			if($wynik)
 			{
 				while( list($kwota_jednostowa_r) = $wynik->fetch_row() )
 				{
 					$suma_rozliczona += $kwota_jednostowa_r;
+					$suma_rozliczona_g += $kwota_jednostowa_r;
 				}
 			}
+			//$rettext .= "Saldo z gotówki: $suma_rozliczona_g<br />";
 			//--------------------
 
 			//$rettext .= "<div style='text-indent: 20px;'>Zrobić szczegóły</div>";
@@ -214,10 +219,14 @@ if(!class_exists('uczniowie'))
 						$link_do_platnosci = "Rozliczone z salda";
 					}
 					//--------------------
+					if ( $comment != "" )
+					{
+						$comment = "(" . $comment . ")";
+					}
 					$rettext.="
 						<tr>
 							<td>$lp.</td>
-							<td>$nazwa ($comment)</td>
+							<td>$nazwa $comment</td>
 							<td>$kwota_m zł</td>
 							<td>$rabat_nazwa</td>
 							<td>$rabat_kwota zł</td>
@@ -258,7 +267,7 @@ if(!class_exists('uczniowie'))
 			$imie_uczniowie_nazwisko_uczniowie='';
 			if($idu!="" && is_numeric($idu) && $idu>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_uczniowie,' ',nazwisko_uczniowie) from ".get_class($this)." where usuniety='nie' and idu=$idu");
+				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_uczniowie,' ',nazwisko_uczniowie) from ".get_class($this)." where idu = $idu;");
 				if($wynik)
 				{
 					list($imie_uczniowie_nazwisko_uczniowie)=$wynik->fetch_row();

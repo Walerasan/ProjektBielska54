@@ -61,7 +61,7 @@ if(!class_exists('uczniowie_opiekunowie'))
 		{
 			$rettext=array();
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idu from ".get_class($this)." where ido=$ido and usuniety='nie';");
+			$wynik=$this->page_obj->database_obj->get_data("select uo.idu from ".get_class($this)." uo, uczniowie u where uo.idu = u.idu and uo.ido = $ido and uo.usuniety = 'nie' and u.usuniety = 'nie';");
 			if($wynik)
 			{
 				while(list($idu)=$wynik->fetch_row())

@@ -100,9 +100,9 @@ if(!class_exists('wyciagi'))
 						<th>Kwota zł</th>
 					</tr>";
 				$lp=1;
-
+				$kwota_all = 0;
 			//wyciagi
-			$wynik = $this->page_obj->database_obj->get_data("select imie_uczniowie, nazwisko_uczniowie, tytul, kwota from uczniowie_opiekunowie uo, uczniowie u, wyciagi_uczniowie wu, wyciagi w where uo.idu = u.idu and wu.idu = u.idu and wu.idw = w.idw and uo.ido = $ido and uo.usuniety = 'nie' and u.usuniety = 'nie' and wu.usuniety = 'nie' and w.usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select imie_uczniowie, nazwisko_uczniowie, tytul, kwota from uczniowie_opiekunowie uo, uczniowie u, wyciagi_uczniowie wu, wyciagi w where uo.idu = u.idu and wu.idu = u.idu and wu.idw = w.idw and uo.ido = $ido and uo.usuniety = 'nie' and u.usuniety = 'nie' and wu.usuniety = 'nie' and w.usuniety = 'nie' and status = 'auto';");
 			if($wynik)
 			{
 				while( list($imie_uczniowie, $nazwisko_uczniowie, $tytul, $kwota) = $wynik->fetch_row() )
@@ -115,6 +115,7 @@ if(!class_exists('wyciagi'))
 						<td>$kwota zł</td>
 					</tr>";
 					$lp++;
+					$kwota_all += $kwota;
 				}
 			}
 
@@ -132,8 +133,16 @@ if(!class_exists('wyciagi'))
 						<td>$kwota zł</td>
 					</tr>";
 					$lp++;
+					$kwota_all += $kwota;
 				}
 			}
+			$rettext.="
+					<tr style='background:inherit;'>
+						<td style = 'border:0px;'></td>
+						<td style = 'border:0px;'></td>
+						<td style = 'border:0px;'></td>
+						<td>$kwota_all zł</td>
+					</tr>";
 
 			$rettext.="</table>";
 			//--------------------
