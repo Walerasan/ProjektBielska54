@@ -79,15 +79,44 @@ if(!class_exists('opiekunowie'))
 			$rettext .= "<button class='button_add' title='dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button><br />";
 			//--------------------
 			if($aktualnailosc == "") $aktualnailosc = 0;
-			$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
-			$iloscwszystkich = $this->page_obj->database_obj->result_count();
 			$iloscnastronie = 15;
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
+			if(isset($_POST['submit_szukaj']))
+			{
+				if(isset($_POST['imie']) && !empty($_POST['imie']))
+				{
+					$imie = $_POST['imie'];
+					$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where imie_opiekun like '%$imie%';");
+					$iloscwszystkich = $this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where imie_opiekun like '%$imie%' order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
+				}
+				else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko']))
+				{
+					$nazwisko = $_POST['nazwisko'];
+					$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where nazwisko_opiekun like '%$nazwisko%';");
+					$iloscwszystkich = $this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where nazwisko_opiekun like '%$nazwisko%' order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
+				}
+				else
+				{
+					$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
+					$iloscwszystkich = $this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
+				}
+			}
+			else
+			{
+				$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this).";");
+				$iloscwszystkich = $this->page_obj->database_obj->result_count();
+				$wynik=$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." order by nazwisko_opiekun, imie_opiekun limit $aktualnailosc,$iloscnastronie;");
+			}
+
+
 			if($wynik)
 			{
 				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= $this->formularz_wyszukiwarki();
 				$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext .= "
 					<tr style='font-weight:bold;'>
@@ -418,6 +447,22 @@ if(!class_exists('opiekunowie'))
 			return 0;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function formularz_wyszukiwarki()
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
+			$rettext .= "<legend>Szukaj:</legend>";
+			$rettext .= "<form method='post' action='" . get_class($this) . "," . $this->page_obj->template .",lista'>";
+			$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
+			$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
+			$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+			$rettext .= "</form>";
+			$rettext .= "</fieldset><br><br>";
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()

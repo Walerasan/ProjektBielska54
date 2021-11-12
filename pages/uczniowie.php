@@ -170,13 +170,15 @@ if(!class_exists('uczniowie'))
 					{
 						$lp++;
 						//--------------------
-						if($usuniety=='nie')
+						if($usuniety == 'nie')
 						{
-							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idu,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+							$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun,$idu,yes\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+							$edit_link = "<a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 						}
 						else
 						{
-							$operacja="<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+							$operacja = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},przywroc,$idu,yes\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+							$edit_link = "";
 						}
 						//--------------------
 						$rettext .= "
@@ -186,7 +188,7 @@ if(!class_exists('uczniowie'))
 								<td onclick=\"uczniowie.open($idu);\">{$this->page_obj->klasa->get_name($idkl)} - {$this->page_obj->oddzialy->get_name($this->page_obj->klasa->get_oddzial($idkl))}</td>
 								
 								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},szczegoly,$idu'><img src='./media/ikony/szczegoly.png' alt='' style='height:30px;'/></a></td>
-								<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz,$idu'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
+								<td style='text-align:center;'>$edit_link</td>
 								<td style='text-align:center;'>$operacja</td>
 							</tr>";
 						$oplaty_array = $this->get_kwota_do_zaplaty($idu);
