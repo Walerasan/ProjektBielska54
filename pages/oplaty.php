@@ -131,15 +131,45 @@ if(!class_exists('oplaty'))
 			$rettext .= "<br />";
 			//--------------------
 			if($aktualnailosc == "") $aktualnailosc = 0;
-			$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." order by idop;");
-			$iloscwszystkich=$this->page_obj->database_obj->result_count();
 			$iloscnastronie = 15;
 			//--------------------
-			$wynik=$this->page_obj->database_obj->get_data("select idop,idto,nazwa,kwota,usuniety from ".get_class($this)." order by idop desc limit $aktualnailosc,$iloscnastronie;");
+			if(isset($_POST['submit_szukaj']))
+			{
+				if(isset($_POST['tytul']) && !empty($_POST['tytul']))
+				{
+					$iloscnastronie = 10000;
+					$tytul = $_POST['tytul'];
+					$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto and o.nazwa like '%$tytul%' order by o.idop;");
+					$iloscwszystkich=$this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto and o.nazwa like '%$tytul%' order by o.idop desc limit $aktualnailosc,$iloscnastronie;");
+				}
+				else if(isset($_POST['komentarz']) && !empty($_POST['komentarz']))
+				{
+					$iloscnastronie = 10000;
+					$komentarz = $_POST['komentarz'];
+					$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto and t_o.nazwa like '%$komentarz%' order by o.idop;");
+					$iloscwszystkich=$this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto and t_o.nazwa like '%$komentarz%' order by o.idop desc limit $aktualnailosc,$iloscnastronie;");
+				}
+				else
+				{
+					$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto order by o.idop;");
+					$iloscwszystkich=$this->page_obj->database_obj->result_count();
+					$wynik=$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto order by o.idop desc limit $aktualnailosc,$iloscnastronie;");
+				}
+			}
+			else
+			{
+				$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto order by o.idop;");
+				$iloscwszystkich=$this->page_obj->database_obj->result_count();
+				$wynik=$this->page_obj->database_obj->get_data("select o.idop,o.idto,o.nazwa,o.kwota,o.usuniety,t_o.nazwa from " . get_class($this) . " o, typy_oplat t_o where o.idto = t_o.idto order by o.idop desc limit $aktualnailosc,$iloscnastronie;");
+			}
+
 			if($wynik)
 			{
 				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
 				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= $this->formularz_wyszukiwarki();
 				$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 				$rettext .= "
 					<tr style='font-weight:bold;'>
@@ -151,7 +181,7 @@ if(!class_exists('oplaty'))
 						<td style='width:18px;'></td>
 					</tr>";
 				$lp=0;
-				while(list($idop,$idto,$nazwa,$kwota,$usuniety)=$wynik->fetch_row())
+				while(list($idop,$idto,$nazwa,$kwota,$usuniety, $komentarz)=$wynik->fetch_row())
 				{
 					$lp++;
 					//--------------------
@@ -169,7 +199,7 @@ if(!class_exists('oplaty'))
 							<td style='text-align:right;padding-right:10px;color:#555555;'>".($aktualnailosc + $lp).".</td>
 							<td>$nazwa</td>
 							<td>$kwota</td>
-							<td>{$this->page_obj->typy_oplat->get_name($idto)}</td>
+							<td>$komentarz</td>
 							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},formularz_uczen,$idop'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a></td>
 							<td style='text-align:center;'>$operacja</td>
 						</tr>";
@@ -1474,6 +1504,22 @@ if(!class_exists('oplaty'))
 			}
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function formularz_wyszukiwarki()
+		{
+			$rettext = "";
+			//--------------------
+			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
+			$rettext .= "<legend>Szukaj:</legend>";
+			$rettext .= "<form method='post' action='" . get_class($this) . "," . $this->page_obj->template . ",lista'>";
+			$rettext .= "<input type='text' name='tytul' placeholder='wg tytułu'>&nbsp;&nbsp";
+			$rettext .= "<input type='text' name='komentarz' placeholder='wg komentarza'>&nbsp;&nbsp";
+			$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+			$rettext .= "</form>";
+			$rettext .= "</fieldset><br><br>";
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()

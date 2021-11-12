@@ -85,6 +85,7 @@ if(!class_exists('opiekunowie'))
 			{
 				if(isset($_POST['imie']) && !empty($_POST['imie']))
 				{
+					$iloscnastronie = 10000;
 					$imie = $_POST['imie'];
 					$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where imie_opiekun like '%$imie%';");
 					$iloscwszystkich = $this->page_obj->database_obj->result_count();
@@ -92,6 +93,7 @@ if(!class_exists('opiekunowie'))
 				}
 				else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko']))
 				{
+					$iloscnastronie = 10000;
 					$nazwisko = $_POST['nazwisko'];
 					$this->page_obj->database_obj->get_data("select ido,imie_opiekun,nazwisko_opiekun,telefon_opiekun,email_opiekun,usuniety from ".get_class($this)." where nazwisko_opiekun like '%$nazwisko%';");
 					$iloscwszystkich = $this->page_obj->database_obj->result_count();
