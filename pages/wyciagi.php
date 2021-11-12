@@ -228,6 +228,14 @@ if(!class_exists('wyciagi'))
 					$link_edytuj = "<a href='".get_class($this).",{$this->page_obj->template},formularz,$idw'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					//blokada linku edytuj
 					$link_edytuj = "";
+					if( $typ == "bankowy" )
+					{
+						$link_assign = "<a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'><img src='./media/ikony/niegotowe.png' alt='' style='height:30px;'/></a>";
+					}
+					else
+					{
+						$link_assign = "";
+					}
 					//--------------------
 					$rettext .= "
 						<tr style='".($usuniety=='tak'?"text-decoration:line-through;color:gray;":"")."' id='wiersz$idw' onmouseover=\"setopticalwhite50('wiersz$idw')\" onmouseout=\"setoptical0('wiersz$idw')\">
@@ -237,7 +245,7 @@ if(!class_exists('wyciagi'))
 							<td>$typ</td>
 							<td style='text-align:center;'>$is_assigned</td>
 							<td style='text-align:center;'>$link_ukryj_odkryj</td>
-							<td style='text-align:center;'><a href='".get_class($this).",{$this->page_obj->template},assign_select_idu,$idw,$aktualnailosc'><img src='./media/ikony/niegotowe.png' alt='' style='height:30px;'/></a></td>
+							<td style='text-align:center;'>$link_assign</td>
 							<!--<td style='text-align:center;'>$link_edytuj</td>-->
 							<!--<td style='text-align:center;'>$operacja</td>-->
 						</tr>";
@@ -1615,6 +1623,36 @@ if(!class_exists('wyciagi'))
 			return $rettext;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		public function get_nazwanadawcy_from_rachuneknadawcy($rachunek_nadawcy)
+		{
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select nazwanadawcy from ".get_class($this)." where rachuneknadawcy = '$rachunek_nadawcy';");
+			if($wynik)
+			{
+				list($rettext) = $wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function get_idw_list_for_rachuneknadawcy($rachuneknadawcy)
+		{
+			$rettext = array();
+			//--------------------
+			//echo("SELECT idw FROM ".get_class($this)." where rachuneknadawcy = '$rachuneknadawcy';");
+			$wynik = $this->page_obj->database_obj->get_data("SELECT idw FROM ".get_class($this)." where rachuneknadawcy = '$rachuneknadawcy';");
+			if($wynik)
+			{
+				while( list($idw) = $wynik->fetch_row() )
+				{
+					$rettext[] = (int)$idw;
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()

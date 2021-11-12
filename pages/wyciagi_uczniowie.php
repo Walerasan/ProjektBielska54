@@ -81,6 +81,19 @@ if(!class_exists('wyciagi_uczniowie'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		public function delete_idw($idw, $idu)
+		{
+			$rettext = "";
+			//--------------------
+			if( isset($idw) && isset($idu) && is_numeric($idw) && is_numeric($idu) && ($idw > 0) && ($idu > 0) )
+			{
+				//$rettext .= "update ".get_class($this)." set usuniety = 'tak' where idw = $idw and idu = $idu; <br />";
+				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where idw = $idw and idu = $idu;");
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
 		#region synchronize
 		public function synchronize($idu,$idw,$set_automatic,$set_auto_ident)
 		{
@@ -184,7 +197,8 @@ if(!class_exists('wyciagi_uczniowie'))
 			}
 
 			//pobieram ilość idu dla tego idw
-			$wynik=$this->page_obj->database_obj->get_data("select count(idu) from ".get_class($this)." where idw=$idw and usuniety='nie';");
+			//$wynik=$this->page_obj->database_obj->get_data("select count(idu) from ".get_class($this)." where idw=$idw and usuniety='nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select count(wu.idu) from wyciagi_uczniowie wu, uczniowie u where wu.idu = u.idu and wu.idw = $idw and wu.usuniety = 'nie' and u.usuniety = 'nie';");
 			if($wynik)
 			{
 				list($count) = $wynik->fetch_row();

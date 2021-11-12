@@ -30,6 +30,12 @@ if(!class_exists('uczniowie'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "usun_konto_bankowe":
+						$idukb = isset($_GET['par1']) ? $_GET['par1'] : 0;
+						$confirm = isset($_GET['par2']) ? $_GET['par2'] : "";
+						$idu = isset($_GET['par3']) ? $_GET['par3'] : 0;
+						$content_text .= $this->usun_konto_bankowe($idukb, $confirm, $idu);
+						break;
 					case "zapisz_gotowka":
 						$idu = isset($_POST['idu']) ? $_POST['idu'] : 0;
 						$kwota = isset($_POST['kwota']) ? $_POST['kwota'] : 0;
@@ -533,7 +539,7 @@ if(!class_exists('uczniowie'))
 			$imie_uczniowie_nazwisko_uczniowie='';
 			if($idu!="" && is_numeric($idu) && $idu>0)
 			{
-				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_uczniowie,' ',nazwisko_uczniowie) from ".get_class($this)." where usuniety='nie' and idu=$idu");
+				$wynik=$this->page_obj->database_obj->get_data("select CONCAT(imie_uczniowie,' ',nazwisko_uczniowie) from ".get_class($this)." where idu=$idu");
 				if($wynik)
 				{
 					list($imie_uczniowie_nazwisko_uczniowie)=$wynik->fetch_row();
@@ -618,6 +624,8 @@ if(!class_exists('uczniowie'))
 		{
 			$rettext = "";
 			//--------------------
+			$is_deleted = $this->is_deleted($idu);
+			//--------------------
 			$rettext .= "<button class='button_add' title='Drukuj' type='button' onclick='var printWindow = window.open(\"".get_class($this).",raw,szczegoly_drukuj,$idu\",\"chaild\");printWindow.print();printWindow.onafterprint = function(){printWindow.close()};return false;'>Drukuj</button>&#160;";
 			$rettext .= "<button class='button_add' style='width:240px;' title='Dodaj identyfikator płatności' type='button' onclick='window.location=\"iden_wyciagu,{$this->page_obj->template},form,$idu\"'>Dodaj identyfikator płatności</button>&#160;";
 			$rettext .= "<button class='button_add' style='width:140px;' title='Wpłata gotówki' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},form_gotowka,$idu\"'>Wpłata gotówki</button>&#160;";
@@ -687,6 +695,21 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			$rettext .= "<hr /><br />";
 			//----------------------------------------------------------------------------------------------------
+
+			//----------------------------------------------------------------------------------------------------
+			// WYCIĄGI
+			//----------------------------------------------------------------------------------------------------
+			if($is_deleted)
+			{
+				$strike_tag_start = "<s>";
+				$strike_tag_end = "</s>";
+			}
+			else
+			{
+				$strike_tag_start = "";
+				$strike_tag_end = "";
+			}
+
 			$rettext .= "<b style='font-size:16px;'><u>WYCIĄGI</u></b><br /><br />";
 			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
 			$rettext .= "
@@ -705,6 +728,7 @@ if(!class_exists('uczniowie'))
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
 			if(is_array($wyciagi_list))
 			{
+				
 				foreach($wyciagi_list as $idw)
 				{
 					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
@@ -716,14 +740,15 @@ if(!class_exists('uczniowie'))
 						$suma_rozliczen += $kwota;
 					}
 					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+					
 					$rettext .= "<tr>
-										<td>$oplata_counter ($idw)</td>
-										<td>$tytul</td>
-										<td>$nadawca</td>
-										<td>$data</td>
-										<td>$kwota</td>
+										<td>$strike_tag_start $oplata_counter ($idw) $strike_tag_end</td>
+										<td>$strike_tag_start $tytul $strike_tag_end</td>
+										<td>$strike_tag_start $nadawca $strike_tag_end</td>
+										<td>$strike_tag_start $data $strike_tag_end</td>
+										<td>$strike_tag_start $kwota $strike_tag_end</td>
 										<td></td>
-										<td>$edytuj_oplate_link</td>
+										<td>". ( (!$is_deleted) ? $edytuj_oplate_link : "" ) ."</td>
 									</tr>";
 					$oplata_counter++;
 				}
@@ -745,11 +770,11 @@ if(!class_exists('uczniowie'))
 					}
 					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					$rettext .= "<tr>
-										<td>$oplata_counter</td>
-										<td>$tytul</td>
-										<td>$nadawca</td>
-										<td>$data</td>
-										<td>$kwota</td>
+										<td>$strike_tag_start $oplata_counter [$idw] $strike_tag_end</td>
+										<td>$strike_tag_start $tytul $strike_tag_end</td>
+										<td>$strike_tag_start $nadawca $strike_tag_end</td>
+										<td>$strike_tag_start $data $strike_tag_end</td>
+										<td>$strike_tag_start $kwota $strike_tag_end</td>
 										<td></td>
 										<td>$edytuj_oplate_link</td>
 									</tr>";
@@ -762,12 +787,12 @@ if(!class_exists('uczniowie'))
 									<td></td>
 									<td></td>
 									<td></td>
-									<td style='border-top:1px solid gray;'>$suma_rozliczen</td>
+									<td style='border-top:1px solid gray;'>$strike_tag_start $suma_rozliczen $strike_tag_end</td>
 									<td></td>
 									<td></td>
 								</tr>";
 			$rettext .= "<tr>
-									<td colspan='7'><b>Rozliczono w sumie: $suma_rozliczen </b></td>
+									<td colspan='7'>$strike_tag_start <b>Rozliczono w sumie: $suma_rozliczen </b>$strike_tag_end</td>
 								</tr>";
 			$rettext .= "</table><br /><br />";
 			//----------------------------------------------------------------------------------------------------
@@ -822,6 +847,37 @@ if(!class_exists('uczniowie'))
 				$lp++;
 			}
 			$rettext .= "</table>";
+			$rettext .= "<br /><hr /><br />";
+			//--------------------
+			// przypisane konta bankowe
+			//--------------------
+			$rettext .= "<b style='font-size:16px;'><u>PRZYPISANE NUMERY KONT:</u></b><br /><br />";
+			$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0'>";
+			$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>Lp.</td>
+						<td>numer konta</td>
+						<td>nazwa nadawcy</td>
+						<td style='width:18px;'></td>
+						<td style='width:18px;'></td>
+					</tr>";
+			$counter = 1;
+			foreach($this->page_obj->uczniowie_konta_bankowe->get_list_for_idu($idu) as $key => $val) //[idukb, numer_konta]
+			{
+				$delete_link = "<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},usun_konto_bankowe,{$val[0]},yes,$idu\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+				$nazwanadawcy = $this->page_obj->wyciagi->get_nazwanadawcy_from_rachuneknadawcy($val[1]);
+				$rettext .= "
+					<tr style='font-weight:bold;'>
+						<td style='width:35px;'>$counter.</td>
+						<td>{$val[1]}</td>
+						<td>$nazwanadawcy</td>
+						<td style='width:18px;'></td>
+						<td style='width:18px;'>$delete_link</td>
+					</tr>";
+				$counter++;
+			}
+			$rettext .= "</table>";
+			$rettext .= "<br /><hr /><br />";
 			//--------------------
 			return $rettext;
 		}
@@ -1152,6 +1208,47 @@ if(!class_exists('uczniowie'))
 			$rettext .= "<hr /><br />";
 			//--------------------
 			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function usun_konto_bankowe($idukb, $confirm, $idu)
+		{
+			$rettext = "";
+			//--------------------
+			if($confirm == "yes")
+			{
+				// pobrać numer konta z uczniowie_konta_bankowe join konta_bankowe where idukb = $idukb
+				$numer_konta = $this->page_obj->uczniowie_konta_bankowe->get_numer_konta_for_idukb($idukb);
+				// pobrać wszystkie idw z wyciagi where rachuneknadawcy = powyższe 
+				$idw_array = $this->page_obj->wyciagi->get_idw_list_for_rachuneknadawcy($numer_konta);
+				foreach($idw_array as $key => $val)
+				{
+					// usunąć wszystkie wpisy z wyciagi_uczniowie where idu = idu and idw in (powyższe)
+					$this->page_obj->wyciagi_uczniowie->delete_idw($val, $idu);
+				}
+				// usunąć z uczniowie_konta_bankowe where idukb
+				$this->page_obj->uczniowie_konta_bankowe->delete($idukb);
+			}
+			//--------------------
+			$rettext .= $this->szczegoly($idu);
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function is_deleted($idu)
+		{
+			$result = false;
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select usuniety from ".get_class($this)." where idu = $idu ;");
+			if($wynik)
+			{
+				list($usuniety) = $wynik->fetch_row();
+				if( $usuniety != 'nie')
+				{
+					$result = true;
+				}
+			}
+			//--------------------
+			return $result;
 		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy

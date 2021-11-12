@@ -122,6 +122,48 @@ if(!class_exists('uczniowie_konta_bankowe'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		public function get_list_for_idu($idu)
+		{
+			$rettext = array();
+			//--------------------
+			$wynik=$this->page_obj->database_obj->get_data("select idukb, numer_konta from ".get_class($this)." ukb, konta_bankowe kb where idu = $idu and ukb.usuniety = 'nie' and kb.usuniety = 'nie' and ukb.idk = kb.idk;");
+			if($wynik)
+			{
+				while( list($idukb, $numer_konta) = $wynik->fetch_row() )
+				{
+					$rettext[] = array( (int)$idukb, $numer_konta );
+				}
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function get_numer_konta_for_idukb($idukb)
+		{
+			$numer_konta = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("SELECT numer_konta FROM ".get_class($this)." ukb, konta_bankowe kb where idukb = $idukb and ukb.idk = kb.idk");
+			if($wynik)
+			{
+				list($numer_konta) = $wynik->fetch_row();
+			}
+			//--------------------
+			return $numer_konta;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function delete($idukb)
+		{
+			$rettext = "";
+			//--------------------
+			if( isset($idukb) && is_numeric($idukb) && ($idukb > 0) )
+			{
+				//$rettext .= "update ".get_class($this)." set usuniety = 'tak' where idukb = $idukb limit 1 <br />";
+				$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where idukb = $idukb limit 1");
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy
 		private function definicjabazy()
 		{
