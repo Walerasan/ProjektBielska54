@@ -240,6 +240,7 @@ if( !class_exists("iden_wyciagu") )
 							if($idw > 0)
 							{
 								$this->page_obj->database_obj->execute_query("update wyciagi_uczniowie set usuniety = 'tak' where idw = $idw and status = 'auto_iden';");//, status = 'not_asigned', idw = 0
+								$this->page_obj->database_obj->execute_query("update wyciagi set usuniety = 'tak' where idw = $idw and typ = 'gotowka';");
 							}
 						}
 						$this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak', idw = 0 where idu = $idu and idiw = $idiw;");
