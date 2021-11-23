@@ -66,12 +66,12 @@ if(!class_exists('index_template'))
 			$rettext .= 		$this->button("Opiekunowie","opiekunowie,index,lista");
 			$rettext .= 		"<div class='button_spacing_x4'></div>";
 			$rettext .= 		$this->button("Wyloguj","staticpages,index,logout");
+			$rettext .=			"<p style='padding:10px;'>v 1.7</p>";
 			$rettext .= 	"</div>";
 			$rettext .= 	"<div style='overflow:hidden;padding:20px;'>";
 			$rettext .= 		$trescstrony;
 			$rettext .= 	"</div>";
 			$rettext .= "</div>";
-			$rettext .= "<div style='width:100%;height:30px;clear:both;text-align:right;position:absolute;bottom:10px;'><p style='padding:10px;'>v 1.7</p></div>";
 			return $rettext;
 		}
 		//----------------------------------------------------------------------------------------------------

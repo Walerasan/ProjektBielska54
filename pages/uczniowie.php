@@ -91,7 +91,8 @@ if(!class_exists('uczniowie'))
 					case "lista":
 					default:
 						$aktualnailosc = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['aktualnailosc'])?$_POST['aktualnailosc']:0);
-						$content_text .= $this->lista($aktualnailosc);
+						$type = isset($_GET['par2']) ? $_GET['par2'] : (isset($_POST['type']) ? $_POST['type'] : "");
+						$content_text .= $this->lista($aktualnailosc, $type);
 					break;
 				}
 			}
@@ -114,7 +115,7 @@ if(!class_exists('uczniowie'))
 		#endregion
 		//----------------------------------------------------------------------------------------------------
 		#region lista
-		public function lista($aktualnailosc)
+		public function lista($aktualnailosc, $type)
 		{
 			$rettext="";
 			//--------------------
@@ -127,33 +128,45 @@ if(!class_exists('uczniowie'))
 			//--------------------
 			if(isset($_POST['submit_szukaj']))
 			{
+				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= $this->uczniowie_formularz_wyszukiwarki($type);
+				$type = $_SESSION['uczniowie_lista_type'];
+				$filtr = "";
+				$filtr2 = "";
+				if( $type == "rozliczone" )
+				{
+					$filtr .= " where zaleglosci(idu) >= 0 ";
+					$filtr2 .= " and zaleglosci(idu) >= 0 ";
+				}
+				else if ( $type == "zaleglosci")
+				{
+					$filtr .= "  where zaleglosci(idu) < 0 ";
+					$filtr2 .= " and zaleglosci(idu) < 0 ";
+				}
+
 				if(isset($_POST['imie']) && !empty($_POST['imie']))
 				{
 					$szukajimie =$_POST['imie'];
-					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%' order by nazwisko_uczniowie ;");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%' $filtr2 order by nazwisko_uczniowie, imie_uczniowie;");
+					//$rettext .= "select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE imie_uczniowie like '%$szukajimie%' order by nazwisko_uczniowie;<br />";
 				}
 				else if(isset($_POST['nazwisko']) && !empty($_POST['nazwisko']))
 				{
 					$szukajnazwisko = $_POST['nazwisko'];
-					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%' order by nazwisko_uczniowie ;");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%' $filtr2 order by nazwisko_uczniowie, imie_uczniowie;");
+					//$rettext .= "select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." WHERE nazwisko_uczniowie like '%$szukajnazwisko%' order by nazwisko_uczniowie ; <br />";
 				}
 				else
 				{
-					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie limit $aktualnailosc,$iloscnastronie;");
+					$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." $filtr order by nazwisko_uczniowie, imie_uczniowie limit $aktualnailosc,$iloscnastronie;");
+					//$rettext .= "select idu, idkl, imie_uczniowie, nazwisko_uczniowie, numer_indeksu, usuniety from ".get_class($this)." order by nazwisko_uczniowie limit $aktualnailosc, $iloscnastronie; <br />";
 				}
+				
 
 				if($wynik)
 				{
-					$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-					$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-					$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
-					$rettext .= "<legend>Szukaj ucznia:</legend>";
-					$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
-					$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
-					$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
-					$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
-					$rettext .= "</form>";
-					$rettext .= "</fieldset><br><br>";
+					
 					$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
 					$rettext .= "
 						<tr style='font-weight:bold;'>
@@ -220,22 +233,29 @@ if(!class_exists('uczniowie'))
 			}
 			else
 			{
-				$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie;");
+				$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
+				$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
+				$rettext .= $this->uczniowie_formularz_wyszukiwarki($type);
+				$type = $_SESSION['uczniowie_lista_type'];
+				$filtr = "";
+				if( $type == "rozliczone" )
+				{
+					$filtr .= " where zaleglosci(idu) >= 0 ";
+				}
+				else if ( $type == "zaleglosci")
+				{
+					$filtr .= "  where zaleglosci(idu) < 0 ";
+				}
+
+				$wynik = $this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." $filtr order by nazwisko_uczniowie, imie_uczniowie;");
 				$iloscwszystkich = $this->page_obj->database_obj->result_count();
 
-				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie limit $aktualnailosc,$iloscnastronie;");
+				$wynik=$this->page_obj->database_obj->get_data("select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." $filtr order by nazwisko_uczniowie, imie_uczniowie limit $aktualnailosc,$iloscnastronie;");
+				//$rettext .= "select idu,idkl,imie_uczniowie,nazwisko_uczniowie,numer_indeksu,usuniety from ".get_class($this)." order by nazwisko_uczniowie, imie_uczniowie limit $aktualnailosc,$iloscnastronie; <br />";
+				
 				if($wynik)
 				{
-					$rettext .= "<script type='text/javascript' src='./js/opticaldiv.js'></script>";
-					$rettext .= "<script type='text/javascript' src='./js/potwierdzenie.js'></script>";
-					$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
-					$rettext .= "<legend>Szukaj ucznia:</legend>";
-					$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
-					$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
-					$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
-					$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
-					$rettext .= "</form>";
-					$rettext .= "</fieldset><br><br>";
+					
 					$rettext .= "<table style='width:100%;font-size:16px;' cellspacing='0' id='uczniowie_blocks'>";
 					$rettext .= "
 						<tr style='font-weight:bold;'>
@@ -301,6 +321,41 @@ if(!class_exists('uczniowie'))
 			return $rettext;
 		}
 		#endregion
+		//----------------------------------------------------------------------------------------------------
+		private function uczniowie_formularz_wyszukiwarki($type)
+		{
+			$rettext = "";
+			//--------------------
+			if( isset($type) && ($type != "") )
+			{
+				$_SESSION['uczniowie_lista_type'] = $type;
+			}
+			else
+			{
+				$type = $_SESSION['uczniowie_lista_type'];
+			}
+			if( !isset($type) || ($type == "") )
+			{
+				$type = "wszystkie";
+				$_SESSION['uczniowie_lista_type'] = $type;
+			}
+			//--------------------
+			$rettext .= "<fieldset style='border:1px solid black;width:630px;'>";
+			$rettext .= "<legend>Szukaj ucznia:</legend>";
+			$rettext .= "<form method='post' action='".get_class($this).",{$this->page_obj->template},lista'>";
+			$rettext .= "<input type='text' name='imie' placeholder='wg imienia'>&nbsp;&nbsp";
+			$rettext .= "<input type='text' name='nazwisko' placeholder='wg nazwiska'>&nbsp;&nbsp";
+			$rettext .= "<select type='text' name='type'>";
+			$rettext .= "<option value = 'wszystkie' " . ( ($type == "wszystkie") ? "selected='selected'" : "" ) . ">wszyscy</option>";
+			$rettext .= "<option value = 'rozliczone' " . ( ($type == "rozliczone") ? "selected='selected'" : "" ) . ">tylko rozliczeni</option>";
+			$rettext .= "<option value = 'zaleglosci' " . ( ($type == "zaleglosci") ? "selected='selected'" : "" ) . ">tylko z zaległościami</option>";
+			$rettext .= "</select>&nbsp;&nbsp";
+			$rettext .= "<input type='submit' name='submit_szukaj' value='szukaj' style='background-color:#97b6c3;border:1px solid #3a7090;border-radius:5px;width:80px;height:25px;color:white;font-weight:bold;'>";
+			$rettext .= "</form>";
+			$rettext .= "</fieldset><br><br>";
+			//--------------------
+			return $rettext;
+		}
 		//----------------------------------------------------------------------------------------------------
 		#region form
 		public function form($idu,$idkl,$imie_uczniowie,$nazwisko_uczniowie,$numer_indeksu,$ido,$imie_opiekun,$nazwisko_opiekun,$telefon_opiekun,$email_opiekun)
@@ -1087,24 +1142,39 @@ if(!class_exists('uczniowie'))
 		#region get_kwota_rozliczona
 		private function get_kwota_rozliczona($idu)
 		{
-			$rettext = 0;
+			$suma_rozliczen = 0;
+			//--------------------
+			// wyciagi
 			//--------------------
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
-			if(is_array($wyciagi_list))
+			if( is_array($wyciagi_list) )
 			{
-				$suma_rozliczen = 0;
 				foreach($wyciagi_list as $idw)
 				{
 					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);
-					if(!is_nan($kwota))
+					if( !is_nan($kwota) )
 					{
 						$suma_rozliczen += $kwota;
 					}
 				}
-				$rettext = $suma_rozliczen;
 			}
 			//--------------------
-			return $rettext;
+			// gotówka
+			//--------------------
+			$wyciagi_list = $this->page_obj->iden_wyciagu->get_liste_wyciagow_dla_ucznia($idu);
+			if( is_array($wyciagi_list) )
+			{
+				foreach($wyciagi_list as $idw)
+				{
+					$kwota = $this->page_obj->wyciagi->get_kwota($idw);
+					if( !is_nan($kwota) )
+					{
+						$suma_rozliczen += $kwota;
+					}
+				}
+			}
+			//--------------------
+			return $suma_rozliczen;
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
