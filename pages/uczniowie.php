@@ -785,7 +785,6 @@ if(!class_exists('uczniowie'))
 			$wyciagi_list = $this->page_obj->wyciagi_uczniowie->get_liste_wyciagow_dla_ucznia($idu);
 			if(is_array($wyciagi_list))
 			{
-				
 				foreach($wyciagi_list as $idw)
 				{
 					$kwota = $this->page_obj->wyciagi_uczniowie->get_kwota($idw);

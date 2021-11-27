@@ -302,7 +302,7 @@ if( !class_exists("iden_wyciagu") )
 		{
 			$rettext = array();
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu = $idu and usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select idw from ".get_class($this)." where idu = $idu and usuniety = 'nie' and idw <> 0;");
 			if($wynik)
 			{
 				while(list($idw) = $wynik->fetch_row())

@@ -65,6 +65,8 @@ if(!class_exists('index_template'))
 			$rettext .= 		"<div class='button_spacing'></div>";
 			$rettext .= 		$this->button("Opiekunowie","opiekunowie,index,lista");
 			$rettext .= 		"<div class='button_spacing_x4'></div>";
+			$rettext .= 		$this->button("Pobierz archiwum bazy","backup,raw,get");
+			$rettext .= 		"<div class='button_spacing'></div>";
 			$rettext .= 		$this->button("Wyloguj","staticpages,index,logout");
 			$rettext .=			"<p style='padding:10px;'>v 1.7</p>";
 			$rettext .= 	"</div>";

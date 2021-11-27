@@ -43,6 +43,9 @@ if(!class_exists('wyciagi'))
 					case "processing":
 						$content_text .= $this->processing();
 						break;
+					case "refresh":
+						$content_text .= $this->refresh();
+						break;
 					case "assign_write":
 						$idw = isset($_GET['par1'])?$_GET['par1']:(isset($_POST['idw'])?$_POST['idw']:0);
 						$selected_uczniowie = isset($_GET['par2'])?$_GET['par2']:(isset($_POST['selected_uczniowie'])?$_POST['selected_uczniowie']:0);
@@ -144,7 +147,9 @@ if(!class_exists('wyciagi'))
 			//$rettext .= "<button title='Dodaj nowy' type='button' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},formularz\"'>Dodaj nowy</button> ";
 			$rettext .= "<button title='Wgraj plik eksportu' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},przetwarzanie\"'>Wgraj plik eksportu</button> ";
 			$rettext .= "<button title='Raport wyciągów' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},raporty\"'>Raport wyciągów</button> ";
-			$rettext .= "<button title='Processing' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button><br />";
+			$rettext .= "<button title='Processing' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing\"'>Processing</button>";
+			$rettext .= "<button title='Refresh' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},refresh\"'>Refresh</button>";
+			$rettext .= "<button title='Processing iden' type='button' class='button_add' onclick='window.location=\"".get_class($this).",{$this->page_obj->template},processing_iden_wyciagu\"'>Processing iden</button><br />";
 			//--------------------
 			$rettext .= "<br />";
 			$rettext .= "<fieldset style='border:1px solid black;width:500px;'>";
