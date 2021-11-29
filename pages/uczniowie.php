@@ -484,7 +484,7 @@ if(!class_exists('uczniowie'))
 						}
 					}
 					$rettext .= "Zapisane $idu<br />";
-					$rettext.=$this->lista(0);
+					$rettext.=$this->lista(0, "");
 				}
 				else
 				{
@@ -494,7 +494,7 @@ if(!class_exists('uczniowie'))
 			}
 			else
 			{
-				$rettext .= $this->lista(0);
+				$rettext .= $this->lista(0, "");
 			}
 			return $rettext;
 		}
@@ -510,12 +510,12 @@ if(!class_exists('uczniowie'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='tak' where idu=$idu;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista(0);
+					$rettext.=$this->lista(0, "");
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd usuwania</span><br />";
-					$rettext.=$this->lista(0);
+					$rettext.=$this->lista(0, "");
 				}
 			}
 			else
@@ -537,12 +537,12 @@ if(!class_exists('uczniowie'))
 				if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety='nie' where idu=$idu;"))
 				{
 					//$rettext .= "<span style='font-weight:bold;color:green;'>Pozycja została usunięta</span><br />";
-					$rettext.=$this->lista(0);
+					$rettext.=$this->lista(0, "");
 				}
 				else
 				{
 					$rettext .= "<span style='font-weight:bold;color:red;'>Błąd przywracania</span><br />";
-					$rettext.=$this->lista(0);
+					$rettext.=$this->lista(0, "");
 				}
 			}
 			else
