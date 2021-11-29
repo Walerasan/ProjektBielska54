@@ -191,7 +191,7 @@ if(!class_exists('blue_media'))
 				if ( $idbm > 0 )
 				{
 					//join bluemedia with uczen and oplata
-					$this->set_idbm_iduo($idbm,$iduop);
+					$this->set_idbm_iduop($idbm,$iduop);
 					//--------------------
 					$orderID = $this->get_orderID($idbm);
 					if ( $orderID != "" )
@@ -216,7 +216,7 @@ if(!class_exists('blue_media'))
 						{
 							$payment_link = $transactionContinue->getRedirectUrl(); // https://pay-accept.bm.pl/payment/continue/9IA2UISN/718GTV5E
 							$this->set_payment_link($idbm, $payment_link);
-							$this->set_payment_link($idbm, $payment_link);
+							//$this->set_payment_link($idbm, $payment_link);
 							//$rettext .= "Link: $payment_link";
 							$rettext .= "<script>window.location.href='$payment_link'</script>";
 							
@@ -371,13 +371,13 @@ if(!class_exists('blue_media'))
 			return $this->page_obj->database_obj->execute_query($zapytanie);
 		}
 		//----------------------------------------------------------------------------------------------------
-		private function set_idbm_iduo($idbm,$iduo)
+		private function set_idbm_iduop($idbm,$iduop)
 		{
-			$zapytanie = "select idbm_u_o from " . get_class($this)."_uczniowie_oplaty where idbm = $idbm and iduo = $iduo;";
+			$zapytanie = "select idbm_u_o from " . get_class($this)."_uczniowie_oplaty where idbm = $idbm and iduop = $iduop;";
 			$wynik = $this->page_obj->database_obj->get_data($zapytanie);
 			if( !$wynik )
 			{
-				$zapytanie = "insert into " . get_class($this)."_uczniowie_oplaty (idbm, iduo) values ($idbm, $iduo);";
+				$zapytanie = "insert into " . get_class($this)."_uczniowie_oplaty (idbm, iduop) values ($idbm, $iduop);";
 				$this->page_obj->database_obj->execute_query($zapytanie);
 			}
 		}
