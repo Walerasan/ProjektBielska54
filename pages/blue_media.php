@@ -6,12 +6,18 @@ if(!class_exists('blue_media'))
 	class blue_media
 	{
 		var $page_obj;
+		var $service_id;
+		var $service_key;
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
 		{
 			$this->page_obj = $page_obj;
 			$this->definicjabazy();
+			$this->service_id = "54798";
+			//$this->service_id = "903764";
+			$this->service_key = "e259982e536de5d03c293232989ed6cde15d35a822c9af73b58c6bccf0043f61";
+			//$this->service_key = "8424569ac0c061925ab883b6f34ca80ff3ebc165";
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -71,7 +77,7 @@ if(!class_exists('blue_media'))
 			//--------------------
 			$data = [ 'ServiceID' => $ServiceID, 'OrderID' => $OrderID, 'Hash' => $Hash ];
 
-			$client = new BlueMedia\Client('903764', '8424569ac0c061925ab883b6f34ca80ff3ebc165', 'sha256', '|');
+			$client = new BlueMedia\Client($this->service_id, $this->service_key, 'sha256', '|');
 			$result = $client->doConfirmationCheck($data); // true | false
 
 			if($result)
@@ -118,14 +124,13 @@ if(!class_exists('blue_media'))
 		{
 			if( $status != "" )
 			{
-				$client = new BlueMedia\Client('903764', '8424569ac0c061925ab883b6f34ca80ff3ebc165', 'sha256', '|');
+				$client = new BlueMedia\Client($this->service_id, $this->service_key, 'sha256', '|');
 
 				$result = $client->doItnIn($status);
 				$itnIn = $result->getData();
 				$transactionConfirmed = $client->checkHash($itnIn);
-				
+
 				// Jeżeli status płatności z ITN jest potwierdzony i hash jest poprawny - zakończ płatność w systemie
-				$transactionConfirmed = true;
 
 				$idbm = substr($itnIn->getOrderId(),7);
 				$this->add_itn_history($idbm, $itnIn->getPaymentStatus(), $itnIn->getPaymentStatusDetails(), $itnIn->getPaymentDate(), $itnIn->getAmount());
@@ -196,7 +201,7 @@ if(!class_exists('blue_media'))
 					$orderID = $this->get_orderID($idbm);
 					if ( $orderID != "" )
 					{
-						$client = new BlueMedia\Client('903764', '8424569ac0c061925ab883b6f34ca80ff3ebc165', 'sha256', '|');
+						$client = new BlueMedia\Client($this->service_id, $this->service_key, 'sha256', '|');
 
 						$result = $client->doTransactionInit([
 							'gatewayUrl' => 'https://pay-accept.bm.pl',

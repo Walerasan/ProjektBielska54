@@ -199,7 +199,7 @@ if(!class_exists('uczniowie'))
 
 					if($active_link)
 					{
-						$link_action = "onclick='window.location.href=\"blue_media,index,get_link, $idop, $idu\"'";
+						$link_action = "onclick='window.location.href=\"blue_media,index,get_link,$idop,$idu\"'";
 					}
 					else
 					{
