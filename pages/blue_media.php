@@ -8,6 +8,7 @@ if(!class_exists('blue_media'))
 		var $page_obj;
 		var $service_id;
 		var $service_key;
+		var $service_gateway;
 		//----------------------------------------------------------------------------------------------------
 		#region construct
 		public function __construct($page_obj)
@@ -18,6 +19,8 @@ if(!class_exists('blue_media'))
 			//$this->service_id = "903764";
 			$this->service_key = "e259982e536de5d03c293232989ed6cde15d35a822c9af73b58c6bccf0043f61";
 			//$this->service_key = "8424569ac0c061925ab883b6f34ca80ff3ebc165";
+			$this->service_gateway = "https://pay.bm.pl";
+			//$this->service_gateway = "https://pay-accept.bm.pl";
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
@@ -179,7 +182,7 @@ if(!class_exists('blue_media'))
 				return "Nieprawidłowa opłata.";
 			}
 			//--------------------
-			$description = "Płatność: $idop";
+			$description = "Platnosc: $idop";
 			$email = $this->page_obj->opiekunowie->get_email_opiekun($this->page_obj->opiekunowie->get_login_ido());
 			//--------------------
 			$amount = number_format($amount, 2, '.', '');
@@ -204,7 +207,7 @@ if(!class_exists('blue_media'))
 						$client = new BlueMedia\Client($this->service_id, $this->service_key, 'sha256', '|');
 
 						$result = $client->doTransactionInit([
-							'gatewayUrl' => 'https://pay-accept.bm.pl',
+							'gatewayUrl' => $this->service_gateway,
 							'transaction' => [
 								'orderID' => $orderID,
 								'amount' => $amount,
