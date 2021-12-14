@@ -410,6 +410,25 @@ if(!class_exists('oplaty'))
 		}
 		#endregion
 		//----------------------------------------------------------------------------------------------------
+		#region get_name
+		public function get_name_and_state($idop)
+		{
+			$rettext = array("", "");
+			//--------------------
+			$nazwa='';
+			if($idop!="" && is_numeric($idop) && $idop>0)
+			{
+				$wynik=$this->page_obj->database_obj->get_data("select nazwa, usuniety from ".get_class($this)." where idop = $idop");
+				if($wynik)
+				{
+					list($nazwa, $usuniety) = $wynik->fetch_row();
+					$rettext = array($nazwa, $usuniety);
+				}
+			}
+			return $rettext;
+		}
+		#endregion
+		//----------------------------------------------------------------------------------------------------
 		#region get_kwota
 		public function get_kwota($idop)
 		{

@@ -1259,7 +1259,14 @@ if(!class_exists('uczniowie'))
 					$oplata_counter = 1;
 					while( list($iduop, $idop, $orderID, $amount, $date) = $wynik->fetch_row() )
 					{
-						$nazwa_oplaty = $this->page_obj->oplaty->get_name($idop);
+						$nazwa_status_oplaty = $this->page_obj->oplaty->get_name_and_state($idop);
+						$nazwa_oplaty = "";
+						if ($nazwa_status_oplaty[1] == "tak") {
+							$nazwa_oplaty = "Opłata usunięta <span style='font-size:11px;'>({$nazwa_status_oplaty[0]})</span>";
+						}
+						else {
+							$nazwa_oplaty = $nazwa_status_oplaty[0];
+						}
 
 						$rettext .= "<tr>
 											<td>$oplata_counter</td>
