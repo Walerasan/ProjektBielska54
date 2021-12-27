@@ -185,7 +185,7 @@ if(!class_exists('uczniowie'))
 						}
 						else
 						{
-							$kwota = $kwota_z_r - $suma_rozliczona;
+							$kwota = round( ($kwota_z_r - $suma_rozliczona), 2);
 						}
 					}
 					if( ($suma_rozliczona - $kwota_z_r) < 0 )
