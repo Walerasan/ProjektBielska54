@@ -208,7 +208,7 @@ if(!class_exists('oplaty'))
 				$this->lp = 1;
 				foreach($idu_array as $idu)
 				{
-					$rettext .= $this->szczegoly_dla_ucznia($idu, false);
+					$rettext .= $this->szczegoly_dla_ucznia($idu, true);
 				}
 				$rettext.="</table>";
 				$rettext .= "</div>";

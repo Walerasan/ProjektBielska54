@@ -29,11 +29,8 @@ if(!class_exists('uczniowie'))
 			{
 				switch($this->page_obj->target)
 				{
-					case "lista2":
-						$content_text .= $this->uczniowie_info(true);
-						break;
 					default:
-						$content_text .= $this->uczniowie_info(false);
+						$content_text .= $this->uczniowie_info(true);
 						break;
 				}
 			}
