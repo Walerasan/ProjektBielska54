@@ -882,8 +882,8 @@ if(!class_exists('oplaty'))
 				$od = $_SESSION['oplaty_zestawienie_od'];
 			if(isset($_SESSION['oplaty_zestawienie_do']))
 				$do = $_SESSION['oplaty_zestawienie_do'];
-			if($od == "") $od = date("Y-m-d");
-			if($do == "") $do = date("Y-m-d");
+			if ( (!isset($od)) || ($od == "") ) $od = date("Y-m-d");
+			if ( (!isset($do)) || ($do == "") ) $do = date("Y-m-d");
 			//--------------------
 			$rettext .= "<p>Od: $od do: $do</p>";
 			$rettext .= "<table style = 'font-size:11px;width:100%;' cellspacing = '0' cellpadding = '5'  border = '1'>";
