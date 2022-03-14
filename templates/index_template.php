@@ -68,7 +68,7 @@ if(!class_exists('index_template'))
 			$rettext .= 		$this->button("Pobierz archiwum bazy","backup,raw,get");
 			$rettext .= 		"<div class='button_spacing'></div>";
 			$rettext .= 		$this->button("Wyloguj","staticpages,index,logout");
-			$rettext .=			"<p style='padding:10px;'>v 1.7</p>";
+			$rettext .=			"<p style='padding:10px;'>v 1.8</p>";
 			$rettext .= 	"</div>";
 			$rettext .= 	"<div style='overflow:hidden;padding:20px;'>";
 			$rettext .= 		$trescstrony;

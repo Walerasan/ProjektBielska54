@@ -460,7 +460,7 @@ if(!class_exists('wyciagi'))
 			$tablicaData = array();
 			foreach($rowsTr3Tabela as $tr){
 				$cols = $tr->getElementsByTagName('td');
-				if($cols->item(2)->nodeValue == "Przelew na rachunek")
+				if ( ($cols->item(2)->nodeValue == "Przelew na rachunek") || ($cols->item(2)->nodeValue == "Przelew Natychmiastowy na rachunek") )
 				{
 					array_push($tablicaData,$cols->item(0)->nodeValue);//zawiera daty przelewów dla Przelewu na rachunek
 				}
@@ -474,7 +474,7 @@ if(!class_exists('wyciagi'))
 						foreach($rowsTr3Tabela as $tr)
 						{
 							$cols = $tr->getElementsByTagName('td');
-							if($cols->item(2)->nodeValue == "Przelew na rachunek"){
+							if ( ($cols->item(2)->nodeValue == "Przelew na rachunek") || ($cols->item(2)->nodeValue == "Przelew Natychmiastowy na rachunek") ){
 								
 								$data = $cols->item(0)->nodeValue;//zawiera datę przelewu
 								$opis = $cols->item(3)->nodeValue;//zawiera całą komórkę wraz z opisem
@@ -740,8 +740,7 @@ if(!class_exists('wyciagi'))
 					$licznik_odczytanych_wpisow = 0;
 					foreach($xml->operations->children() as $operation)
 					{
-						if($operation->type == "Przelew na rachunek")
-						{
+						if ( ($operation->type == "Przelew na rachunek") || ($operation->type == "Przelew Natychmiastowy na rachunek") ) {
 							$rachunekNadawcy = "";
 							$NazwaNadawcy = "";
 							$AdresNadawcy = "";
