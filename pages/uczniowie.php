@@ -717,9 +717,11 @@ if(!class_exists('uczniowie'))
 					$oplata_rabat = $row[2]; //to jest w kwocie a nie w %
 					$suma_rabat += $oplata_rabat;
 					$edytuj_oplate_link = "<a href='uczniowie_oplaty,{$this->page_obj->template},formularz,$row[0]'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
-					if( $row[4] == false )
-					{
-					$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+					if( $row[4] == false ) {
+						$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+						$oplacone_online = "";
+					} else {
+						$oplacone_online = "BM";
 					}
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
@@ -728,7 +730,7 @@ if(!class_exists('uczniowie'))
 										<td>$oplata_kwota</td>
 										<td>{$row[3]}</td>
 										<td>{$row[2]}</td>
-										<td></td>
+										<td>$oplacone_online</td>
 										<td>$edytuj_oplate_link</td>
 									</tr>";
 									//	idop = $oplata_nazwa, {$row[1]} - rabat:  - {$row[3]} -  - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";

@@ -1,7 +1,7 @@
 <?php
 
 /*
- CREATE DATABASE ksiegowosc_nzpe_pl CHARACTER SET UTF8;
+ CREATE DATABASE 01356449_ksiegowosc_nzpe_pl CHARACTER SET UTF8;
  CREATE USER ksiegowy@localhost IDENTIFIED BY 'Ksiegowy20Nzpe21Pl';
  GRANT ALL PRIVILEGES ON *.* TO 'ksiegowy'@localhost IDENTIFIED BY 'Ksiegowy20Nzpe21Pl'; 
  FLUSH PRIVILEGES;
@@ -25,7 +25,7 @@ if(!class_exists('database_cfg'))
 				$this->server="localhost";
 				$this->login="root";
 				$this->password="";
-				$this->database_name="ksiegowosc_nzpe_pl";
+				$this->database_name="01356449_ksiegowosc_nzpe_pl";
 				$this->show_queries_when_error=true;
 				$this->show_queries_when_ok=true;
 			}
