@@ -269,14 +269,15 @@ if(!class_exists('oplaty'))
 					$oplata_rozliczona = $this->page_obj->blue_media->jest_oplata_rozliczona($iduop);
 					//-----
 					$kwota_m = $kwota;
-					$kwota_z_r = $kwota - $rabat_kwota;
 					$suma_rozliczona_b = $suma_rozliczona;
 					if( $oplata_rozliczona )
 					{
 						$kwota = 0;
+						$kwota_z_r = 0;
 					}
 					else
 					{
+						$kwota_z_r = $kwota - $rabat_kwota;
 						if( $suma_rozliczona > $kwota_z_r )
 						{
 							$kwota = 0;
