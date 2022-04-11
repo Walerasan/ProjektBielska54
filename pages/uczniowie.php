@@ -209,11 +209,11 @@ if(!class_exists('uczniowie'))
 						$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
 						if($pozostalo_do_zaplaty < 0)
 						{
-							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
+							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * round($pozostalo_do_zaplaty, 2));
 						}
 						else if($pozostalo_do_zaplaty > 0)
 						{
-							$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
+							$pozostalo_do_zaplaty = "niedopłata: ".round($pozostalo_do_zaplaty, 2);
 						}
 						else
 						{
@@ -296,11 +296,11 @@ if(!class_exists('uczniowie'))
 						$pozostalo_do_zaplaty = $oplaty_array[2] - $rozliczenia;
 						if($pozostalo_do_zaplaty < 0)
 						{
-							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * $pozostalo_do_zaplaty);
+							$pozostalo_do_zaplaty = "nadpłata: ".(-1 * round($pozostalo_do_zaplaty, 2));
 						}
 						else if($pozostalo_do_zaplaty > 0)
 						{
-							$pozostalo_do_zaplaty = "niedopłata: ".$pozostalo_do_zaplaty;
+							$pozostalo_do_zaplaty = "niedopłata: ".round($pozostalo_do_zaplaty, 2);
 						}
 						else
 						{
@@ -860,11 +860,11 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			if($suma_rozliczen > $suma_do_rozliczenia)
 			{
-				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
+				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".round($suma_rozliczen - $suma_do_rozliczenia, 2)."</b><br />";
 			}
 			else if($suma_rozliczen < $suma_do_rozliczenia)
 			{
-				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".round($suma_do_rozliczenia - $suma_rozliczen, 2)."</b><br />";
 			}
 			else
 			{
@@ -1093,11 +1093,11 @@ if(!class_exists('uczniowie'))
 			//----------------------------------------------------------------------------------------------------
 			if($suma_rozliczen > $suma_do_rozliczenia)
 			{
-				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".($suma_rozliczen - $suma_do_rozliczenia)."</b><br />";
+				$rettext .= "<b style='font-size:16px;'>Nadpłata: ".round($suma_rozliczen - $suma_do_rozliczenia, 2)."</b><br />";
 			}
 			else if($suma_rozliczen < $suma_do_rozliczenia)
 			{
-				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".($suma_do_rozliczenia - $suma_rozliczen)."</b><br />";
+				$rettext .= "<b style='font-size:16px;'>Niedopłata: ".round($suma_do_rozliczenia - $suma_rozliczen, 2)."</b><br />";
 			}
 			else
 			{
