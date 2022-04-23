@@ -30,6 +30,18 @@ if(!class_exists('uczniowie'))
 			{
 				switch($this->page_obj->target)
 				{
+					case "restore_wyciag":
+						$idw = isset($_GET['par1']) ? $_GET['par1'] : 0;
+						$confirm = isset($_GET['par2']) ? $_GET['par2'] : "";
+						$idu = isset($_GET['par3']) ? $_GET['par3'] : 0;
+						$content_text .= $this->restore_wyciag($idw, $confirm, $idu);
+						break;
+					case "delete_wyciag":
+						$idw = isset($_GET['par1']) ? $_GET['par1'] : 0;
+						$confirm = isset($_GET['par2']) ? $_GET['par2'] : "";
+						$idu = isset($_GET['par3']) ? $_GET['par3'] : 0;
+						$content_text .= $this->delete_wyciag($idw, $confirm, $idu);
+						break;
 					case "usun_konto_bankowe":
 						$idukb = isset($_GET['par1']) ? $_GET['par1'] : 0;
 						$confirm = isset($_GET['par2']) ? $_GET['par2'] : "";
@@ -793,18 +805,29 @@ if(!class_exists('uczniowie'))
 					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
 					$data = $this->page_obj->wyciagi->get_date($idw);
 					$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					$is_del = $this->page_obj->wyciagi->get_usuniety($idw) == "tak";
 					if(!is_nan($kwota))
 					{
 						$suma_rozliczen += $kwota;
 					}
-					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
+
+					if ($is_del) {
+						$delete_link = "";
+						$edytuj_oplate_link = "<a href='javascript:potwierdzenie(\"Czy napewno przywrócić?\",\"".get_class($this).",{$this->page_obj->template},restore_wyciag,$idw,yes,$idu\",window)'><img src='./media/ikony/restore.png' alt='' style='height:30px;'/></a>";
+						$strike_tag_start2 = "<s>";
+						$strike_tag_end2 = "</s>";
+					} else {
+						$edytuj_oplate_link = "<a href='javascript:potwierdzenie(\"Czy napewno usunąć?\",\"".get_class($this).",{$this->page_obj->template},delete_wyciag,$idw,yes,$idu\",window)'><img src='./media/ikony/del.png' alt='' style='height:30px;'/></a>";
+						$strike_tag_start2 = "";
+						$strike_tag_end2 = "";
+					}
 					
 					$rettext .= "<tr>
-										<td>$strike_tag_start $oplata_counter ($idw) $strike_tag_end</td>
-										<td>$strike_tag_start $tytul $strike_tag_end</td>
-										<td>$strike_tag_start $nadawca $strike_tag_end</td>
-										<td>$strike_tag_start $data $strike_tag_end</td>
-										<td>$strike_tag_start $kwota $strike_tag_end</td>
+										<td>$strike_tag_start $strike_tag_start2 $oplata_counter ($idw) $strike_tag_end2 $strike_tag_end</td>
+										<td>$strike_tag_start $strike_tag_start2 $tytul $strike_tag_end2 $strike_tag_end</td>
+										<td>$strike_tag_start $strike_tag_start2 $nadawca $strike_tag_end2 $strike_tag_end</td>
+										<td>$strike_tag_start $strike_tag_start2 $data $strike_tag_end2 $strike_tag_end</td>
+										<td>$strike_tag_start $strike_tag_start2 $kwota $strike_tag_end2 $strike_tag_end</td>
 										<td></td>
 										<td>". ( (!$is_deleted) ? $edytuj_oplate_link : "" ) ."</td>
 									</tr>";
@@ -966,6 +989,7 @@ if(!class_exists('uczniowie'))
 						<td style='width:100px;'>kwota</td>
 						<td>rabat nazwa</td>
 						<td style='width:100px;'>rabat kwota</td>
+						<td style='width:18px;'></td>
 					</tr>";
 			$oplaty_list = $this->page_obj->uczniowie_oplaty->get_liste_oplat_dla_ucznia($idu); // [iduop, idop, rabat_kwota, rabat_nazwa, zaplacone_online, comment]
 			if(is_array($oplaty_list))
@@ -985,6 +1009,9 @@ if(!class_exists('uczniowie'))
 					if( $row[4] == false )
 					{
 						$suma_do_rozliczenia += ($oplata_kwota - $oplata_rabat);
+						$oplacone_online = "";
+					} else {
+						$oplacone_online = "BM";
 					}
 					$rettext .= "<tr>
 										<td>$oplata_counter</td>
@@ -993,6 +1020,7 @@ if(!class_exists('uczniowie'))
 										<td>$oplata_kwota</td>
 										<td>{$row[3]}</td>
 										<td>{$row[2]}</td>
+										<td>$oplacone_online</td>
 									</tr>";
 									//	idop = $oplata_nazwa, {$row[1]} - rabat:  - {$row[3]} -  - $oplata_rabat = ".(($oplata_kwota - $oplata_rabat))." $edytuj_oplate_link<br />";
 					$oplata_counter++;
@@ -1034,17 +1062,27 @@ if(!class_exists('uczniowie'))
 					$tytul = $this->page_obj->wyciagi->get_tytul($idw);
 					$data = $this->page_obj->wyciagi->get_date($idw);
 					$nadawca = $this->page_obj->wyciagi->get_nadawce($idw);
+					$is_del = $this->page_obj->wyciagi->get_usuniety($idw) == "tak";
 					if(!is_nan($kwota))
 					{
 						$suma_rozliczen += $kwota;
 					}
+
+					if ($is_del) {
+						$strike_tag_start2 = "<s>";
+						$strike_tag_end2 = "</s>";
+					} else {
+						$strike_tag_start2 = "";
+						$strike_tag_end2 = "";
+					}
+
 					$edytuj_oplate_link = "<a href='#'><img src='./media/ikony/edit.png' alt='' style='height:30px;'/></a>";
 					$rettext .= "<tr>
-										<td>$oplata_counter</td>
-										<td>$tytul</td>
-										<td>$nadawca</td>
-										<td>$data</td>
-										<td>$kwota</td>
+										<td>$strike_tag_start2 $oplata_counter $strike_tag_end2</td>
+										<td>$strike_tag_start2 $tytul $strike_tag_end2</td>
+										<td>$strike_tag_start2 $nadawca $strike_tag_end2</td>
+										<td>$strike_tag_start2 $data $strike_tag_end2</td>
+										<td>$strike_tag_start2 $kwota $strike_tag_end2</td>
 									</tr>";
 					$oplata_counter++;
 				}
@@ -1329,6 +1367,16 @@ if(!class_exists('uczniowie'))
 			}
 			//--------------------
 			return $result;
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function restore_wyciag($idw, $confirm, $idu) {
+			$this->page_obj->wyciagi->set_undelete($idw,$confirm);
+			return $this->szczegoly($idu);
+		}
+		//----------------------------------------------------------------------------------------------------
+		private function delete_wyciag($idw, $confirm, $idu) {
+			$this->page_obj->wyciagi->set_delete($idw,$confirm);
+			return $this->szczegoly($idu);
 		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy

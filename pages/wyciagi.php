@@ -1488,7 +1488,7 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext = "";
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select tytul from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select tytul from ".get_class($this)." where idw = $idw;");
 			if($wynik)
 			{
 				list($rettext)=$wynik->fetch_row();
@@ -1503,7 +1503,7 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext = "";
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select dataoperacji from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select dataoperacji from ".get_class($this)." where idw = $idw;");
 			if($wynik)
 			{
 				list($rettext) = $wynik->fetch_row();
@@ -1518,7 +1518,7 @@ if(!class_exists('wyciagi'))
 		{
 			$rettext = "";
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select nazwanadawcy from ".get_class($this)." where idw = $idw and usuniety = 'nie';");
+			$wynik = $this->page_obj->database_obj->get_data("select nazwanadawcy from ".get_class($this)." where idw = $idw;");
 			if($wynik)
 			{
 				list($rettext)=$wynik->fetch_row();
@@ -1656,6 +1656,39 @@ if(!class_exists('wyciagi'))
 			}
 			//--------------------
 			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function get_usuniety($idw) {
+			$rettext = "";
+			//--------------------
+			$wynik = $this->page_obj->database_obj->get_data("select usuniety from ".get_class($this)." where idw = $idw;");
+			if($wynik) {
+				list($rettext) = $wynik->fetch_row();
+			}
+			//--------------------
+			return $rettext;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function set_delete($idw,$confirm) {
+			if($confirm == "yes") {
+				if ( isset($idw) && is_numeric($idw) && ($idw > 0) ) {
+					if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'tak' where idw = $idw;")) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		//----------------------------------------------------------------------------------------------------
+		public function set_undelete($idw,$confirm) {
+			if($confirm == "yes") {
+				if ( isset($idw) && is_numeric($idw) && ($idw > 0) ) {
+					if($this->page_obj->database_obj->execute_query("update ".get_class($this)." set usuniety = 'nie' where idw = $idw;")) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 		//----------------------------------------------------------------------------------------------------
 		#region definicjabazy

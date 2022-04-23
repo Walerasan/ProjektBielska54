@@ -163,7 +163,8 @@ if(!class_exists('wyciagi_uczniowie'))
 		{
 			$rettext = array();
 			//--------------------
-			$wynik = $this->page_obj->database_obj->get_data("select wu.idw, wu.status from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie' and status = 'auto';");
+			//$wynik = $this->page_obj->database_obj->get_data("select wu.idw, wu.status from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and w.usuniety = 'nie' and status = 'auto';");
+			$wynik = $this->page_obj->database_obj->get_data("select wu.idw, wu.status from ".get_class($this)." wu, wyciagi w where wu.idw = w.idw and wu.idu = $idu and wu.usuniety = 'nie' and status = 'auto';");
 			if($wynik)
 			{
 				while( list($idw, $status) = $wynik->fetch_row() )
